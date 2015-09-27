@@ -19,8 +19,8 @@
     <feature name="${project.artifactId}" version="${project.version}"
              description="${project.description}">
         <feature>onos-api</feature>
-        <bundle>mvn:com.sun.jersey/jersey-client/${jersey.version}</bundle>
-        <bundle>mvn:io.netty/netty/${netty.version}</bundle>
+        <bundle>mvn:com.sun.jersey/jersey-client/1.19</bundle>
+        <bundle>mvn:io.netty/netty/3.9.2.Final</bundle>
         <bundle>mvn:${project.groupId}/onos-restconf-provider-device/${project.version}</bundle>
     </feature>
 </features>
