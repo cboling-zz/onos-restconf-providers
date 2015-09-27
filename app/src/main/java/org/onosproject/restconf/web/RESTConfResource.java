@@ -38,7 +38,7 @@ public class RESTConfResource extends AbstractWebResource {
     private final Logger log = getLogger(getClass());
 
     /**
-     * Create a new vWLAN Access Point
+     * Create a new RESTCOnf Device
      *
      * @param stream input stream
      * @return response to the request

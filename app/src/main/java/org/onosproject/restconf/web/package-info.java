@@ -15,6 +15,6 @@
  */
 
 /**
- * vWLAN application for handling mobile hosts in an ADTRAN Bluesocket environment
+ * RESTConf southbound provider
  */
 package org.onosproject.restconf.web;

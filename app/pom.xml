@@ -27,9 +27,20 @@
     </parent>
 
     <artifactId>onos-restconf</artifactId>
-    <packaging>pom</packaging>
+    <packaging>bundle</packaging>
 
     <description>RESTConf protocol southbound provider</description>
+
+    <properties>
+        <onos.app.name>org.onosproject.restconf</onos.app.name>
+        <onos.app.origin>Boling Consulting Solutions, bcsw.net</onos.app.origin>
+
+        <web.context>/onos/restconf</web.context>
+        <api.version>1.0.0</api.version>
+        <api.title>ONOS RESTConf REST API</api.title>
+        <api.description>APIs for interacting with the RESTConf southbound provider.</api.description>
+        <api.package>org.onosproject.restconf</api.package>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -40,7 +51,23 @@
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-client</artifactId>
-            <version>1.19</version>
+            <version>${jersey.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.onosproject</groupId>
+            <artifactId>onos-api</artifactId>
+            <version>${onos.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.onosproject</groupId>
+            <artifactId>onos-cli</artifactId>
+            <version>${onos.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.onosproject</groupId>
+            <artifactId>onlab-osgi</artifactId>
+            <version>${onos.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.felix</groupId>

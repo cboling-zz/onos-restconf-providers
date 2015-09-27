@@ -22,22 +22,15 @@
     <groupId>org.onosproject</groupId>
     <artifactId>onos-restconf-providers</artifactId>
     <version>1.4.0-SNAPSHOT</version>
-    <!--<packaging>bundle</packaging>-->
     <packaging>pom</packaging>
+
     <properties>
         <onos.version>1.4.0-SNAPSHOT</onos.version>
         <karaf.version>3.0.3</karaf.version>
+
+        <!-- NOTE: Must use fixed version numbers in features.xml files for Jersey/Netty -->
         <jersey.version>1.19</jersey.version>
         <netty.version>3.9.2.Final</netty.version>
-
-        <onos.app.name>org.onosproject.restconf</onos.app.name>
-        <onos.app.origin>Boling Consulting Solutions, bcsw.net</onos.app.origin>
-
-        <web.context>/onos/restconf</web.context>
-        <api.version>1.0.0</api.version>
-        <api.title>ONOS RESTConf REST API</api.title>
-        <api.description>APIs for interacting with the RESTConf southbound provider.</api.description>
-        <api.package>org.onosproject.restconf</api.package>
     </properties>
 
     <description>ONOS RESTConf protocol adapters</description>

@@ -40,7 +40,7 @@ public class HelloWorldCommand extends AbstractShellCommand {
     private String devName = null;
 
     /**
-     * Execute the vwlan CLI command
+     * Execute the RESTConf CLI command
      */
     @Override
     protected void execute() {
