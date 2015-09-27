@@ -15,6 +15,6 @@
  */
 
 /**
- * Provider that uses Netconf capability request as a means of infrastructure device discovery.
+ * vWLAN application for handling mobile hosts in an ADTRAN Bluesocket environment
  */
-package org.onosproject.provider.restconf.device.impl;
+package org.onosproject.restconf.web;

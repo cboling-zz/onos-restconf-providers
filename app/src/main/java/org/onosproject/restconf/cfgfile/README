@@ -1,0 +1,37 @@
+###########################################################
+# cfgfile - Configuration File classes and interfaces
+###########################################################
+
+This directory contains interfaces and classes concerned with reading/monitoring
+JSON configuration files.
+
+These files can be used to seed RESTConf devices into a given ONOS controller
+cluster and is most useful for testing and quick demo purposes.
+
+A real-life 'deployed, application would use the REST interface and/or CLI
+too createe and manage the devices.
+
+----------------------------------------------------------
+On startup, the suggested sequence of events should be:
+
+1. Restore information from the persistent storage location (may be empty)
+
+2. Read in any configuration file.  Using a unique identifier for each item
+   being restored (say MAC address - not decided yet), update any existing
+   data (perhaps from step 1) with this data.
+
+   For this purposes, it is suggested that most device information in a
+   configuration file be empty for an actual deployment.
+
+3. Register any appropriate device listeners.
+
+   Question: does anyone see a need for RESTConf to hosts at this point?
+
+4. Walk existing topology and look for any new access points interest. While
+   some device flows may be controlled by other southbound protocols, RESTConf
+   supports more than just flow provisioning.
+
+   During this period, device events may occur.  The fun here will be
+   experimenting and figuring out the best thing to do.
+
+5. We are initialized.  Treat device events appropriately.
