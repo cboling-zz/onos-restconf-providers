@@ -18,11 +18,10 @@
     <repository>mvn:${project.groupId}/${project.artifactId}/${project.version}/xml/features</repository>
     <feature name="${project.artifactId}" version="${project.version}"
              description="${project.description}">
-        <feature>onos-api</feature>
-        <feature>onos-thirdparty-web</feature>
-        <bundle>mvn:com.sun.jersey/jersey-client/1.19</bundle>
-        <bundle>mvn:io.netty/netty/3.9.2.Final</bundle>
-        <bundle>mvn:${project.groupId}/onos-restconf-provider-device/${project.version}</bundle>
         <bundle>mvn:${project.groupId}/${project.artifactId}/${project.version}</bundle>
+        <bundle>mvn:${project.groupId}/onos-restconf-provider-device/${project.version}</bundle>
+        <feature>onos-api</feature>
+        <feature>onos-cli</feature>
+        <feature>onos-thirdparty-web</feature>
     </feature>
 </features>

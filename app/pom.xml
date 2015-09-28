@@ -29,18 +29,18 @@
     <artifactId>onos-restconf</artifactId>
     <packaging>bundle</packaging>
 
-    <description>RESTConf protocol southbound provider</description>
-
     <properties>
         <onos.app.name>org.onosproject.restconf</onos.app.name>
         <onos.app.origin>Boling Consulting Solutions, bcsw.net</onos.app.origin>
 
-        <web.context>/onos/restconf</web.context>
+        <web.context>/onos/v1/restconf</web.context>
+
         <api.version>1.0.0</api.version>
         <api.title>ONOS RESTConf REST API</api.title>
         <api.description>APIs for interacting with the RESTConf southbound provider.</api.description>
         <api.package>org.onosproject.restconf</api.package>
     </properties>
+    <description>RESTConf protocol southbound provider</description>
 
     <dependencies>
         <dependency>
@@ -66,6 +66,11 @@
         </dependency>
         <dependency>
             <groupId>org.onosproject</groupId>
+            <artifactId>onlab-thirdparty</artifactId>
+            <version>${onos.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.onosproject</groupId>
             <artifactId>onlab-osgi</artifactId>
             <version>${onos.version}</version>
         </dependency>
@@ -82,8 +87,8 @@
         </dependency>
         <dependency>
             <groupId>org.onosproject</groupId>
-            <artifactId>onlab-rest</artifactId>
-            <version>${onos.version}</version>
+            <artifactId>onos-rest</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.ws.rs</groupId>
@@ -95,6 +100,35 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.5.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-scr-plugin</artifactId>
+                <version>1.20.0</version>
+                <executions>
+                    <execution>
+                        <id>generate-scr-srcdescriptor</id>
+                        <goals>
+                            <goal>scr</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <supportedProjectTypes>
+                        <supportedProjectType>bundle</supportedProjectType>
+                        <supportedProjectType>war</supportedProjectType>
+                    </supportedProjectTypes>
+                </configuration>
+            </plugin>
+            <!--
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
@@ -129,34 +163,7 @@
                     </instructions>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.5.1</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-scr-plugin</artifactId>
-                <version>1.20.0</version>
-                <executions>
-                    <execution>
-                        <id>generate-scr-srcdescriptor</id>
-                        <goals>
-                            <goal>scr</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <supportedProjectTypes>
-                        <supportedProjectType>bundle</supportedProjectType>
-                        <supportedProjectType>war</supportedProjectType>
-                    </supportedProjectTypes>
-                </configuration>
-            </plugin>
+            -->
             <plugin>
                 <groupId>org.onosproject</groupId>
                 <artifactId>onos-maven-plugin</artifactId>
