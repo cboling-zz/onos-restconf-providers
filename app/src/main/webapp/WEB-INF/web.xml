@@ -15,6 +15,7 @@
   ~ limitations under the License.
   -->
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
          xmlns="http://java.sun.com/xml/ns/javaee"
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
          id="ONOS" version="2.5">
@@ -29,7 +30,7 @@
         </init-param>
         <init-param>
             <param-name>com.sun.jersey.config.property.classnames</param-name>
-            <param-value>org.onosproject.provider.restconf.device.impl.RESTConfResource</param-value>
+            <param-value>org.onosproject.restconf.web.RESTConfResource</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
