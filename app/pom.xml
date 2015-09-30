@@ -95,7 +95,6 @@
         </dependency>
     </dependencies>
 
-
     <build>
         <plugins>
             <plugin>
@@ -117,7 +116,7 @@
                             javax.ws.rs,
                             javax.ws.rs.core,
                             com.sun.jersey.api.core,
-                            com.sun.jersey.api.client,
+                            <!--com.sun.jersey.api.client,-->
                             com.sun.jersey.spi.container.servlet,
                             com.sun.jersey.server.impl.container.servlet,
                             com.fasterxml.jackson.databind,

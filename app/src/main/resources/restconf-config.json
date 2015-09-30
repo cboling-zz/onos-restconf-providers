@@ -1,12 +1,43 @@
 {
+  "event-interval": 5,
+  "connection-timeout": 30000,
+  "worker-threads": 2,
   "devices": [
     {
       "name": "node1",
-      "url": "http://192.168.0.1/restconf"
+      "address": "192.168.0.1",
+      "ports": [
+        443,
+        80
+      ],
+      "api-root": "/.well-known/host-meta",
+      "url": "/restconf",
+      "username": "myName",
+      "password": "secret",
+      "media-types": [
+        "xml",
+        "json"
+      ],
+      "X509v3Path": "../config/node1.pem"
     },
     {
       "name": "node1",
-      "url": "https://192.168.0.2/restconf"
+      "address": "192.168.0.2",
+      "ports": [
+        80
+      ],
+      "api-root": "/.well-known/host-meta",
+      "url": "/restconf",
+      "username": "",
+      "password": "",
+      "media-types": [
+        "json",
+        "xml"
+      ]
+    },
+    {
+      "name": "node1",
+      "address": "192.168.0.3"
     }
   ]
 }
