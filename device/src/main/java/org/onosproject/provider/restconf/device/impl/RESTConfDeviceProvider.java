@@ -38,27 +38,31 @@ import static org.onlab.util.Tools.groupedThreads;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
- * Provider which will try to fetch the details of RESTCONF devices from the core
+ * Provider which will try to fetch the details of RESTConf devices from the core
  * and run a capability discovery on each of the device.
  */
 @Component(immediate = true)
 public class RESTConfDeviceProvider extends AbstractProvider
         implements DeviceProvider {
 
-    // Delay between events in ms.
-    private static final int EVENTINTERVAL = 5;
-    private static final String SCHEME = "restconf";
     private final Logger log = getLogger(RESTConfDeviceProvider.class);
+
     protected Map<DeviceId, RESTConfDevice> restconfDeviceMap = new ConcurrentHashMap<DeviceId, RESTConfDevice>();
+
     @Reference(cardinality = ReferenceCardinality.MANDATORY_UNARY)
     protected DeviceProviderRegistry providerRegistry;
+
     @Reference(cardinality = ReferenceCardinality.MANDATORY_UNARY)
     protected DeviceService deviceService;
+
     @Reference(cardinality = ReferenceCardinality.MANDATORY_UNARY)
     protected ClusterService clusterService;
+
     @Reference(cardinality = ReferenceCardinality.MANDATORY_UNARY)
     protected ComponentConfigService cfgService;
+
     private DeviceProviderService providerService;
+
     // TODO More threads for pool, configurable?
     // TODO Search service (ip scan)?
     private ExecutorService deviceBuilder = Executors
@@ -78,7 +82,7 @@ public class RESTConfDeviceProvider extends AbstractProvider
 
     @Activate
     public void activate(ComponentContext context) {
-//        cfgService.registerProperties(getClass());
+        cfgService.registerProperties(getClass());
 //        providerService = providerRegistry.register(this);
 //        modified(context);
         log.info("Started");
@@ -86,7 +90,7 @@ public class RESTConfDeviceProvider extends AbstractProvider
 
     @Deactivate
     public void deactivate(ComponentContext context) {
-//        cfgService.unregisterProperties(getClass(), false);
+        cfgService.unregisterProperties(getClass(), false);
 //        try {
 //            for (Entry<DeviceId, RESTConfDevice> deviceEntry : restconfDeviceMap
 //                    .entrySet()) {
@@ -106,16 +110,8 @@ public class RESTConfDeviceProvider extends AbstractProvider
 
     @Modified
     public void modified(ComponentContext context) {
-//        if (context == null) {
-//            log.info("No configuration file");
-//            return;
-//        }
-//        Dictionary<?, ?> properties = context.getProperties();
-//        String deviceCfgValue = get(properties, "devConfigs");
-//        log.info("Settings: devConfigs={}", deviceCfgValue);
-//        if (!isNullOrEmpty(deviceCfgValue)) {
-//            addOrRemoveDevicesConfig(deviceCfgValue);
-//        }
+        log.info("modified: not supported");
+        return;
     }
 
     @Override

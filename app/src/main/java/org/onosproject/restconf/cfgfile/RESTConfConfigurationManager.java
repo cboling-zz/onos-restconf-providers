@@ -89,11 +89,11 @@ public class RESTConfConfigurationManager implements RESTConfConfigurationServic
             log.info("Loading config: {}", configFile.getAbsolutePath());
             RESTConfConfiguration config = mapper.readValue(configFile, RESTConfConfiguration.class);
 
-            numThreads = config.getNumberOfWorkerThreads();
+            numThreads = config.getNumThreads();
             eventInterval = config.getEventInterval();
             connectionTimeout = config.getConnectionTimeout();
-
             deviceEntries = config.getDevices();
+
         } catch (FileNotFoundException e) {
             log.warn("RESTConfConfiguration file not found: {}", configFileName);
         } catch (IOException e) {

@@ -34,10 +34,10 @@ public class RESTConfDeviceEntry {
     private List<Integer> portNumbers;
     private String apiRoot;
     private String url;
-    private String username;
+    private String userName;
     private String password;
     private List<String> mediaTypes;
-    private String x503File;
+    private String x509Path;
 
     /**
      * s
@@ -64,17 +64,17 @@ public class RESTConfDeviceEntry {
         portNumbers = ports;
         apiRoot = root;
         this.url = url;
-        username = user;
+        userName = user;
         password = pwd;
         mediaTypes = typeList;
-        x503File = certificateFile;
+        x509Path = certificateFile;
     }
 
     public String getHostName() {
         return hostName;
     }
 
-    @JsonProperty("hostname")
+    @JsonProperty("hostName")
     public void setHostName(String name) {
         hostName = name;
     }
@@ -83,7 +83,7 @@ public class RESTConfDeviceEntry {
         return ipAddress;
     }
 
-    @JsonProperty("address")
+    @JsonProperty("ipAddress")
     public void setIpAddress(IpAddress addr) {
         ipAddress = addr;
     }
@@ -92,7 +92,7 @@ public class RESTConfDeviceEntry {
         return portNumbers;
     }
 
-    @JsonProperty("ports")
+    @JsonProperty("portNumbers")
     public void setPortNumbers(List<Integer> name) {
         portNumbers = name;
     }
@@ -101,7 +101,7 @@ public class RESTConfDeviceEntry {
         return apiRoot;
     }
 
-    @JsonProperty("api-root")
+    @JsonProperty("apiRoot")
     public void setApiRoot(String name) {
         apiRoot = name;
     }
@@ -116,12 +116,12 @@ public class RESTConfDeviceEntry {
     }
 
     public String getUserName() {
-        return username;
+        return userName;
     }
 
-    @JsonProperty("username")
+    @JsonProperty("userName")
     public void setUserName(String name) {
-        username = name;
+        userName = name;
     }
 
     public String getPassword() {
@@ -137,17 +137,17 @@ public class RESTConfDeviceEntry {
         return mediaTypes;
     }
 
-    @JsonProperty("media-types")
+    @JsonProperty("mediaTypes")
     public void setMediaTypes(List<String> name) {
         mediaTypes = name;
     }
 
-    public String getX503File() {
-        return x503File;
+    public String getX509File() {
+        return x509Path;
     }
 
-    @JsonProperty("password")
-    public void setX503File(String path) {
-        x503File = path;
+    @JsonProperty("x509Path")
+    public void setX509File(String path) {
+        x509Path = path;
     }
 }

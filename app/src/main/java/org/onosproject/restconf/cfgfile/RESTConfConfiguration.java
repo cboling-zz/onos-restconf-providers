@@ -54,24 +54,24 @@ public class RESTConfConfiguration {
      * Default constructor.
      */
     private RESTConfConfiguration() {
-        numThreads = DEFAULT_WORKER_THREADS;
-        connectionTimeout = DEFAULT_CONN_TIMEOUT;
         eventInterval = DEFAULT_EVENT_INTERVAL;
+        connectionTimeout = DEFAULT_CONN_TIMEOUT;
+        numThreads = DEFAULT_WORKER_THREADS;
         devices = new ArrayList<>();
     }
 
     @JsonCreator
-    public RESTConfConfiguration(@JsonProperty("event-interval")
+    public RESTConfConfiguration(@JsonProperty("eventInterval")
                                  Integer interval,
-                                 @JsonProperty("connection-timeout")
+                                 @JsonProperty("connectionTimeout")
                                  Integer timeout,
-                                 @JsonProperty("worker-threads")
+                                 @JsonProperty("numThreads")
                                  Integer workers,
                                  @JsonProperty("devices")
                                  List<RESTConfDeviceEntry> devs) {
+        eventInterval = interval;
         connectionTimeout = timeout;
         numThreads = workers;
-        eventInterval = interval;
         devices = devs;
     }
 
@@ -80,7 +80,7 @@ public class RESTConfConfiguration {
      *
      * @return Number of threads
      */
-    public int getNumberOfWorkerThreads() {
+    public int getNumThreads() {
         return numThreads;
     }
 

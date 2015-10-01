@@ -29,6 +29,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class RESTConfDevice {
     // TODO: Store these in distributed store (eventually consistent) and provide ability to change
     //       via CLI, REST, and JSON Configuration File
+    // TODO: Move defaults to 'app.configuration'
+
     private static final int DEFAULT_URL_UPDATE_TIMEOUT = (24 * 3600 * 1000); // One Day
     private static final int DEFAULT_DEVICE_UPDATE_TIMEOUT = (15 * 60 * 1000);   // Fifteen minutes
     private static final int DEFAULT_TIME_SKEW_PERCENT = 5;                  // 5% skew
