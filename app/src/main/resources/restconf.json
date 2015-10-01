@@ -4,7 +4,7 @@
   "worker-threads": 2,
   "devices": [
     {
-      "name": "node1",
+      "hostname": "node1",
       "address": "192.168.0.1",
       "ports": [
         443,
@@ -18,10 +18,10 @@
         "xml",
         "json"
       ],
-      "X509v3Path": "../config/node1.pem"
+      "x509Path": "../config/node1.pem"
     },
     {
-      "name": "node1",
+      "hostname": "node1",
       "address": "192.168.0.2",
       "ports": [
         80
@@ -36,7 +36,7 @@
       ]
     },
     {
-      "name": "node1",
+      "hostname": "node3",
       "address": "192.168.0.3"
     }
   ]
