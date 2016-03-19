@@ -1,5 +1,13 @@
 # RESTConf Southbound Provider for ONOS
 
+**NOTE**: Currently this code is being restructured to fit the current device model
+and directory structure of the ONOS master GIT tip (post-falcon ... early goldeneye release).
+
+Once this conversion is complete and a clean build is available, this notice will be
+removed and the documentation updated below accordingly.
+
+-------------------------------------------
+
 This project provides a southbound device provider via RESTConf for ONOS.
 
 The planned design for this module is to leverage the work done by
