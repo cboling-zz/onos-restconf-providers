@@ -62,13 +62,13 @@ public class RESTConfConfiguration {
 
     @JsonCreator
     public RESTConfConfiguration(@JsonProperty("eventInterval")
-                                 Integer interval,
+                                         Integer interval,
                                  @JsonProperty("connectionTimeout")
-                                 Integer timeout,
+                                         Integer timeout,
                                  @JsonProperty("numThreads")
-                                 Integer workers,
+                                         Integer workers,
                                  @JsonProperty("devices")
-                                 List<RESTConfDeviceEntry> devs) {
+                                         List<RESTConfDeviceEntry> devs) {
         eventInterval = interval;
         connectionTimeout = timeout;
         numThreads = workers;

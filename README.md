@@ -21,7 +21,8 @@ Currently, only the skeleton of each portion of the RESTConf provider is
 available, so please check back later for updates.
 
 -----------------------------------------------------------------------------
-The project currently is written to be built out-of-tree.  To build and
+The project currently is written to be built out-of-tree but is structured in such
+a way as to easily overlay (with a bit of work) into the main ONOS source tree.  To build and
 install, setup the appropriate cell file and execute.
 
     # Local virtualbox RESTConf test with mininet 

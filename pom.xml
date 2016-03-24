@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright 2015 Boling Consulting Solutions, bcsw.net
+  ~ Copyright 2015 - 2016 Boling Consulting Solutions, bcsw.net
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -19,13 +19,29 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <prerequisites>
+        <maven>3.0.1</maven>
+    </prerequisites>
+
     <groupId>org.onosproject</groupId>
+
+    <!--NOTE: The next is similar to what is in ./providers/restconf/pom.xml but-->
+    <!--      is just missing the 's' at the end.  When built in tree, this is the -->
+    <!--      base onos pom.xml and the artifactId would be just 'onos' -->
+
     <artifactId>onos-restconf-provider</artifactId>
     <version>1.6.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <description>ONOS RESTConf protocol adapter</description>
     <url>http://bcsw.net</url>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -36,13 +52,19 @@
         <!-- NOTE: Must use fixed version numbers in features.xml files for Jersey/Netty -->
         <jersey.version>1.19</jersey.version>
         <jackson.version>2.7.0</jackson.version>
+        <slf4j.version>1.7.13</slf4j.version>
         <felix.version>1.9.12</felix.version>
         <netty.version>3.9.2.Final</netty.version>
         <netty4.version>4.0.33.Final</netty4.version>
+        <junit.version>4.12</junit.version>
         <!-- TODO: replace with final release version when it is out -->
     </properties>
 
     <modules>
+        <module>providers</module>
+
+
+
         <module>device</module>
         <module>app</module>
     </modules>
@@ -72,8 +94,35 @@
         </dependency>
         <dependency>
             <groupId>org.onosproject</groupId>
+            <artifactId>onos-api</artifactId>
+            <version>${onos.version}</version>
+            <scope>test</scope>
+            <classifier>tests</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.onosproject</groupId>
             <artifactId>onlab-osgi</artifactId>
             <version>${onos.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-core</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jdk14</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -156,4 +205,6 @@
             </plugin>
         </plugins>
     </build>
+
+    <!--TODO: Add plugin support for checkstyle (see base ONOS pom.xml)-->
 </project>

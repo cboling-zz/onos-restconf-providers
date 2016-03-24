@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Open Networking Laboratory
+ * Copyright 2015 - 2016 Boling Consulting Solutions, bcsw.net
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,6 @@
  */
 
 /**
- * Provider that uses Netconf capability request as a means of infrastructure device discovery.
+ * Provider that uses RESTCONF capability request as a means of infrastructure device discovery.
  */
 package org.onosproject.provider.restconf.device.impl;
