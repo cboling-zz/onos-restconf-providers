@@ -41,7 +41,7 @@ install, setup the appropriate cell file and execute.
 
 use install! or reinstall! to install or re-install and activate with one command:
 
-    $ onos-app $OC1 install app/target/onos-restconf-providers-1.4.0-SNAPSHOT.oar
+    $ onos-app $OC1 install app/target/onos-restconf-provider-1.6.0-SNAPSHOT.oar
     $ onos-app $OC1 activate onos-restconf-provider
 
 -----------------------------------------------------------------------------

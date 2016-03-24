@@ -20,23 +20,26 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.onosproject</groupId>
-    <artifactId>onos-restconf-providers</artifactId>
-    <version>1.4.0-SNAPSHOT</version>
+    <artifactId>onos-restconf-provider</artifactId>
+    <version>1.6.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <description>ONOS RESTConf protocol adapters</description>
+    <description>ONOS RESTConf protocol adapter</description>
     <url>http://bcsw.net</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <onos.version>1.4.0-SNAPSHOT</onos.version>
-        <karaf.version>3.0.3</karaf.version>
-
+        <onos.version>1.6.0-SNAPSHOT</onos.version>
+        <osgi.version>4.3.1</osgi.version>
+        <karaf.version>3.0.5</karaf.version>
         <!-- NOTE: Must use fixed version numbers in features.xml files for Jersey/Netty -->
         <jersey.version>1.19</jersey.version>
+        <jackson.version>2.7.0</jackson.version>
+        <felix.version>1.9.12</felix.version>
         <netty.version>3.9.2.Final</netty.version>
-        <netty4.version>4.0.23.Final</netty4.version>
+        <netty4.version>4.0.33.Final</netty4.version>
+        <!-- TODO: replace with final release version when it is out -->
     </properties>
 
     <modules>
@@ -48,13 +51,13 @@
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
-            <version>4.3.1</version>
+            <version>${osgi.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.scr.annotations</artifactId>
-            <version>1.9.8</version>
+            <version>${felix.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
