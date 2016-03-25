@@ -122,17 +122,17 @@ public class RestconfDeviceProvider extends AbstractProvider
         appId = coreService.registerApplication(APP_NAME);
         cfgService.registerConfigFactory(factory);
         cfgService.addListener(cfgLister);
-        controller.addDeviceListener(innerNodeListener);
+        // TODO: controller.addDeviceListener(innerNodeListener);
         // TODO: executor.execute(RestconfDeviceProvider.this::connectDevices);
         log.info("Started");
     }
 
     @Deactivate
     public void deactivate() {
-        controller.removeDeviceListener(innerNodeListener);
-        controller.getRestconfDevices().forEach(id ->
-                controller.removeDevice(controller.getDevicesMap().get(id)
-                        .getDeviceInfo()));
+        // TODO: controller.removeDeviceListener(innerNodeListener);
+        // TODO: controller.getRestconfDevices().forEach(id ->
+        // TODO:        controller.removeDevice(controller.getDevicesMap().get(id)
+        // TODO:                 .getDeviceInfo()));
         providerRegistry.unregister(this);
         providerService = null;
         cfgService.unregisterConfigFactory(factory);
@@ -156,13 +156,14 @@ public class RestconfDeviceProvider extends AbstractProvider
 
     @Override
     public boolean isReachable(DeviceId deviceId) {
-        RestconfDevice device = controller.getRestconfDevice(deviceId);
-        if (device == null) {
-            log.debug("Requested device id: {} is not associated to any " +
-                    "RESTCONF Device", deviceId.toString());
-            return false;
-        }
-        return device.isActive();
+        // TODO: RestconfDevice device = controller.getRestconfDevice(deviceId);
+//        if (device == null) {
+//            log.debug("Requested device id: {} is not associated to any " +
+//                    "RESTCONF Device", deviceId.toString());
+//            return false;
+//        }
+//        return device.isActive();
+        return false;
     }
 
     private class InnerRestconfDeviceListener implements RestconfDeviceListener {
@@ -170,32 +171,32 @@ public class RestconfDeviceProvider extends AbstractProvider
         private static final String IPADDRESS = "ipaddress";
         protected static final String ISNULL = "RestconfDeviceInfo is null";
 
-        @Override
+        // TODO: @Override
         public void deviceAdded(RestconfDeviceInfo nodeId) {
-            Preconditions.checkNotNull(nodeId, ISNULL);
-            DeviceId deviceId = nodeId.getDeviceId();
-            //Restconf configuration object
-            ChassisId cid = new ChassisId();
-            String ipAddress = nodeId.ip().toString();
-            SparseAnnotations annotations = DefaultAnnotations.builder()
-                    .set(IPADDRESS, ipAddress)
-                    .set(AnnotationKeys.PROTOCOL, SCHEME_NAME.toUpperCase())
-                    .build();
-            DeviceDescription deviceDescription = new DefaultDeviceDescription(
-                    deviceId.uri(),
-                    Device.Type.SWITCH,
-                    UNKNOWN, UNKNOWN,
-                    UNKNOWN, UNKNOWN,
-                    cid,
-                    annotations);
-            providerService.deviceConnected(deviceId, deviceDescription);
+            // TODO: Preconditions.checkNotNull(nodeId, ISNULL);
+//            DeviceId deviceId = nodeId.getDeviceId();
+//            //Restconf configuration object
+//            ChassisId cid = new ChassisId();
+//            String ipAddress = nodeId.ip().toString();
+//            SparseAnnotations annotations = DefaultAnnotations.builder()
+//                    .set(IPADDRESS, ipAddress)
+//                    .set(AnnotationKeys.PROTOCOL, SCHEME_NAME.toUpperCase())
+//                    .build();
+//            DeviceDescription deviceDescription = new DefaultDeviceDescription(
+//                    deviceId.uri(),
+//                    Device.Type.SWITCH,
+//                    UNKNOWN, UNKNOWN,
+//                    UNKNOWN, UNKNOWN,
+//                    cid,
+//                    annotations);
+//            providerService.deviceConnected(deviceId, deviceDescription);
         }
 
-        @Override
+        // TODO: @Override
         public void deviceRemoved(RestconfDeviceInfo nodeId) {
             Preconditions.checkNotNull(nodeId, ISNULL);
-            DeviceId deviceId = nodeId.getDeviceId();
-            providerService.deviceDisconnected(deviceId);
+            // TODO: DeviceId deviceId = nodeId.getDeviceId();
+            // TODO: providerService.deviceDisconnected(deviceId);
 
         }
     }
@@ -243,7 +244,8 @@ public class RestconfDeviceProvider extends AbstractProvider
 
         @Override
         public void event(NetworkConfigEvent event) {
-            executor.execute(RestconfDeviceProvider.this::connectDevices);
+
+            // TODO: executor.execute(RestconfDeviceProvider.this::connectDevices);
         }
 
         @Override
