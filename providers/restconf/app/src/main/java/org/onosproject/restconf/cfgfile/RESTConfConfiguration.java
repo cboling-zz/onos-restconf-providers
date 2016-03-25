@@ -31,8 +31,9 @@ public class RESTConfConfiguration {
     // Constants / Defaults
 
     static final int DEFAULT_WORKER_THREADS = 1;
-    static final int DEFAULT_EVENT_INTERVAL = 5;
-    static final int DEFAULT_CONN_TIMEOUT = 45 * 1000;
+    static final int DEFAULT_EVENT_INTERVAL = 5;            // Seconds
+    static final int DEFAULT_CONN_TIMEOUT = 45 * 1000;      // Seconds
+
 
     static final int DEFAULT_SSL_PORT = 443;
     static final int DEFAULT_TCP_PORT = 80;

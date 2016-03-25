@@ -1,0 +1,41 @@
+// The first & second is something we see if we do a 'GET'
+// The second is we send to do configuring of the app and any devices
+{
+    "devices" : {
+        "https://192.168.1.100" : {
+            "basic" : {
+                "driver" : "basic-driver-name",
+                "baseUri" : "https://192.168.1.100/restconf",
+                "currUri" : "http://192.168.1.100/restconf-legacy",
+                "timeouts" : 2
+            }
+        }
+    }
+}
+,
+{
+"apps" : {
+"org.onosproject.restconf" : {
+"restconf" : {
+"workerThreads" : 5,
+"eventInterval" : 5,
+"connectionTimeout" : 15000,
+"sslPreferred" : "True",
+"devices" : [
+{
+"hostname" : "testSwitch-1",
+"username" : "root",
+"password" : "test",
+"x509Path" : "",
+"ipAddress" : "192.168.1.100",
+"tcpPort" : 80,
+"sslPort" : 443,
+"apiRoot" : "/restconf",
+"mediaTypes" : [ "xml", "json" ]
+}
+]
+}
+}
+}
+}
+

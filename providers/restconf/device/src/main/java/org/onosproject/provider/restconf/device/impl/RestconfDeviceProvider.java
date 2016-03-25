@@ -21,23 +21,14 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Deactivate;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.ReferenceCardinality;
-import org.onlab.packet.ChassisId;
 import org.onosproject.core.ApplicationId;
 import org.onosproject.core.CoreService;
-import org.onosproject.incubator.net.config.basics.ConfigException;
-import org.onosproject.net.AnnotationKeys;
-import org.onosproject.net.DefaultAnnotations;
-import org.onosproject.net.Device;
 import org.onosproject.net.DeviceId;
 import org.onosproject.net.MastershipRole;
-import org.onosproject.net.SparseAnnotations;
-import org.onosproject.net.behaviour.PortDiscovery;
 import org.onosproject.net.config.ConfigFactory;
 import org.onosproject.net.config.NetworkConfigEvent;
 import org.onosproject.net.config.NetworkConfigListener;
 import org.onosproject.net.config.NetworkConfigRegistry;
-import org.onosproject.net.device.DefaultDeviceDescription;
-import org.onosproject.net.device.DeviceDescription;
 import org.onosproject.net.device.DeviceProvider;
 import org.onosproject.net.device.DeviceProviderRegistry;
 import org.onosproject.net.device.DeviceProviderService;
@@ -48,14 +39,9 @@ import org.onosproject.net.provider.ProviderId;
 import org.slf4j.Logger;
 
 import org.onosproject.restconf.RestconfController;
-import org.onosproject.restconf.RestconfDevice;
 import org.onosproject.restconf.RestconfDeviceInfo;
 import org.onosproject.restconf.RestconfDeviceListener;
-import org.onosproject.restconf.RestconfException;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -97,31 +83,35 @@ public class RestconfDeviceProvider extends AbstractProvider
     private static final String DEVICE_PROVIDER_PACKAGE = "org.onosproject.restconf.provider.device";
     private static final String UNKNOWN = "unknown";
 
+    // TODO: Make number of initial threads tunable (network config structure)
+    // Probably want to create with just '1', then after reading config (or notify on config update)
+    // the number can be increased/decreased as appropriate
     private final ExecutorService executor =
             Executors.newFixedThreadPool(5, groupedThreads("onos/restconfdeviceprovider", "device-installer-%d", log));
 
     private DeviceProviderService providerService;
     private RestconfDeviceListener innerNodeListener = new InnerRestconfDeviceListener();
 
-    private final ConfigFactory factory =
+    private final ConfigFactory appConfigFactory =
             new ConfigFactory<ApplicationId, RestconfProviderConfig>(APP_SUBJECT_FACTORY,
                     RestconfProviderConfig.class,
-                    "devices",
+                    "restconf",
                     true) {
                 @Override
                 public RestconfProviderConfig createConfig() {
                     return new RestconfProviderConfig();
                 }
             };
-    private final NetworkConfigListener cfgLister = new InternalNetworkConfigListener();
+
+    private final NetworkConfigListener configListener = new InternalNetworkConfigListener();
     private ApplicationId appId;
 
     @Activate
     public void activate() {
         providerService = providerRegistry.register(this);
         appId = coreService.registerApplication(APP_NAME);
-        cfgService.registerConfigFactory(factory);
-        cfgService.addListener(cfgLister);
+        cfgService.registerConfigFactory(appConfigFactory);
+        cfgService.addListener(configListener);
         // TODO: controller.addDeviceListener(innerNodeListener);
         // TODO: executor.execute(RestconfDeviceProvider.this::connectDevices);
         log.info("Started");
@@ -135,7 +125,7 @@ public class RestconfDeviceProvider extends AbstractProvider
         // TODO:                 .getDeviceInfo()));
         providerRegistry.unregister(this);
         providerService = null;
-        cfgService.unregisterConfigFactory(factory);
+        cfgService.unregisterConfigFactory(appConfigFactory);
         log.info("Stopped");
     }
 
@@ -143,17 +133,41 @@ public class RestconfDeviceProvider extends AbstractProvider
         super(new ProviderId(SCHEME_NAME, DEVICE_PROVIDER_PACKAGE));
     }
 
+    /**
+     * Triggers an asynchronous probe of the specified device, intended to
+     * determine whether the device is present or not. An indirect result of this
+     * should be invocation of
+     * {@link org.onosproject.net.device.DeviceProviderService#deviceConnected} )} or
+     * {@link org.onosproject.net.device.DeviceProviderService#deviceDisconnected}
+     * at some later point in time.
+     *
+     * @param deviceId ID of device to be probed
+     */
     @Override
     public void triggerProbe(DeviceId deviceId) {
         // TODO: This will be implemented later.
         log.info("Triggering probe on device {}", deviceId);
     }
 
+    /**
+     * Notifies the provider of a mastership role change for the specified
+     * device as decided by the core.
+     *
+     * @param deviceId device identifier
+     * @param newRole  newly determined mastership role
+     */
     @Override
     public void roleChanged(DeviceId deviceId, MastershipRole newRole) {
         // TODO: This will be implemented later.
     }
 
+    /**
+     * Checks the reachability (connectivity) of a device from this provider.
+     *
+     * @param deviceId device identifier
+     *
+     * @return true if reachable, false otherwise
+     */
     @Override
     public boolean isReachable(DeviceId deviceId) {
         // TODO: RestconfDevice device = controller.getRestconfDevice(deviceId);
