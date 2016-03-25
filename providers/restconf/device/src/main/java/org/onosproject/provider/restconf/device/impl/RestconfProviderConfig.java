@@ -14,7 +14,7 @@ import java.util.Set;
  * Configuration for RESTCONF provider.
  */
 @Beta
-public class RestconfProviderConfig {
+public class RestconfProviderConfig extends Config<ApplicationId> {
 
     public static final String CONFIG_VALUE_ERROR = "Error parsing config value";
     private static final String IP = "ip";
@@ -52,7 +52,7 @@ public class RestconfProviderConfig {
         private final String name;
         private final String password;
 
-        public NetconfDeviceAddress(IpAddress ip, int port, String name, String password) {
+        public RestconfDeviceAddress(IpAddress ip, int port, String name, String password) {
             this.ip = ip;
             this.port = port;
             this.name = name;

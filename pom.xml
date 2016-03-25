@@ -60,7 +60,9 @@
     </properties>
 
     <modules>
+        <module>protocols</module>
         <module>providers</module>
+        <module>drivers</module>
     </modules>
 
     <dependencies>

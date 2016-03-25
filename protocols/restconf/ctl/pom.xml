@@ -14,46 +14,40 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
         <groupId>org.onosproject</groupId>
-        <artifactId>onos-restconf-providers</artifactId>
+        <artifactId>onos-restconf</artifactId>
         <version>1.6.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>onos-restconf-provider-device</artifactId>
+    <artifactId>onos-restconf-ctl</artifactId>
     <packaging>bundle</packaging>
 
-    <description>ONOS RESTCONF protocol device provider</description>
+    <description>ONOS RESTCONF plugin controller</description>
 
     <dependencies>
-        <dependency>
-            <groupId>org.onosproject</groupId>
-            <artifactId>onos-restconf-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.onosproject</groupId>
-            <artifactId>onos-restconf-ctl</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <!-- TODO: add other dependencies here as more bundles are added to the app -->
     </dependencies>
 
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.felix</groupId>
-                <artifactId>maven-scr-plugin</artifactId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Private-Package>ch.ethz.ssh2.*</Private-Package>
+                        <Embed-Dependecy>ganymed-ssh2</Embed-Dependecy>
+                    </instructions>
+                </configuration>
             </plugin>
             <plugin>
-                <groupId>org.onosproject</groupId>
-                <artifactId>onos-maven-plugin</artifactId>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-scr-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

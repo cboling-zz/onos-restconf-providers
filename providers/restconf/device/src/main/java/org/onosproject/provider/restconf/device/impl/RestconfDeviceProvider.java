@@ -68,7 +68,7 @@ import static org.slf4j.LoggerFactory.getLogger;
  * and run a capability discovery on each of the device.
  */
 @Component(immediate = true)
-public class RESTConfDeviceProvider extends AbstractProvider
+public class RestconfDeviceProvider extends AbstractProvider
         implements DeviceProvider {
     private final Logger log = getLogger(getClass());
 
@@ -90,7 +90,7 @@ public class RESTConfDeviceProvider extends AbstractProvider
     @Reference(cardinality = ReferenceCardinality.MANDATORY_UNARY)
     protected DeviceService deviceService;
 
-    protected Map<DeviceId, RESTConfDevice> restconfDeviceMap = new ConcurrentHashMap<DeviceId, RESTConfDevice>();
+    // TODO:Keep this?  -> protected Map<DeviceId, RESTConfDevice> restconfDeviceMap = new ConcurrentHashMap<DeviceId, RESTConfDevice>();
 
     private static final String APP_NAME = "org.onosproject.restconf";
     private static final String SCHEME_NAME = "restconf";
