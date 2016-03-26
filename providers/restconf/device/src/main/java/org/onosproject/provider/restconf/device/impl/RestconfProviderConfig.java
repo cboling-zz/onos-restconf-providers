@@ -1,13 +1,19 @@
 package org.onosproject.provider.restconf.device.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.annotations.Beta;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.onlab.packet.IpAddress;
 import org.onosproject.core.ApplicationId;
 import org.onosproject.incubator.net.config.basics.ConfigException;
 import org.onosproject.net.config.Config;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -21,90 +27,187 @@ public class RestconfProviderConfig extends Config<ApplicationId> {
 
     static final int DEFAULT_WORKER_THREADS = 1;        // TODO: Increase later (before release)
     static final int DEFAULT_EVENT_INTERVAL = 5;        // seconds
-    static final int DEFAULT_CONN_TIMEOUT = 15 * 1000;  // milliseconds
+    static final int DEFAULT_CONNECTION_TIMEOUT = 15 * 1000;  // milliseconds
 
-    // TODO: Need a number of times we fail on a permanent redirect 'GET' request before we
-    //       start to rediscover from the base URI.
-    // TODO: For 302 (Temporary redirects) need a default 'rediscover'/'revert' timeout.
-    // TODO: For 302, should we also look at any TTL/cache info in the header
-    //
+    // TODO: for some values, have a maximum as well...
 
     static final int DEFAULT_SSL_PORT = 443;
     static final int DEFAULT_TCP_PORT = 80;
 
     static final String DEFAULT_XML_MEDIA_TYPE = "xml";
     static final String DEFAULT_JSON_MEDIA_TYPE = "json";
-
     static final String DEFAULT_API_ROOT = "/restconf";
 
     /////////////////////////////////////////////////////////////////////////
-    // Properites
+    // Application level Properties
 
-    private int numThreads = DEFAULT_WORKER_THREADS;
-    private int eventInterval = DEFAULT_EVENT_INTERVAL;
-    private int connectionTimeout = DEFAULT_CONN_TIMEOUT;
-
+    private static String WORKER_THREADS = "workerThreads";
+    private static String EVENT_INTERVAL = "eventInterval";
+    private static String CONNECTION_TIMEOUT = "connectionTimeout";
+    private static String SSL_PREFERRED = "sslPreferred";
 
     public static final String CONFIG_VALUE_ERROR = "Error parsing config value";
-    private static final String IP = "ip";
-    //private static final int DEFAULT_TCP_PORT = 830;
-    private static final String PORT = "port";
-    private static final String NAME = "name";
-    private static final String PASSWORD = "password";
 
-    // TODO: Make number of initial threads tunable (network config structure)
+    /////////////////////////////////////////////////////////////////////////
+    // Per Device/node Properties
 
-    public Set<RestconfDeviceAddress> getDevicesAddresses() throws ConfigException {
-        Set<RestconfDeviceAddress> devicesAddresses = Sets.newHashSet();
+    private static String DEVICES = "devices";
+    private static String HOSTNAME = "hostname";
+    private static String USERNAME = "username";
+    private static String PASSWORD = "password";
+    private static String CERTIFICATE_PATH = "x509Path";
+    private static String IP_ADDRESS = "ipAddress";
+    private static String TCP_PORT = "tcpPort";
+    private static String SSL_PORT = "sslPort";
+    private static String API_ROOT = "apiRoot";
+    private static String MEDIA_TYPES = "mediaTypes";
 
-        try {
-            for (JsonNode node : array) {
-                String ip = node.path(IP).asText();
-                IpAddress ipAddr = ip.isEmpty() ? null : IpAddress.valueOf(ip);
-                int port = node.path(PORT).asInt(DEFAULT_TCP_PORT);
-                String name = node.path(NAME).asText();
-                String password = node.path(PASSWORD).asText();
-                devicesAddresses.add(new RestconfDeviceAddress(ipAddr, port, name, password));
+    // TODO: Need a number of times we fail on a permanent redirect 'GET' request before we
+    //       start to rediscover from the base URI.
+    // TODO: For 302 (Temporary redirects) need a default 'rediscover'/'revert' timeout.
+    // TODO: For 302, should we also look at any TTL/cache info in the header
 
+    /**
+     * The number of worker threads for device discovery and maintenance
+     *
+     * @return number of threads (1..n)
+     *
+     * @throws ConfigException
+     */
+    public int getNumberOfWorkerThreads() throws ConfigException {
+        int count = get(WORKER_THREADS, DEFAULT_WORKER_THREADS);
+
+        if (count < 1) {
+            throw new ConfigException("Invalid worker thread count. Must be >= 1");
+        }
+        return count;
+    }
+
+    /**
+     * The polling event interval for a discovered device, in seconds
+     *
+     * @return number of seconds (1..n)
+     *
+     * @throws ConfigException
+     */
+    public int getEventInterval() throws ConfigException {
+        int count = get(EVENT_INTERVAL, DEFAULT_EVENT_INTERVAL);
+
+        if (count < 1) {
+            throw new ConfigException("Invalid device polling interval. Must be >= 1");
+        }
+        return count;
+    }
+
+    /**
+     * The number of milliseconds to wait for a response to a REST command
+     *
+     * @return number of milliseconds (1..n)
+     *
+     * @throws ConfigException
+     */
+    public int getConnectionTimeout() throws ConfigException {
+        int count = get(CONNECTION_TIMEOUT, DEFAULT_CONNECTION_TIMEOUT);
+
+        if (count < 1) {
+            throw new ConfigException("Invalid connection timeout. Must be >= 1 mS");
+        }
+        return count;
+    }
+
+    /**
+     * Return an immutable map of the devices in the configuration file
+     * <p>
+     * The key for the map is the string composed of the IP Address for the
+     * device.  The contents of the device info provides further information/clarification
+     * for the way to contact/discover the device.
+     *
+     * @return immutable map of Device Information
+     *
+     * @throws ConfigException
+     */
+    public Map<String, RestconfDeviceInfo> getDeviceInfo() throws ConfigException {
+
+        Map<String, RestconfDeviceInfo> devicesInfo = Maps.newHashMap();
+
+        if (object.has(DEVICES)) {
+            ArrayNode nodeArray = (ArrayNode) object.path(DEVICES);
+
+            try {
+                nodeArray.forEach(node -> {
+                    String hostName = node.path(HOSTNAME).asText("");
+                    String userName = node.path(USERNAME).asText("");
+                    String password = node.path(PASSWORD).asText("");
+                    String certPath = node.path(CERTIFICATE_PATH).asText("");
+                    IpAddress address = IpAddress.valueOf(node.path(IP_ADDRESS).asText(""));
+                    short tcpPort = (short) node.path(TCP_PORT).asInt(DEFAULT_TCP_PORT);
+                    short sslPort = (short) node.path(SSL_PORT).asInt(DEFAULT_SSL_PORT);
+                    String apiRoot = node.path(API_ROOT).asText(DEFAULT_API_ROOT);
+                    List<String> mediaTypes = Lists.newArrayList();
+
+                    if (node.has(MEDIA_TYPES)) {
+                        node.forEach(mtype -> mediaTypes.add(node.asText()));
+                    } else {
+                        mediaTypes.add(DEFAULT_XML_MEDIA_TYPE);
+                        mediaTypes.add(DEFAULT_JSON_MEDIA_TYPE);
+                    }
+                    RestconfDeviceInfo device = new RestconfDeviceInfo(hostName, address,
+                            tcpPort, sslPort, userName,
+                            password, certPath, apiRoot,
+                            mediaTypes);
+
+                    devicesInfo.put(address.toString(), device);
+                });
+            } catch (IllegalArgumentException e) {
+                throw new ConfigException(CONFIG_VALUE_ERROR, e);
             }
-        } catch (IllegalArgumentException e) {
-            throw new ConfigException(CONFIG_VALUE_ERROR, e);
         }
-
-        return devicesAddresses;
+        return Collections.unmodifiableMap(devicesInfo);
     }
 
-    public class RestconfDeviceAddress {
+    /**
+     * TODO: Provide info...
+     */
+    public class RestconfDeviceInfo {
+        public final String hostName;
+        public final String userName;
+        public final String password;
+        public final String certificatePath;
+        public final IpAddress address;
+        public final short tcpPort;
+        public final short sslPort;
+        public final String apiRoot;
+        public final List<String> mediaTypes;
 
-        // TODO: Extend for REST services...
+        /**
+         * TODO: Complete documentation here...
+         *
+         * @param hostname
+         * @param ipaddr
+         * @param tcpPort
+         * @param sslPort
+         * @param username
+         * @param password
+         * @param certificatePath
+         * @param apiRoot
+         * @param mediaTypes
+         */
+        public RestconfDeviceInfo(String hostname, IpAddress ipaddr, short tcpPort,
+                                  short sslPort, String username, String password,
+                                  String certificatePath,
+                                  String apiRoot, List<String> mediaTypes) {
 
-        private final IpAddress ip;
-        private final int port;
-        private final String name;
-        private final String password;
+            // TODO: Validate parameters...  Throw exception on error.
 
-        public RestconfDeviceAddress(IpAddress ip, int port, String name, String password) {
-            this.ip = ip;
-            this.port = port;
-            this.name = name;
+            this.hostName = hostname;
+            this.userName = username;
             this.password = password;
-        }
-
-        public IpAddress ip() {
-            return ip;
-        }
-
-        public int port() {
-            return port;
-        }
-
-        public String name() {
-            return name;
-        }
-
-        public String password() {
-            return password;
+            this.certificatePath = certificatePath;
+            this.address = ipaddr;
+            this.tcpPort = tcpPort;
+            this.sslPort = sslPort;
+            this.apiRoot = apiRoot;
+            this.mediaTypes = mediaTypes;
         }
     }
-
 }

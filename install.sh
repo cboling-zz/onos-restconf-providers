@@ -14,3 +14,4 @@ fi
 
 find . -name *.oar -print -exec onos-app $OC1 $cmd {} \;
 
+touch .installed

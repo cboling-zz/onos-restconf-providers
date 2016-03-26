@@ -14,7 +14,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<app name="org.onosproject.restconf" origin="ON.Lab" version="${project.version}"
+<app name="org.onosproject.restconf" origin="bcsw.net" version="${project.version}"
      category="Provider" url="https://wiki.onosproject.org/display/ONOS/RESTCONF" title="RESTCONF Provider"
      featuresRepo="mvn:${project.groupId}/${project.artifactId}/${project.version}/xml/features"
      features="${project.artifactId}">
