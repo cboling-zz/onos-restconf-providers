@@ -41,8 +41,8 @@ public class RestconfDiscovery {
 //    private static final boolean support308Redirects = true;  // Permanent redirects
 //    private static final String Root_XML_MSG = new StringBuilder(
 //            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
-//            .append("<hello xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">")
-//            .append("<capabilities><capability>urn:ietf:params:netconf:base:1.0</capability>")
+//            .append("<hello xmlns=\"urn:ietf:params:xml:ns:restconf:base:1.0\">")
+//            .append("<capabilities><capability>urn:ietf:params:restconf:base:1.0</capability>")
 //            .append("</capabilities></hello>").toString();
 //    @Reference(cardinality = ReferenceCardinality.MANDATORY_UNARY)
 //    protected ComponentConfigService cfgService;

@@ -103,7 +103,7 @@ public class RestconfDeviceProvider extends AbstractProvider
                 }
             };
 
-    private final NetworkConfigListener configListener = new InternalNetworkConfigListener();
+    private final NetworkConfigListener configListener = new InternalConfigListener();
     private ApplicationId appId;
 
     @Activate
@@ -254,20 +254,63 @@ public class RestconfDeviceProvider extends AbstractProvider
 //        }
 //    }
 
-    private class InternalNetworkConfigListener implements NetworkConfigListener {
+    private class InternalConfigListener implements NetworkConfigListener {
 
         @Override
         public void event(NetworkConfigEvent event) {
+            if ((event.type() == NetworkConfigEvent.Type.CONFIG_ADDED ||
+                    event.type() == NetworkConfigEvent.Type.CONFIG_UPDATED) &&
+                    event.configClass().equals(RestconfProviderConfig.class)) {
 
-            // TODO: executor.execute(RestconfDeviceProvider.this::connectDevices);
+                RestconfProviderConfig cfg = cfgService.getConfig(appId,
+                        RestconfProviderConfig.class);
+
+                reconfigureNetwork(cfg);
+                log.info("Reconfigured: {}", event.type().toString());
+
+            } else {
+                log.info("Why are we here, is isRelevant not working?");
+            }
         }
 
         @Override
         public boolean isRelevant(NetworkConfigEvent event) {
-            //TODO refactor
             return event.configClass().equals(RestconfProviderConfig.class) &&
                     (event.type() == NetworkConfigEvent.Type.CONFIG_ADDED ||
                             event.type() == NetworkConfigEvent.Type.CONFIG_UPDATED);
+
+            // TODO: Also may want to support NetworkConfigEvent.Type.CONFIG_REMOVED.  Investigate this.
+        }
+
+        private void reconfigureNetwork(RestconfProviderConfig cfg) {
+            // TODO: Throw excepton?
+            if (cfg == null) {
+                return;
+            }
+//            gatewayFlowPriority    = cfg.getDefaultGatewayFlowPriority();
+//            roamingUnicastPriority = cfg.getRoamingUnicastFlowPriority();
+//            hostRemovedTimeout     = cfg.getDefaultRemovedHostTimeout();
+//
+//            // Walk new list of access points and updateConfig existing ones and then add new ones
+//
+//            Map<MacAddress, AccessPointConfig> newPoints = cfg.getAccessPoints();
+//
+//            // Remove any APs no longer configured. Use an immutable copy of the access point map
+//            // as the backing collections since we may be removing items from it.
+//
+//            getAccessPoints().values().stream().filter(ap -> !newPoints.containsKey(ap.getMacAddress())).forEach(ap -> {
+//                onRemoveAccessPoint(ap);
+//            });
+//            // Update existing ones
+//
+//            newPoints.values().stream().filter(newConfig -> accessPoints.containsKey(newConfig.getMacAddress())).forEach(newConfig -> {
+//                accessPoints.get(newConfig.getMacAddress()).updateConfig(newConfig);
+//            });
+//            // Then add any new ones
+//
+//            newPoints.values().stream().filter(newConfig -> !accessPoints.containsKey(newConfig.getMacAddress())).forEach(newConfig -> {
+//                onAddAccessPoint(new AccessPoint(newConfig));
+//            });
         }
     }
 }

@@ -15,6 +15,6 @@
  */
 
 /**
- * NETCONF controller implementations.
+ * RESTCONF controller implementations.
  */
 package org.onosproject.restconf.ctl;

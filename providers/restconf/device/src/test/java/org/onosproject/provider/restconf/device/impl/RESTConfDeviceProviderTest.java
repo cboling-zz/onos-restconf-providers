@@ -22,7 +22,7 @@ import org.slf4j.Logger;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
- * Test Case to Validate Netconf Device Provider.
+ * Test Case to Validate RESTCONF Device Provider.
  */
 public class RESTConfDeviceProviderTest {
     private final Logger log = getLogger(RESTConfDeviceProviderTest.class);
