@@ -16,7 +16,22 @@
 package org.onosproject.restconf;
 
 /**
- * Created by cboling on 3/24/16.
+ * Abstraction of an RESTCONF controller.
+ *
+ * Used to obtain RestconfDevice and (un)register listeners on RESTCONF device events.
  */
 public interface RestconfController {
+    /**
+     * Adds Device Event Listener.
+     *
+     * @param listener node listener
+     */
+    void addDeviceListener(RestconfDeviceListener listener);
+
+    /**
+     * Removes Device Listener.
+     *
+     * @param listener node listener
+     */
+    void removeDeviceListener(RestconfDeviceListener listener);
 }

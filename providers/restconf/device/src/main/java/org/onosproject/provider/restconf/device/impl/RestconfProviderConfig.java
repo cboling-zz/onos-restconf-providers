@@ -10,6 +10,7 @@ import org.onlab.packet.IpAddress;
 import org.onosproject.core.ApplicationId;
 import org.onosproject.incubator.net.config.basics.ConfigException;
 import org.onosproject.net.config.Config;
+import org.onosproject.restconf.RestconfDeviceInfo;
 
 import java.util.Collections;
 import java.util.List;
@@ -25,9 +26,9 @@ public class RestconfProviderConfig extends Config<ApplicationId> {
     /////////////////////////////////////////////////////////////////////////
     // Constants / Defaults
 
-    static final int DEFAULT_WORKER_THREADS = 1;        // TODO: Increase later (before release)
-    static final int DEFAULT_EVENT_INTERVAL = 5;        // seconds
-    static final int DEFAULT_CONNECTION_TIMEOUT = 15 * 1000;  // milliseconds
+    public static final int DEFAULT_WORKER_THREADS = 1;        // TODO: Increase later (before release)
+    public static final int DEFAULT_EVENT_INTERVAL = 5;        // seconds
+    public static final int DEFAULT_CONNECTION_TIMEOUT = 15 * 1000;  // milliseconds
 
     // TODO: for some values, have a maximum as well...
 
@@ -163,51 +164,5 @@ public class RestconfProviderConfig extends Config<ApplicationId> {
             }
         }
         return Collections.unmodifiableMap(devicesInfo);
-    }
-
-    /**
-     * TODO: Provide info...
-     */
-    public class RestconfDeviceInfo {
-        public final String hostName;
-        public final String userName;
-        public final String password;
-        public final String certificatePath;
-        public final IpAddress address;
-        public final short tcpPort;
-        public final short sslPort;
-        public final String apiRoot;
-        public final List<String> mediaTypes;
-
-        /**
-         * TODO: Complete documentation here...
-         *
-         * @param hostname
-         * @param ipaddr
-         * @param tcpPort
-         * @param sslPort
-         * @param username
-         * @param password
-         * @param certificatePath
-         * @param apiRoot
-         * @param mediaTypes
-         */
-        public RestconfDeviceInfo(String hostname, IpAddress ipaddr, short tcpPort,
-                                  short sslPort, String username, String password,
-                                  String certificatePath,
-                                  String apiRoot, List<String> mediaTypes) {
-
-            // TODO: Validate parameters...  Throw exception on error.
-
-            this.hostName = hostname;
-            this.userName = username;
-            this.password = password;
-            this.certificatePath = certificatePath;
-            this.address = ipaddr;
-            this.tcpPort = tcpPort;
-            this.sslPort = sslPort;
-            this.apiRoot = apiRoot;
-            this.mediaTypes = mediaTypes;
-        }
     }
 }

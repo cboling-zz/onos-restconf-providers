@@ -16,7 +16,20 @@
 package org.onosproject.restconf;
 
 /**
- * Created by cboling on 3/24/16.
+ * Allows for providers interested in node events to be notified.
  */
 public interface RestconfDeviceListener {
+    /**
+     * Notifies that the node was added.
+     *
+     * @param nodeId the node where the event occurred
+     */
+    void deviceAdded(RestconfDeviceInfo nodeId);
+
+    /**
+     * Notifies that the node was removed.
+     *
+     * @param nodeId the node where the event occurred
+     */
+    void deviceRemoved(RestconfDeviceInfo nodeId);
 }

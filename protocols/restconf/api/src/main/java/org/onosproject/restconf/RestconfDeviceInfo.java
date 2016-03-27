@@ -15,8 +15,80 @@
  */
 package org.onosproject.restconf;
 
+import com.google.common.base.Preconditions;
+import org.onlab.packet.IpAddress;
+
+import java.util.List;
+import java.util.Objects;
+
 /**
  * Created by cboling on 3/24/16.
  */
 public class RestconfDeviceInfo {
+
+    // TODO: Make private and provide property access methods
+    public final String hostName;
+    public final String userName;
+    public final String password;
+    public final String certificatePath;
+    public final IpAddress address;
+    public final short tcpPort;
+    public final short sslPort;
+    public final String apiRoot;
+    public final List<String> mediaTypes;
+
+    /**
+     * TODO: Complete documentation here...
+     *
+     * @param hostname
+     * @param ipaddr
+     * @param tcpPort
+     * @param sslPort
+     * @param username
+     * @param password
+     * @param certificatePath
+     * @param apiRoot
+     * @param mediaTypes
+     */
+    public RestconfDeviceInfo(String hostname, IpAddress ipaddr, short tcpPort,
+                              short sslPort, String username, String password,
+                              String certificatePath,
+                              String apiRoot, List<String> mediaTypes) {
+
+        Preconditions.checkArgument(!apiRoot.equals(""), "Empty RESTCONF API Root");
+        Preconditions.checkNotNull(tcpPort > 0, "Negative TCP port");
+        Preconditions.checkNotNull(sslPort > 0, "Negative SSL port");
+        Preconditions.checkNotNull(ipaddr, "Null ip address");
+
+        // TODO: Validate parameters...  Throw exception on error.
+
+        if ((hostname == null) || hostname.isEmpty()) {
+            hostname = ipaddr.toString();
+        }
+        this.hostName = hostname;
+        this.userName = username;
+        this.password = password;
+        this.certificatePath = certificatePath;
+        this.address = ipaddr;
+        this.tcpPort = tcpPort;
+        this.sslPort = sslPort;
+        this.apiRoot = apiRoot;
+        this.mediaTypes = mediaTypes;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(address);
+    }
+
+    @Override
+    public boolean equals(Object toBeCompared) {
+        if (toBeCompared instanceof RestconfDeviceInfo) {
+            RestconfDeviceInfo deviceInfo = (RestconfDeviceInfo) toBeCompared;
+            if (deviceInfo.address.equals(address)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

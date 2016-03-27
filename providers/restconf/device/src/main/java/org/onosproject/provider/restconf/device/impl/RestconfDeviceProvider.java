@@ -16,13 +16,16 @@
 package org.onosproject.provider.restconf.device.impl;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
 import org.apache.felix.scr.annotations.Activate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Deactivate;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.ReferenceCardinality;
+import org.onlab.util.SharedScheduledExecutors;
 import org.onosproject.core.ApplicationId;
 import org.onosproject.core.CoreService;
+import org.onosproject.incubator.net.config.basics.ConfigException;
 import org.onosproject.net.DeviceId;
 import org.onosproject.net.MastershipRole;
 import org.onosproject.net.config.ConfigFactory;
@@ -42,8 +45,10 @@ import org.onosproject.restconf.RestconfController;
 import org.onosproject.restconf.RestconfDeviceInfo;
 import org.onosproject.restconf.RestconfDeviceListener;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 
 import static org.onlab.util.Tools.groupedThreads;
 import static org.onosproject.net.config.basics.SubjectFactories.APP_SUBJECT_FACTORY;
@@ -83,14 +88,8 @@ public class RestconfDeviceProvider extends AbstractProvider
     private static final String DEVICE_PROVIDER_PACKAGE = "org.onosproject.restconf.provider.device";
     private static final String UNKNOWN = "unknown";
 
-    // TODO: Make number of initial threads tunable (network config structure)
-    // Probably want to create with just '1', then after reading config (or notify on config update)
-    // the number can be increased/decreased as appropriate
-    private final ExecutorService executor =
-            Executors.newFixedThreadPool(5, groupedThreads("onos/restconfdeviceprovider", "device-installer-%d", log));
-
     private DeviceProviderService providerService;
-    private RestconfDeviceListener innerNodeListener = new InnerRestconfDeviceListener();
+    private RestconfDeviceListener deviceListener = new InternalDeviceProvider();
 
     private final ConfigFactory appConfigFactory =
             new ConfigFactory<ApplicationId, RestconfProviderConfig>(APP_SUBJECT_FACTORY,
@@ -105,6 +104,27 @@ public class RestconfDeviceProvider extends AbstractProvider
 
     private final NetworkConfigListener configListener = new InternalConfigListener();
     private ApplicationId appId;
+    private HashMap<String, ScheduledFuture<?>> executorResults = Maps.newHashMap();
+
+    public static int connectionTimeout = RestconfProviderConfig.DEFAULT_CONNECTION_TIMEOUT;
+    public static int numWorkers = RestconfProviderConfig.DEFAULT_WORKER_THREADS;
+    public static int newNumWorkers = RestconfProviderConfig.DEFAULT_WORKER_THREADS;
+    public static int eventInterval = RestconfProviderConfig.DEFAULT_EVENT_INTERVAL;
+
+    // TODO: Make number of initial threads tunable (network config structure)
+    // Probably want to create with just '1', then after reading config (or notify on config update)
+    // the number can be increased/decreased as appropriate
+//    private ExecutorService executor =
+//            Executors.newFixedThreadPool(numWorkers, groupedThreads("onos/restconfdeviceprovider", "device-installer-%d", log));
+
+    private ScheduledExecutorService executor;
+
+    /**
+     * Create a device provider for the RESTCONF protocol
+     */
+    public RestconfDeviceProvider() {
+        super(new ProviderId(SCHEME_NAME, DEVICE_PROVIDER_PACKAGE));
+    }
 
     @Activate
     public void activate() {
@@ -112,25 +132,25 @@ public class RestconfDeviceProvider extends AbstractProvider
         appId = coreService.registerApplication(APP_NAME);
         cfgService.registerConfigFactory(appConfigFactory);
         cfgService.addListener(configListener);
-        // TODO: controller.addDeviceListener(innerNodeListener);
-        // TODO: executor.execute(RestconfDeviceProvider.this::connectDevices);
+
+        controller.addDeviceListener(deviceListener);
+        executor = SharedScheduledExecutors.getSingleThreadExecutor();
+        connectDevices();
+
         log.info("Started");
     }
 
     @Deactivate
     public void deactivate() {
-        // TODO: controller.removeDeviceListener(innerNodeListener);
+        cfgService.unregisterConfigFactory(appConfigFactory);
+
+        controller.removeDeviceListener(deviceListener);
         // TODO: controller.getRestconfDevices().forEach(id ->
         // TODO:        controller.removeDevice(controller.getDevicesMap().get(id)
         // TODO:                 .getDeviceInfo()));
         providerRegistry.unregister(this);
         providerService = null;
-        cfgService.unregisterConfigFactory(appConfigFactory);
         log.info("Stopped");
-    }
-
-    public RestconfDeviceProvider() {
-        super(new ProviderId(SCHEME_NAME, DEVICE_PROVIDER_PACKAGE));
     }
 
     /**
@@ -180,13 +200,13 @@ public class RestconfDeviceProvider extends AbstractProvider
         return false;
     }
 
-    private class InnerRestconfDeviceListener implements RestconfDeviceListener {
+    private class InternalDeviceProvider implements RestconfDeviceListener {
 
         private static final String IPADDRESS = "ipaddress";
         protected static final String ISNULL = "RestconfDeviceInfo is null";
 
         // TODO: @Override
-        public void deviceAdded(RestconfDeviceInfo nodeId) {
+        public void deviceAdded(RestconfDeviceInfo info) {
             // TODO: Preconditions.checkNotNull(nodeId, ISNULL);
 //            DeviceId deviceId = nodeId.getDeviceId();
 //            //Restconf configuration object
@@ -215,11 +235,18 @@ public class RestconfDeviceProvider extends AbstractProvider
         }
     }
 
-//    private void connectDevices() {
-//        RestconfProviderConfig cfg = cfgService.getConfig(appId, RestconfProviderConfig.class);
-//        if (cfg != null) {
-//            try {
-//                cfg.getDevicesAddresses().stream()
+    private void connectDevices() {
+        RestconfProviderConfig cfg = cfgService.getConfig(appId, RestconfProviderConfig.class);
+
+        if (cfg != null) {
+            try {
+                Map<String, RestconfDeviceInfo> devInfo = cfg.getDeviceInfo();
+
+                devInfo.forEach((id, info) -> {
+                    deviceListener.deviceAdded(info);
+                });
+
+//                cfg.getDeviceInfo().s.getDevicesAddresses().stream()
 //                        .forEach(addr -> {
 //                                    try {
 //                                        RestconfDeviceInfo restconf = new RestconfDeviceInfo(addr.name(),
@@ -248,11 +275,11 @@ public class RestconfDeviceProvider extends AbstractProvider
 //                                }
 //                        );
 //
-//            } catch (ConfigException e) {
-//                log.error("Cannot read config error " + e);
-//            }
-//        }
-//    }
+            } catch (ConfigException e) {
+                log.error("Cannot read config error " + e);
+            }
+        }
+    }
 
     private class InternalConfigListener implements NetworkConfigListener {
 
@@ -283,34 +310,26 @@ public class RestconfDeviceProvider extends AbstractProvider
         }
 
         private void reconfigureNetwork(RestconfProviderConfig cfg) {
-            // TODO: Throw excepton?
+            // TODO: Throw exception?
             if (cfg == null) {
                 return;
             }
-//            gatewayFlowPriority    = cfg.getDefaultGatewayFlowPriority();
-//            roamingUnicastPriority = cfg.getRoamingUnicastFlowPriority();
-//            hostRemovedTimeout     = cfg.getDefaultRemovedHostTimeout();
-//
-//            // Walk new list of access points and updateConfig existing ones and then add new ones
-//
-//            Map<MacAddress, AccessPointConfig> newPoints = cfg.getAccessPoints();
-//
-//            // Remove any APs no longer configured. Use an immutable copy of the access point map
-//            // as the backing collections since we may be removing items from it.
-//
-//            getAccessPoints().values().stream().filter(ap -> !newPoints.containsKey(ap.getMacAddress())).forEach(ap -> {
-//                onRemoveAccessPoint(ap);
-//            });
-//            // Update existing ones
-//
-//            newPoints.values().stream().filter(newConfig -> accessPoints.containsKey(newConfig.getMacAddress())).forEach(newConfig -> {
-//                accessPoints.get(newConfig.getMacAddress()).updateConfig(newConfig);
-//            });
-//            // Then add any new ones
-//
-//            newPoints.values().stream().filter(newConfig -> !accessPoints.containsKey(newConfig.getMacAddress())).forEach(newConfig -> {
-//                onAddAccessPoint(new AccessPoint(newConfig));
-//            });
+            try {
+                RestconfDeviceProvider.connectionTimeout = cfg.getConnectionTimeout();
+                RestconfDeviceProvider.eventInterval = cfg.getEventInterval();
+                RestconfDeviceProvider.newNumWorkers = cfg.getNumberOfWorkerThreads();
+
+                // TODO: Handle
+            } catch (ConfigException e) {
+                // TODO: Handle this
+            }
+            try {
+                Map<String, RestconfDeviceInfo> devices = cfg.getDeviceInfo();
+
+                // TODO: Handle
+            } catch (ConfigException e) {
+                // TODO: Handle this
+            }
         }
     }
 }
