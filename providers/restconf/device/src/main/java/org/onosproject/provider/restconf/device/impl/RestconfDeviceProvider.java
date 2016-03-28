@@ -39,18 +39,16 @@ import org.onosproject.net.device.DeviceService;
 import org.onosproject.net.driver.DriverService;
 import org.onosproject.net.provider.AbstractProvider;
 import org.onosproject.net.provider.ProviderId;
-import org.slf4j.Logger;
-
 import org.onosproject.restconf.RestconfController;
 import org.onosproject.restconf.RestconfDeviceInfo;
 import org.onosproject.restconf.RestconfDeviceListener;
+import org.slf4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 
-import static org.onlab.util.Tools.groupedThreads;
 import static org.onosproject.net.config.basics.SubjectFactories.APP_SUBJECT_FACTORY;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -114,8 +112,8 @@ public class RestconfDeviceProvider extends AbstractProvider
     // TODO: Make number of initial threads tunable (network config structure)
     // Probably want to create with just '1', then after reading config (or notify on config update)
     // the number can be increased/decreased as appropriate
-//    private ExecutorService executor =
-//            Executors.newFixedThreadPool(numWorkers, groupedThreads("onos/restconfdeviceprovider", "device-installer-%d", log));
+    //    private ExecutorService executor =
+    //            Executors.newFixedThreadPool(numWorkers, groupedThreads("onos/restconfdeviceprovider", "device-installer-%d", log));
 
     private ScheduledExecutorService executor;
 
@@ -133,7 +131,7 @@ public class RestconfDeviceProvider extends AbstractProvider
         cfgService.registerConfigFactory(appConfigFactory);
         cfgService.addListener(configListener);
 
-        controller.addDeviceListener(deviceListener);
+        controller.getDevices().forEach(device -> device.addEventListener(deviceListener));
         executor = SharedScheduledExecutors.getSingleThreadExecutor();
         connectDevices();
 
@@ -142,14 +140,13 @@ public class RestconfDeviceProvider extends AbstractProvider
 
     @Deactivate
     public void deactivate() {
-        cfgService.unregisterConfigFactory(appConfigFactory);
-
-        controller.removeDeviceListener(deviceListener);
-        // TODO: controller.getRestconfDevices().forEach(id ->
-        // TODO:        controller.removeDevice(controller.getDevicesMap().get(id)
-        // TODO:                 .getDeviceInfo()));
         providerRegistry.unregister(this);
         providerService = null;
+
+        cfgService.unregisterConfigFactory(appConfigFactory);
+
+        controller.getDevices().forEach(device -> device.removeEventListener(deviceListener));
+
         log.info("Stopped");
     }
 
@@ -240,11 +237,8 @@ public class RestconfDeviceProvider extends AbstractProvider
 
         if (cfg != null) {
             try {
-                Map<String, RestconfDeviceInfo> devInfo = cfg.getDeviceInfo();
 
-                devInfo.forEach((id, info) -> {
-                    deviceListener.deviceAdded(info);
-                });
+                cfg.getDeviceInfo().forEach((id, info) -> deviceListener.deviceAdded(info));
 
 //                cfg.getDeviceInfo().s.getDevicesAddresses().stream()
 //                        .forEach(addr -> {
@@ -319,16 +313,21 @@ public class RestconfDeviceProvider extends AbstractProvider
                 RestconfDeviceProvider.eventInterval = cfg.getEventInterval();
                 RestconfDeviceProvider.newNumWorkers = cfg.getNumberOfWorkerThreads();
 
-                // TODO: Handle
+                // TODO: drop worker threads if not used... otherwise handle changes
+
             } catch (ConfigException e) {
-                // TODO: Handle this
+                log.error("Reconfigure Network: ConfigException during parameter read: {}",
+                        e.toString());
             }
             try {
                 Map<String, RestconfDeviceInfo> devices = cfg.getDeviceInfo();
 
-                // TODO: Handle
+                // TODO: Test how to best handle new/removed devices after we have already
+                //       started.  Perhaps only look for additions?
+
             } catch (ConfigException e) {
-                // TODO: Handle this
+                log.error("Reconfigure Network: ConfigException during device read: {}",
+                        e.toString());
             }
         }
     }

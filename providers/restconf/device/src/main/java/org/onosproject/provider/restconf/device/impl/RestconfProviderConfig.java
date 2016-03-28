@@ -1,11 +1,9 @@
 package org.onosproject.provider.restconf.device.impl;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.annotations.Beta;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import org.onlab.packet.IpAddress;
 import org.onosproject.core.ApplicationId;
 import org.onosproject.incubator.net.config.basics.ConfigException;
@@ -15,7 +13,6 @@ import org.onosproject.restconf.RestconfDeviceInfo;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Configuration for RESTCONF provider.

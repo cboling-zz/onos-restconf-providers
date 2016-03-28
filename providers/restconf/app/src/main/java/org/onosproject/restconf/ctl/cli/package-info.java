@@ -15,6 +15,6 @@
  */
 
 /**
- * RESTConf southbound provider
+ * The CLI of vBNG application.
  */
-package org.onosproject.restconf.web;
+package org.onosproject.restconf.ctl.cli;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.onosproject.restconf;
+package org.onosproject.restconf.ctl;
 
 /**
  * Created by cboling on 3/24/16.

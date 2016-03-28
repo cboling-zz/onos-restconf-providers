@@ -30,7 +30,7 @@
         </init-param>
         <init-param>
             <param-name>com.sun.jersey.config.property.classnames</param-name>
-            <param-value>org.onosproject.restconf.web.RESTConfResource</param-value>
+            <param-value>org.onosproject.restconf.ctl.web.RESTConfResource</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>

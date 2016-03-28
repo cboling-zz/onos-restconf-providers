@@ -21,17 +21,30 @@ package org.onosproject.restconf;
  * Used to obtain RestconfDevice and (un)register listeners on RESTCONF device events.
  */
 public interface RestconfController {
+
+    /**
+     * Returns all devices known to this RESTCONF controller.
+     * @return Iterable of RESTCONF devices
+     */
+    Iterable<RestconfDevice> getDevices();
+
+
+    // TODO: These are being moved to the RestconfDevice interface
+
     /**
      * Adds Device Event Listener.
      *
      * @param listener node listener
      */
+    @Deprecated
     void addDeviceListener(RestconfDeviceListener listener);
 
+    // TODO: These are being moved to the RestconfDevice interface
     /**
      * Removes Device Listener.
      *
      * @param listener node listener
      */
+    @Deprecated
     void removeDeviceListener(RestconfDeviceListener listener);
 }

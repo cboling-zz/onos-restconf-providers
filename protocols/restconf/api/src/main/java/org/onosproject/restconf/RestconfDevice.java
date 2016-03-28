@@ -19,4 +19,20 @@ package org.onosproject.restconf;
  * Created by cboling on 3/24/16.
  */
 public interface RestconfDevice {
+
+
+    /**
+     * Registers a listener for RESTCONF events.
+     *
+     * @param listener the listener to notify
+     */
+    void addEventListener(RestconfDeviceListener listener);
+
+    /**
+     * Unregisters a listener.
+     *
+     * @param listener the listener to unregister
+     */
+    void removeEventListener(RestconfDeviceListener listener);
+
 }

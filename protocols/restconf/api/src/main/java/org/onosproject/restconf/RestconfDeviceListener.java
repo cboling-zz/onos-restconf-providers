@@ -32,4 +32,7 @@ public interface RestconfDeviceListener {
      * @param nodeId the node where the event occurred
      */
     void deviceRemoved(RestconfDeviceInfo nodeId);
+
+    // TODO: Add other methods that provide different change events that
+    // may be of importance to others.
 }

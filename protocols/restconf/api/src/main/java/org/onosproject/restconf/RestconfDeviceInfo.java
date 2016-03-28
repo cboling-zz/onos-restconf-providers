@@ -18,24 +18,24 @@ package org.onosproject.restconf;
 import com.google.common.base.Preconditions;
 import org.onlab.packet.IpAddress;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 /**
- * Created by cboling on 3/24/16.
+ * Provides information on initial connectivity to a RESTCONF device
  */
 public class RestconfDeviceInfo {
 
-    // TODO: Make private and provide property access methods
-    public final String hostName;
-    public final String userName;
-    public final String password;
-    public final String certificatePath;
-    public final IpAddress address;
-    public final short tcpPort;
-    public final short sslPort;
-    public final String apiRoot;
-    public final List<String> mediaTypes;
+    private final String hostName;
+    private final String userName;
+    private final String password;
+    private final String certificatePath;
+    private final IpAddress address;
+    private final short tcpPort;
+    private final short sslPort;
+    private final String apiRoot;
+    private final List<String> mediaTypes;
 
     /**
      * TODO: Complete documentation here...
@@ -74,6 +74,69 @@ public class RestconfDeviceInfo {
         this.sslPort = sslPort;
         this.apiRoot = apiRoot;
         this.mediaTypes = mediaTypes;
+    }
+
+    /**
+     * @return
+     */
+    public String getHostName() {
+        return hostName;
+    }
+
+    /**
+     * @return
+     */
+    public String getUserName() {
+        return userName;
+    }
+
+    /**
+     * @return
+     */
+    public String getPassword() {
+        return password;
+    }
+
+    /**
+     * @return
+     */
+    public String getCertificatePath() {
+        return certificatePath;
+    }
+
+    /**
+     * @return
+     */
+    public IpAddress getIpAddress() {
+        return address;
+    }
+
+    /**
+     * @return
+     */
+    public String getApiRoot() {
+        return apiRoot;
+    }
+
+    /**
+     * @return
+     */
+    public List<String> getMediaTYpes() {
+        return Collections.unmodifiableList(mediaTypes);
+    }
+
+    /**
+     * @return
+     */
+    public short getSslPort() {
+        return sslPort;
+    }
+
+    /**
+     * @return
+     */
+    public short getTcpPort() {
+        return tcpPort;
     }
 
     @Override

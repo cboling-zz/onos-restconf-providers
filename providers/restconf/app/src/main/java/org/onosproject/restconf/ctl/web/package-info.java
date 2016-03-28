@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 - 2016 Boling Consulting Solutions, bcsw.net
+ * Copyright 2015 Boling Consulting Solutions, bcsw.net
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,10 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.onosproject.restconf;
 
 /**
- * Created by cboling on 3/24/16.
+ * RESTConf southbound provider
  */
-public interface RestconfSessionDelegate {
-}
+package org.onosproject.restconf.ctl.web;
