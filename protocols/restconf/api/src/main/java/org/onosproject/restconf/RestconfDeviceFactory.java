@@ -19,4 +19,13 @@ package org.onosproject.restconf;
  * Created by cboling on 3/24/16.
  */
 public interface RestconfDeviceFactory {
+
+    /**
+     * Creates a new RESTCONF device
+     *
+     * @param deviceInfo RESTCONF device seed information
+     *
+     * @return New device
+     */
+    RestconfDevice createRestconfDevice(RestconfDeviceInfo deviceInfo);
 }

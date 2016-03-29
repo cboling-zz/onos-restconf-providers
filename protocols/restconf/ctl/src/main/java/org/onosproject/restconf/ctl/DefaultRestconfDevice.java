@@ -15,8 +15,79 @@
  */
 package org.onosproject.restconf.ctl;
 
+import org.onosproject.restconf.RestconfDevice;
+import org.onosproject.restconf.RestconfDeviceInfo;
+import org.onosproject.restconf.RestconfDeviceListener;
+import org.onosproject.restconf.RestconfException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Created by cboling on 3/24/16.
  */
-public class DefaultRestconfDevice {
+public class DefaultRestconfDevice implements RestconfDevice {
+
+    public static final Logger log = LoggerFactory
+            .getLogger(DefaultRestconfDevice.class);
+
+    private RestconfDeviceInfo deviceInfo;
+    private State state = State.INITIAL;
+    private String failureReason = "";
+
+    public DefaultRestconfDevice(RestconfDeviceInfo deviceInfo) {
+
+        this.deviceInfo = deviceInfo;
+    }
+
+    /**
+     * Registers a listener for RESTCONF events.
+     *
+     * @param listener the listener to notify
+     */
+    public void addEventListener(RestconfDeviceListener listener) {
+
+        //TODO: Need to implement
+    }
+
+    /**
+     * Unregisters a listener.
+     *
+     * @param listener the listener to unregister
+     */
+    public void removeEventListener(RestconfDeviceListener listener) {
+
+        //TODO: Need to implement
+    }
+
+    /***
+     * Get the current state of the device
+     *
+     * @return Device State
+     */
+    public State getState() {
+        return state;
+    }
+
+    /**
+     * Get reason the device is in the FAILED or INACTIVE state
+     *
+     * @return Failure reason (blank if not in a failed or inactive state)
+     */
+    public String getFailureReason() {
+        return failureReason;
+    }
+
+
+    /**
+     * Writes the message to the driver.
+     * <p>
+     * Note: Messages may be silently dropped/lost due to IOExceptions or
+     * role. If this is a concern, then a caller should use barriers.
+     * </p>
+     *
+     * @param msg the message to write
+     */
+    public void sendMsg(Byte[] msg) {
+        //TODO: Need to implement
+    }
 }

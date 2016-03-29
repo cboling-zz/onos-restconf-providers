@@ -37,6 +37,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import static org.onlab.util.Tools.groupedThreads;
 
 /**
  * RestconfController implementation
@@ -55,7 +59,11 @@ public class RestconfControllerImpl implements RestconfController {
     protected Set<RestconfDeviceListener> restconfDeviceListeners = new CopyOnWriteArraySet<>();
     //protected RestconfDeviceFactory deviceFactory = new DefaultRestconfDeviceFactory();
 
+    private int workerThreads = 5;  // TODO: Make this a configuration varioable
 
+    protected ExecutorService executorRxMsgs =
+            Executors.newFixedThreadPool(workerThreads, groupedThreads("onos/netconf", "rx-%d",
+                    log));
     @Activate
     public void activate(ComponentContext context) {
         log.info("Started");
@@ -67,9 +75,25 @@ public class RestconfControllerImpl implements RestconfController {
         log.info("Stopped");
     }
 
+    /**
+     * Returns all devices known to this RESTCONF controller.
+     *
+     * @return Iterable of RESTCONF devices
+     */
     @Override
     public Iterable<RestconfDevice> getDevices() {
         return restconfDeviceMap.values();
+    }
+
+    /**
+     * Get a specific RESTCONF device
+     *
+     * @param id device ID
+     *
+     * @return Requested device or NULL if not found
+     */
+    public RestconfDevice getDevice(String id) {
+        return restconfDeviceMap.get(id);
     }
 
     @Override
@@ -82,5 +106,35 @@ public class RestconfControllerImpl implements RestconfController {
     @Override
     public void removeDeviceListener(RestconfDeviceListener listener) {
         restconfDeviceListeners.remove(listener);
+    }
+
+    /**
+     * Send a RESTCONF message to a managed RESTCONF device
+     *
+     * @param id  Devide ID
+     * @param msg Message to send
+     */
+    @Override
+    public void write(String id, Byte[] msg) {
+        this.getDevice(id).sendMsg(msg);
+    }
+
+    /**
+     * Send a RESTCONF message to a managed RESTCONF device
+     *
+     * @param id  Devide ID
+     * @param msg Message to send
+     */
+    @Override
+    public void processPacket(String id, Byte[] msg) {
+    }
+
+    //Device factory for the specific NetconfDeviceImpl
+    private class DefaultRestconfDeviceFactory implements RestconfDeviceFactory {
+
+        @Override
+        public RestconfDevice createNetconfDevice(RestconfDeviceInfo restconfDeviceInfo) {
+            return new DefaultRestconfDevice(restconfDeviceInfo);
+        }
     }
 }

@@ -20,7 +20,42 @@ package org.onosproject.restconf;
  */
 public interface RestconfDevice {
 
+    /**
+     * Representation of the RESTCONF device state
+     */
+    enum State {
+        /**
+         * Initial (temporary) state of the device that occurs just after the device
+         * is created by CLI/NetConfig JSON or is being restored from persistent
+         * storage after a Control or RESTCONF protocol driver reset.
+         */
+        INITIAL,
 
+        /**
+         *
+         */
+        DISCOVERY,
+
+        /**
+         *
+         */
+        LIBRARY_POPULATE,
+
+        /**
+         *
+         */
+        ACTIVE,
+
+        /**
+         *
+         */
+        INACTIVE,
+
+        /**
+         *
+         */
+        FAILED
+    }
     /**
      * Registers a listener for RESTCONF events.
      *
@@ -35,4 +70,29 @@ public interface RestconfDevice {
      */
     void removeEventListener(RestconfDeviceListener listener);
 
+    /***
+     * Get the current state of the device
+     *
+     * @return Device State
+     */
+    State getState();
+
+    /**
+     * Get reason the device is in the FAILED or INACTIVE state
+     *
+     * @return Failure reason (blank if not in a failed or inactive state)
+     */
+    String getFailureReason();
+
+
+    /**
+     * Writes the message to the driver.
+     * <p>
+     * Note: Messages may be silently dropped/lost due to IOExceptions or
+     * role. If this is a concern, then a caller should use barriers.
+     * </p>
+     *
+     * @param msg the message to write
+     */
+    void sendMsg(Byte[] msg);
 }

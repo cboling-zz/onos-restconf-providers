@@ -37,6 +37,13 @@ public class RestconfDeviceInfo {
     private final String apiRoot;
     private final List<String> mediaTypes;
 
+    // TODO: Do we want to support persistent connections to devices?
+    // TODO: Do we want to keep sessions to devices opened for a smaller window of time after
+    //       a message is sent/received in order to improve performance during tasks that may
+    //       take several round-trips to perform?
+    // TODO: Any 'cached' connection timeouts may need to be different depending upon RESTCONF
+    //       device state (Discovery, ...)
+
     /**
      * TODO: Complete documentation here...
      *
