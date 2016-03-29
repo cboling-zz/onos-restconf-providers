@@ -15,6 +15,7 @@
  */
 package org.onosproject.restconf.ctl;
 
+import org.onosproject.restconf.RestId;
 import org.onosproject.restconf.RestconfDeviceInfo;
 import org.onosproject.restconf.RestconfDeviceListener;
 
@@ -28,17 +29,17 @@ import java.util.Map;
  */
 public class RestconfDeviceListerImpl implements RestconfDeviceListener {
 
-    final List<RestconfDeviceInfo> removedDevices = new ArrayList<>();
-    final List<RestconfDeviceInfo> addedDevices = new ArrayList<>();
-    final List<RestconfDeviceInfo> changedDevices = new ArrayList<>();
-    // final Map<String, OFPortStatus> portChangedDevices = new HashMap<>();
+    final List<RestId> removedDevices = new ArrayList<>();
+    final List<RestId> addedDevices = new ArrayList<>();
+    final List<RestId> changedDevices = new ArrayList<>();
+    // final Map<RestId, OFPortStatus> portChangedDevices = new HashMap<>();
 
     /**
-     * Notifies that the node was added.
+     * Notifies that the RESTCONF node was added.
      *
-     * @param nodeId the node where the event occurred
+     * @param devInfo Device information
      */
-    public void deviceAdded(RestconfDeviceInfo nodeId) {
+    public void deviceAdded(RestconfDeviceInfo devInfo) {
         // TODO: Implement this
 
         // Create device ID (may need to be port of RestconfDeviceInfo)
@@ -49,11 +50,11 @@ public class RestconfDeviceListerImpl implements RestconfDeviceListener {
     }
 
     /**
-     * Notifies that the node was removed.
+     * Notifies that the RESTCONF node was removed.
      *
-     * @param nodeId the node where the event occurred
+     * @param id Device ID
      */
-    public void deviceRemoved(RestconfDeviceInfo nodeId) {
+    public void deviceRemoved(RestId id) {
         // TODO: Implement this
     }
 }

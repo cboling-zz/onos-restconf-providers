@@ -20,18 +20,18 @@ package org.onosproject.restconf;
  */
 public interface RestconfDeviceListener {
     /**
-     * Notifies that the node was added.
+     * Notifies that the RESTCONF node was added.
      *
-     * @param nodeId the node where the event occurred
+     * @param devInfo Device information
      */
-    void deviceAdded(RestconfDeviceInfo nodeId);
+    void deviceAdded(RestconfDeviceInfo devInfo);
 
     /**
-     * Notifies that the node was removed.
+     * Notifies that the RESTCONF node was removed.
      *
-     * @param nodeId the node where the event occurred
+     * @param id Device ID
      */
-    void deviceRemoved(RestconfDeviceInfo nodeId);
+    void deviceRemoved(RestId id);
 
     // TODO: Add other methods that provide different change events that
     // may be of importance to others.

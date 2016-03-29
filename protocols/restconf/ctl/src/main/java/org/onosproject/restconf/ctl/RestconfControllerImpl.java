@@ -20,17 +20,10 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Deactivate;
 import org.apache.felix.scr.annotations.Service;
 import org.onosproject.net.DeviceId;
+import org.onosproject.restconf.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.onosproject.restconf.RestconfController;
-import org.onosproject.restconf.RestconfDevice;
-import org.onosproject.restconf.RestconfDeviceFactory;
-import org.onosproject.restconf.RestconfDeviceInfo;
-import org.onosproject.restconf.RestconfDeviceListener;
-import org.onosproject.restconf.RestconfDeviceOutputEvent;
-import org.onosproject.restconf.RestconfDeviceOutputEventListener;
-import org.onosproject.restconf.RestconfException;
 import org.osgi.service.component.ComponentContext;
 
 import java.util.Map;
@@ -52,12 +45,12 @@ public class RestconfControllerImpl implements RestconfController {
     public static final Logger log = LoggerFactory
             .getLogger(RestconfControllerImpl.class);
 
-    private Map<DeviceId, RestconfDevice> restconfDeviceMap = new ConcurrentHashMap<>();
+    private Map<RestId, RestconfDevice> restconfDeviceMap = new ConcurrentHashMap<>();
 
     //private final RestconfDeviceOutputEventListener downListener = new DeviceDownEventListener();
 
     protected Set<RestconfDeviceListener> restconfDeviceListeners = new CopyOnWriteArraySet<>();
-    //protected RestconfDeviceFactory deviceFactory = new DefaultRestconfDeviceFactory();
+    protected RestconfDeviceFactory deviceFactory = new DefaultRestconfDeviceFactory();
 
     private int workerThreads = 5;  // TODO: Make this a configuration varioable
 
@@ -92,8 +85,19 @@ public class RestconfControllerImpl implements RestconfController {
      *
      * @return Requested device or NULL if not found
      */
-    public RestconfDevice getDevice(String id) {
+    public RestconfDevice getDevice(RestId id) {
         return restconfDeviceMap.get(id);
+    }
+
+    /**
+     * Create a RESTCONF device object
+     *
+     * @param devInfo
+     *
+     * @return
+     */
+    public RestconfDevice createDevice(RestconfDeviceInfo devInfo) {
+        return deviceFactory.createRestconfDevice(devInfo);
     }
 
     @Override
@@ -111,30 +115,38 @@ public class RestconfControllerImpl implements RestconfController {
     /**
      * Send a RESTCONF message to a managed RESTCONF device
      *
-     * @param id  Devide ID
+     * @param id  Device ID
      * @param msg Message to send
      */
     @Override
-    public void write(String id, Byte[] msg) {
+    public void write(RestId id, Byte[] msg) {
         this.getDevice(id).sendMsg(msg);
     }
 
     /**
      * Send a RESTCONF message to a managed RESTCONF device
      *
-     * @param id  Devide ID
+     * @param id  Device ID
      * @param msg Message to send
      */
     @Override
-    public void processPacket(String id, Byte[] msg) {
+    public void processPacket(RestId id, Byte[] msg) {
     }
 
-    //Device factory for the specific NetconfDeviceImpl
+    /**
+     * Device factory for the specific RestconfDevice implementation
+     */
     private class DefaultRestconfDeviceFactory implements RestconfDeviceFactory {
-
+        /**
+         * Creates a new RESTCONF device
+         *
+         * @param deviceInfo RESTCONF device seed information
+         *
+         * @return New device
+         */
         @Override
-        public RestconfDevice createNetconfDevice(RestconfDeviceInfo restconfDeviceInfo) {
-            return new DefaultRestconfDevice(restconfDeviceInfo);
+        public RestconfDevice createRestconfDevice(RestconfDeviceInfo deviceInfo) {
+            return new DefaultRestconfDevice(deviceInfo);
         }
     }
 }

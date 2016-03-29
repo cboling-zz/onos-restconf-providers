@@ -15,10 +15,7 @@
  */
 package org.onosproject.restconf.ctl;
 
-import org.onosproject.restconf.RestconfDevice;
-import org.onosproject.restconf.RestconfDeviceInfo;
-import org.onosproject.restconf.RestconfDeviceListener;
-import org.onosproject.restconf.RestconfException;
+import org.onosproject.restconf.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,11 +28,12 @@ public class DefaultRestconfDevice implements RestconfDevice {
             .getLogger(DefaultRestconfDevice.class);
 
     private RestconfDeviceInfo deviceInfo;
+    private final RestId deviceId;
     private State state = State.INITIAL;
     private String failureReason = "";
 
     public DefaultRestconfDevice(RestconfDeviceInfo deviceInfo) {
-
+        this.deviceId = deviceInfo.getRestconfId();
         this.deviceInfo = deviceInfo;
     }
 
@@ -59,7 +57,25 @@ public class DefaultRestconfDevice implements RestconfDevice {
         //TODO: Need to implement
     }
 
-    /***
+    /**
+     * Get the device ID for this RESTCONF device
+     *
+     * @return device ID
+     */
+    public RestId getDeviceId() {
+        return deviceId;
+    }
+
+    /**
+     * Get the initial connection information fro a device
+     *
+     * @return device info
+     */
+    public RestconfDeviceInfo getDevideInfo() {
+        return deviceInfo;
+    }
+
+    /**
      * Get the current state of the device
      *
      * @return Device State

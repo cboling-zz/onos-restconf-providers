@@ -39,9 +39,7 @@ import org.onosproject.net.device.DeviceService;
 import org.onosproject.net.driver.DriverService;
 import org.onosproject.net.provider.AbstractProvider;
 import org.onosproject.net.provider.ProviderId;
-import org.onosproject.restconf.RestconfController;
-import org.onosproject.restconf.RestconfDeviceInfo;
-import org.onosproject.restconf.RestconfDeviceListener;
+import org.onosproject.restconf.*;
 import org.slf4j.Logger;
 
 import java.util.HashMap;
@@ -133,6 +131,13 @@ public class RestconfDeviceProvider extends AbstractProvider
 
         controller.getDevices().forEach(device -> device.addEventListener(deviceListener));
         executor = SharedScheduledExecutors.getSingleThreadExecutor();
+
+        // Connect from persistent storage first
+
+        connectInitialDevices();
+
+        // Now any devices in network configuration file
+
         connectDevices();
 
         log.info("Started");
@@ -204,7 +209,20 @@ public class RestconfDeviceProvider extends AbstractProvider
 
         // TODO: @Override
         public void deviceAdded(RestconfDeviceInfo info) {
-            // TODO: Preconditions.checkNotNull(nodeId, ISNULL);
+            /**
+             * Notifies that the RESTCONF node was added.
+             *
+             * @param devInfo Device information
+             */
+            Preconditions.checkNotNull(info, ISNULL);
+            // Provider service is set to 'null' during deactivation of app
+
+            if (providerService == null) {
+                return;
+            }
+
+            // DeviceId did = deviceId(uri(info.getRestconfId()));
+
 //            DeviceId deviceId = nodeId.getDeviceId();
 //            //Restconf configuration object
 //            ChassisId cid = new ChassisId();
@@ -224,22 +242,52 @@ public class RestconfDeviceProvider extends AbstractProvider
         }
 
         // TODO: @Override
-        public void deviceRemoved(RestconfDeviceInfo nodeId) {
-            Preconditions.checkNotNull(nodeId, ISNULL);
+        public void deviceRemoved(RestId deviceId) {
+            Preconditions.checkNotNull(deviceId, ISNULL);
             // TODO: DeviceId deviceId = nodeId.getDeviceId();
             // TODO: providerService.deviceDisconnected(deviceId);
 
         }
     }
 
+    private void connectInitialDevices() {
+        // TODO: Do we want to handle devices restored from persistent storage separately?
+
+        for (RestconfDevice device : controller.getDevices()) {
+            try {
+                deviceListener.deviceAdded(device.getDevideInfo());
+
+            } catch (Exception e) {
+                log.warn("Failed initially adding {} : {}",
+                        device.getDeviceId().toString(), e.getMessage());
+                log.debug("Error details:", e);
+                // disconnect to trigger device-add later
+                // TODO: device.disconnectDevice();
+            }
+        }
+    }
+
     private void connectDevices() {
+
+        // merge any new devices in from configuration file
+
         RestconfProviderConfig cfg = cfgService.getConfig(appId, RestconfProviderConfig.class);
 
         if (cfg != null) {
             try {
+                for (RestconfDeviceInfo devInfo : cfg.getDeviceInfo().values()) {
+                    RestconfDevice device = controller.getDevice(devInfo.getRestconfId());
 
-                cfg.getDeviceInfo().forEach((id, info) -> deviceListener.deviceAdded(info));
+                    if (device != null) {
+                        // TODO: Update device, disreguard, ???
 
+                        // TODO: Log whatever we decide to do
+                    } else {
+                        device = controller.createDevice(devInfo);
+
+                        // TODO: More to DO HERE !!!
+                    }
+                }
 //                cfg.getDeviceInfo().s.getDevicesAddresses().stream()
 //                        .forEach(addr -> {
 //                                    try {

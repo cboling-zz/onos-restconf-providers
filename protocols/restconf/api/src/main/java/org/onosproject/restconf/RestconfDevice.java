@@ -70,7 +70,14 @@ public interface RestconfDevice {
      */
     void removeEventListener(RestconfDeviceListener listener);
 
-    /***
+    /**
+     * Get the device ID for this RESTCONF device
+     *
+     * @return device ID
+     */
+    RestId getDeviceId();
+
+    /**
      * Get the current state of the device
      *
      * @return Device State
@@ -84,6 +91,12 @@ public interface RestconfDevice {
      */
     String getFailureReason();
 
+    /**
+     * Get the initial connection information fro a device
+     *
+     * @return device info
+     */
+    RestconfDeviceInfo getDevideInfo();
 
     /**
      * Writes the message to the driver.

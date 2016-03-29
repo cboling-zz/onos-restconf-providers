@@ -35,9 +35,18 @@ public interface RestconfController {
      *
      * @return Requested device or NULL if not found
      */
-    RestconfDevice getDevice(String id);
+    RestconfDevice getDevice(RestId id);
 
     // TODO: These are being moved to the RestconfDevice interface
+
+    /**
+     * Create a RESTCONF device object
+     *
+     * @param devInfo
+     *
+     * @return
+     */
+    RestconfDevice createDevice(RestconfDeviceInfo devInfo);
 
     /**
      * Adds Device Event Listener.
@@ -56,20 +65,19 @@ public interface RestconfController {
     @Deprecated
     void removeDeviceListener(RestconfDeviceListener listener);
 
-
     /**
      * Send a RESTCONF message to a managed RESTCONF device
      *
-     * @param id  Devide ID
+     * @param id  Device ID
      * @param msg Message to send       // TODO: Come up with a message object to encaps this
      */
-    void write(String id, Byte[] msg);
+    void write(RestId id, Byte[] msg);
 
     /**
      * Send a RESTCONF message to a managed RESTCONF device
      *
-     * @param id  Devide ID
+     * @param id  Device ID
      * @param msg Message to send     // TODO: Come up with a message object to encaps this
      */
-    void processPacket(String id, Byte[] msg);
+    void processPacket(RestId id, Byte[] msg);
 }
