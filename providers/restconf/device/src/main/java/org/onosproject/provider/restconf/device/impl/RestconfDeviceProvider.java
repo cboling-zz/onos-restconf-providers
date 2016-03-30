@@ -214,31 +214,38 @@ public class RestconfDeviceProvider extends AbstractProvider
     private class InternalDeviceProvider implements RestconfDeviceListener {
 
         private static final String IPADDRESS = "ipaddress";
-        protected static final String ISNULL = "RestconfDeviceInfo is null";
+        // TODO: Any other custom annotations?
 
-        // TODO: @Override
+        /**
+         * Notifies that the RESTCONF node was added.
+         *
+         * @param device RESTCONF Device object
+         */
+        @Override
         public void deviceAdded(RestconfDevice device) {
             /**
              * Notifies that the RESTCONF node was added.
              *
              * @param devInfo Device information
              */
-            Preconditions.checkNotNull(device, ISNULL);
+            Preconditions.checkNotNull(device, "RESTCONF Device is null");
             DeviceId did = device.getDeviceId();
             RestId rid = device.getRestconfId();
 
-            if ((providerService == null) || (controller.getDevice(rid) != null)) {
+            if ((providerService == null) && (controller.getDevice(rid) != null)) {
                 return;
             }
             ChassisId cid = new ChassisId(rid.toLong());
             IpAddress ipAddress = device.getDeviceInfo().getIpAddress();
 
+            // TODO: After discovery, can add the MANAGEMENT_ADDRESS annotation?
+
             SparseAnnotations annotations = DefaultAnnotations.builder()
                     .set(IPADDRESS, ipAddress.toString())
                     .set(AnnotationKeys.PROTOCOL, SCHEME_NAME.toUpperCase())
-                    .set(AnnotationKeys.CHANNEL_ID, SCHEME_NAME.toUpperCase())
-                    // TODO: After discovery, can add the MANAGEMENT_ADDRESS annotation?
+                    .set(AnnotationKeys.CHANNEL_ID, cid.toString())
                     .build();
+
             DeviceDescription deviceDescription = new DefaultDeviceDescription(
                     did.uri(),
                     Device.Type.SWITCH, // TODO: Change after discovery?
@@ -254,12 +261,30 @@ public class RestconfDeviceProvider extends AbstractProvider
             providerService.deviceConnected(did, deviceDescription);
         }
 
-        // TODO: @Override
-        public void deviceRemoved(RestId deviceId) {
-            Preconditions.checkNotNull(deviceId, ISNULL);
+        /**
+         * Notifies that the RESTCONF node was removed.
+         *
+         * @param id Device ID
+         */
+        @Override
+        public void deviceRemoved(DeviceId id) {
+            Preconditions.checkNotNull(id, "Device ID is null");
             // TODO: DeviceId deviceId = nodeId.getDeviceId();
             // TODO: providerService.deviceDisconnected(deviceId);
+        }
 
+        /**
+         * Notifies that the RESTCONF node was removed.
+         *
+         * @param id   Device ID
+         * @param info Updated device information
+         */
+        @Override
+        public void deviceModified(DeviceId id, RestconfDeviceInfo info) {
+            Preconditions.checkNotNull(id, "Device ID is null");
+            Preconditions.checkNotNull(info, "RESTCONF Device info is null");
+
+            // TODO: Update device if needed (IP Address CANNOT change !!!)
         }
     }
 
@@ -274,6 +299,7 @@ public class RestconfDeviceProvider extends AbstractProvider
                 log.warn("Failed initially adding {} : {}",
                         device.getDeviceId().toString(), e.getMessage());
                 log.debug("Error details:", e);
+
                 // disconnect to trigger device-add later
                 // TODO: device.disconnectDevice();
             }
@@ -292,46 +318,14 @@ public class RestconfDeviceProvider extends AbstractProvider
                     RestconfDevice device = controller.getDevice(devInfo.getRestconfId());
 
                     if (device != null) {
-                        // TODO: Update device if needed (IP Address CANNOT change !!!)
                         // If new information, may need to kick device back to DISCOVERY
                         // state.
 
-                        // TODO: Log whatever we decide to do
+                        deviceListener.deviceModified(device.getDeviceId(), devInfo);
                     } else {
-                        device = controller.createDevice(devInfo);
-
-                        // TODO: More to DO HERE !!!
+                        deviceListener.deviceAdded(controller.createDevice(devInfo));
                     }
                 }
-//                cfg.getDeviceInfo().s.getDevicesAddresses().stream()
-//                        .forEach(addr -> {
-//                                    try {
-//                                        RestconfDeviceInfo restconf = new RestconfDeviceInfo(addr.name(),
-//                                                addr.password(),
-//                                                addr.ip(),
-//                                                addr.port());
-//                                        controller.connectDevice(restconf);
-//                                        Device device = deviceService.getDevice(resttconf.getDeviceId());
-//                                        if (device.is(PortDiscovery.class)) {
-//                                            PortDiscovery portConfig = device.as(PortDiscovery.class);
-//                                            if (portConfig != null) {
-//                                                providerService.updatePorts(restconf.getDeviceId(),
-//                                                        portConfig.getPorts());
-//                                            }
-//                                        } else {
-//                                            log.warn("No portGetter behaviour for device {}", restconf.getDeviceId());
-//                                        }
-//
-//                                    } catch (IOException e) {
-//                                        throw new RuntimeException(
-//                                                new RestconfException(
-//                                                        "Can't connect to RESTCONF " +
-//                                                                "device on " + addr.ip() +
-//                                                                ":" + addr.port(), e));
-//                                    }
-//                                }
-//                        );
-//
             } catch (ConfigException e) {
                 log.error("Cannot read config error " + e);
             }

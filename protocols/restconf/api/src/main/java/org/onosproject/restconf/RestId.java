@@ -21,6 +21,7 @@ import org.onlab.util.HexString;
 import javax.ws.rs.NotSupportedException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -88,7 +89,8 @@ public final class RestId {
     public long toLong() {
 
         if (value.isIp4()) {
-            return HexString.toLong(Integer.toHexString(value.getIp4Address().toInt()));
+            String hexString = HexString.toHexString(value.toOctets());
+            return HexString.toLong(hexString);
         }
         byte[] octets = value.toOctets();
 
@@ -101,11 +103,7 @@ public final class RestId {
         if (firstNonZero > 7) {
             throw new NotSupportedException("TODO: Figure out best way to handle this");
         }
-        String hexString = "0x";
-
-        for (int octet = firstNonZero; octet >= 0; octet--) {
-            hexString += String.format("%02x", octets[octet]);
-        }
+        String hexString = HexString.toHexString(Arrays.copyOfRange(octets, 0, firstNonZero));
         return HexString.toLong(hexString);
     }
 

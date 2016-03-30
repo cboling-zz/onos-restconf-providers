@@ -65,12 +65,6 @@ public class DefaultRestconfDevice implements RestconfDevice {
      *
      * @return device ID
      */
-
-    /**
-     * Get the device ID for this RESTCONF device
-     *
-     * @return device ID
-     */
     public DeviceId getDeviceId() {
         return DeviceId.deviceId(RestId.uri(restId));
     }
@@ -110,7 +104,6 @@ public class DefaultRestconfDevice implements RestconfDevice {
     public String getFailureReason() {
         return failureReason;
     }
-
 
     /**
      * Writes the message to the driver.

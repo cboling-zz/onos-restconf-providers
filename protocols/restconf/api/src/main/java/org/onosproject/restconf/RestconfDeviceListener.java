@@ -15,6 +15,8 @@
  */
 package org.onosproject.restconf;
 
+import org.onosproject.net.DeviceId;
+
 /**
  * Allows for providers interested in node events to be notified.
  */
@@ -31,7 +33,15 @@ public interface RestconfDeviceListener {
      *
      * @param id Device ID
      */
-    void deviceRemoved(RestId id);
+    void deviceRemoved(DeviceId id);
+
+    /**
+     * Notifies that the RESTCONF node was removed.
+     *
+     * @param id   Device ID
+     * @param info Updated device information
+     */
+    void deviceModified(DeviceId id, RestconfDeviceInfo info);
 
     // TODO: Add other methods that provide different change events that
     // may be of importance to others.
