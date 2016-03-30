@@ -49,3 +49,56 @@ use install! or reinstall! to install or re-install and activate with one comman
 ##Version Information
 
 TODO:  Future
+
+
+# RESTCONF Device States
+
+Each devices that supports the RESTCONF protocol will exist in a particular state according to the
+connectivity status and YANG models that it supports.
+
+
+## Initial
+
+A RESTCONF device is in the initial state immediately after the RestconfDeviceProvider has been notified of
+its existence from either a CLI command, from a NetworkConfig JSON event notification, or reloaded from persistent
+storage after a controller or restconf provider/driver restart.  This state is temporary and will typically not be
+observable from the outside world.
+
+Once the RESTCONF device object is created, it is verified not to be a duplicate, it will be registered with
+the DeviceService and will transition to the Discovery state.
+
+If the device is a duplicate, it will transition to the Final state where cleanup of any allocated resources
+is performed and deleted.
+
+## Discovery
+
+In the discovery state, the RESTCONF provider attempts to connect the device. HTTP/HTTPS REST GET
+commands will be used to discover the Root Resource directory, following redirects as required. If a
+root resource directory is not discoverable, or the device is not able to be contacted, the device
+will be placed in the Failed State with a reason of 'RESTCONF Root Resource directory not found'.
+
+Note that during Root Resource discovery, redirect (3xx) messages will be handled appropriately for
+the 3xx status received.
+
+If the device root resource can be discovered and the RESTCONF datastore 'yang-library-version' is
+located, the device transitions to the LibraryPopulation state.  If the 'yang-library-version' cannot
+be discovered, the device transitions to the Failed state with a reason of 'YANG Library not found'.
+
+If restoring a device from persistent storage, the RESTCONF Root Resource will be rediscovered even if
+any previously discovered locations may have been the result of a Permanent Redirect (302 status) message.
+
+If new device information is received via NetworkConfig JSON while the device is in any other state, it
+will transition back to the discovery state.
+
+## LibraryPopulation
+
+
+##
+
+## Teardown
+
+## Final
+This state is entered when a RESTCONF device needs to be delted and any allocated resources released. It
+is typically not visible to the outside world.
+
+
