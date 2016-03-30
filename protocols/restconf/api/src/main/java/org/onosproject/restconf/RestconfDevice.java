@@ -15,6 +15,8 @@
  */
 package org.onosproject.restconf;
 
+import org.onosproject.net.DeviceId;
+
 /**
  * Created by cboling on 3/24/16.
  */
@@ -75,7 +77,14 @@ public interface RestconfDevice {
      *
      * @return device ID
      */
-    RestId getDeviceId();
+    DeviceId getDeviceId();
+
+    /**
+     * Get the RESTCONF ID for this device
+     *
+     * @return RESTCONF specific ID
+     */
+    RestId getRestconfId();
 
     /**
      * Get the current state of the device
@@ -96,7 +105,7 @@ public interface RestconfDevice {
      *
      * @return device info
      */
-    RestconfDeviceInfo getDevideInfo();
+    RestconfDeviceInfo getDeviceInfo();
 
     /**
      * Writes the message to the driver.

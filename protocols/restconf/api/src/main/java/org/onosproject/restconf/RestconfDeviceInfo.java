@@ -17,6 +17,7 @@ package org.onosproject.restconf;
 
 import com.google.common.base.Preconditions;
 import org.onlab.packet.IpAddress;
+import org.onosproject.net.DeviceId;
 
 import java.util.Collections;
 import java.util.List;

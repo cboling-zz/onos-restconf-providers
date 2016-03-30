@@ -15,9 +15,12 @@
  */
 package org.onosproject.restconf.ctl;
 
+import org.onosproject.net.DeviceId;
 import org.onosproject.restconf.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.URI;
 
 /**
  * Created by cboling on 3/24/16.
@@ -28,13 +31,13 @@ public class DefaultRestconfDevice implements RestconfDevice {
             .getLogger(DefaultRestconfDevice.class);
 
     private RestconfDeviceInfo deviceInfo;
-    private final RestId deviceId;
+    private final RestId restId;
     private State state = State.INITIAL;
     private String failureReason = "";
 
     public DefaultRestconfDevice(RestconfDeviceInfo deviceInfo) {
-        this.deviceId = deviceInfo.getRestconfId();
         this.deviceInfo = deviceInfo;
+        this.restId = deviceInfo.getRestconfId();
     }
 
     /**
@@ -62,8 +65,23 @@ public class DefaultRestconfDevice implements RestconfDevice {
      *
      * @return device ID
      */
-    public RestId getDeviceId() {
-        return deviceId;
+
+    /**
+     * Get the device ID for this RESTCONF device
+     *
+     * @return device ID
+     */
+    public DeviceId getDeviceId() {
+        return DeviceId.deviceId(RestId.uri(restId));
+    }
+
+    /**
+     * Get the RESTCONF ID for this device
+     *
+     * @return RESTCONF specific ID
+     */
+    public RestId getRestconfId() {
+        return restId;
     }
 
     /**
@@ -71,7 +89,7 @@ public class DefaultRestconfDevice implements RestconfDevice {
      *
      * @return device info
      */
-    public RestconfDeviceInfo getDevideInfo() {
+    public RestconfDeviceInfo getDeviceInfo() {
         return deviceInfo;
     }
 

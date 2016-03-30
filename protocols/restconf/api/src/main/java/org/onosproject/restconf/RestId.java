@@ -16,7 +16,9 @@
 package org.onosproject.restconf;
 
 import org.onlab.packet.IpAddress;
+import org.onlab.util.HexString;
 
+import javax.ws.rs.NotSupportedException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -74,6 +76,37 @@ public final class RestId {
      */
     public byte[] value() {
         return value.toOctets();
+    }
+
+    /**
+     * Convert RESTCONF ID to a long integer
+     * <p>
+     * The 'long' representation is used to create a chassis ID for the RESTCONF device.
+     *
+     * @return long representation of the ID
+     */
+    public long toLong() {
+
+        if (value.isIp4()) {
+            return HexString.toLong(Integer.toHexString(value.getIp4Address().toInt()));
+        }
+        byte[] octets = value.toOctets();
+
+        // Find first non-zero octet on the right or position 7 so we end up with 8 octets
+        // or more to form the long value
+
+        int firstNonZero = octets.length - 1;
+        while ((octets[firstNonZero] == 0) && (firstNonZero > 7)) firstNonZero--;
+
+        if (firstNonZero > 7) {
+            throw new NotSupportedException("TODO: Figure out best way to handle this");
+        }
+        String hexString = "0x";
+
+        for (int octet = firstNonZero; octet >= 0; octet--) {
+            hexString += String.format("%02x", octets[octet]);
+        }
+        return HexString.toLong(hexString);
     }
 
     /**

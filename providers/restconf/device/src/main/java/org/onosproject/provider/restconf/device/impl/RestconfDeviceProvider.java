@@ -22,26 +22,25 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Deactivate;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.ReferenceCardinality;
+import org.onlab.packet.ChassisId;
+import org.onlab.packet.IpAddress;
 import org.onlab.util.SharedScheduledExecutors;
 import org.onosproject.core.ApplicationId;
 import org.onosproject.core.CoreService;
 import org.onosproject.incubator.net.config.basics.ConfigException;
-import org.onosproject.net.DeviceId;
-import org.onosproject.net.MastershipRole;
+import org.onosproject.net.*;
 import org.onosproject.net.config.ConfigFactory;
 import org.onosproject.net.config.NetworkConfigEvent;
 import org.onosproject.net.config.NetworkConfigListener;
 import org.onosproject.net.config.NetworkConfigRegistry;
-import org.onosproject.net.device.DeviceProvider;
-import org.onosproject.net.device.DeviceProviderRegistry;
-import org.onosproject.net.device.DeviceProviderService;
-import org.onosproject.net.device.DeviceService;
+import org.onosproject.net.device.*;
 import org.onosproject.net.driver.DriverService;
 import org.onosproject.net.provider.AbstractProvider;
 import org.onosproject.net.provider.ProviderId;
 import org.onosproject.restconf.*;
 import org.slf4j.Logger;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
@@ -91,7 +90,7 @@ public class RestconfDeviceProvider extends AbstractProvider
             new ConfigFactory<ApplicationId, RestconfProviderConfig>(APP_SUBJECT_FACTORY,
                     RestconfProviderConfig.class,
                     "restconf",
-                    true) {
+                    false) {
                 @Override
                 public RestconfProviderConfig createConfig() {
                     return new RestconfProviderConfig();
@@ -103,8 +102,6 @@ public class RestconfDeviceProvider extends AbstractProvider
     private HashMap<String, ScheduledFuture<?>> executorResults = Maps.newHashMap();
 
     public static int connectionTimeout = RestconfProviderConfig.DEFAULT_CONNECTION_TIMEOUT;
-    public static int numWorkers = RestconfProviderConfig.DEFAULT_WORKER_THREADS;
-    public static int newNumWorkers = RestconfProviderConfig.DEFAULT_WORKER_THREADS;
     public static int eventInterval = RestconfProviderConfig.DEFAULT_EVENT_INTERVAL;
 
     // TODO: Make number of initial threads tunable (network config structure)
@@ -113,7 +110,7 @@ public class RestconfDeviceProvider extends AbstractProvider
     //    private ExecutorService executor =
     //            Executors.newFixedThreadPool(numWorkers, groupedThreads("onos/restconfdeviceprovider", "device-installer-%d", log));
 
-    private ScheduledExecutorService executor;
+    //private ScheduledExecutorService executor;
 
     /**
      * Create a device provider for the RESTCONF protocol
@@ -124,23 +121,35 @@ public class RestconfDeviceProvider extends AbstractProvider
 
     @Activate
     public void activate() {
-        providerService = providerRegistry.register(this);
-        appId = coreService.registerApplication(APP_NAME);
-        cfgService.registerConfigFactory(appConfigFactory);
-        cfgService.addListener(configListener);
+        // During early debugging, failure during 'activate' can leave this component
+        // registered with the ProviderService which can cause errors when reloading
+        // the same image to debug the issue. Note that a 'onos-app reinstall' will
+        // help unregister should you wish to remove the following 'try/catch'.
+        try {
+            providerService = providerRegistry.register(this);
 
-        controller.getDevices().forEach(device -> device.addEventListener(deviceListener));
-        executor = SharedScheduledExecutors.getSingleThreadExecutor();
+            appId = coreService.registerApplication(APP_NAME);
+            cfgService.registerConfigFactory(appConfigFactory);
+            cfgService.addListener(configListener);
 
-        // Connect from persistent storage first
+            controller.getDevices().forEach(device -> device.addEventListener(deviceListener));
+            //executor = SharedScheduledExecutors.getSingleThreadExecutor();
 
-        connectInitialDevices();
+            // Connect from persistent storage first
 
-        // Now any devices in network configuration file
+            connectInitialDevices();
 
-        connectDevices();
+            // Now any devices in network configuration file
 
-        log.info("Started");
+            connectDevices();
+
+            log.info("Started");
+        } catch (Exception ex) {
+            // Failure during activation, make sure we clean up
+
+            log.error("Exception during startup: {}", ex.toString());
+            deactivate();
+        }
     }
 
     @Deactivate
@@ -208,37 +217,41 @@ public class RestconfDeviceProvider extends AbstractProvider
         protected static final String ISNULL = "RestconfDeviceInfo is null";
 
         // TODO: @Override
-        public void deviceAdded(RestconfDeviceInfo info) {
+        public void deviceAdded(RestconfDevice device) {
             /**
              * Notifies that the RESTCONF node was added.
              *
              * @param devInfo Device information
              */
-            Preconditions.checkNotNull(info, ISNULL);
-            // Provider service is set to 'null' during deactivation of app
+            Preconditions.checkNotNull(device, ISNULL);
+            DeviceId did = device.getDeviceId();
+            RestId rid = device.getRestconfId();
 
-            if (providerService == null) {
+            if ((providerService == null) || (controller.getDevice(rid) != null)) {
                 return;
             }
+            ChassisId cid = new ChassisId(rid.toLong());
+            IpAddress ipAddress = device.getDeviceInfo().getIpAddress();
 
-            // DeviceId did = deviceId(uri(info.getRestconfId()));
+            SparseAnnotations annotations = DefaultAnnotations.builder()
+                    .set(IPADDRESS, ipAddress.toString())
+                    .set(AnnotationKeys.PROTOCOL, SCHEME_NAME.toUpperCase())
+                    .set(AnnotationKeys.CHANNEL_ID, SCHEME_NAME.toUpperCase())
+                    // TODO: After discovery, can add the MANAGEMENT_ADDRESS annotation?
+                    .build();
+            DeviceDescription deviceDescription = new DefaultDeviceDescription(
+                    did.uri(),
+                    Device.Type.SWITCH, // TODO: Change after discovery?
+                    UNKNOWN,            // TODO: Change after discovery? manufacturer
+                    UNKNOWN,            // TODO: Change after discovery? hwVersion
+                    UNKNOWN,            // TODO: Change after discovery? swVersion
+                    UNKNOWN,            // TODO: Change after discovery? serialNumber
+                    cid,
+                    annotations);
 
-//            DeviceId deviceId = nodeId.getDeviceId();
-//            //Restconf configuration object
-//            ChassisId cid = new ChassisId();
-//            String ipAddress = nodeId.ip().toString();
-//            SparseAnnotations annotations = DefaultAnnotations.builder()
-//                    .set(IPADDRESS, ipAddress)
-//                    .set(AnnotationKeys.PROTOCOL, SCHEME_NAME.toUpperCase())
-//                    .build();
-//            DeviceDescription deviceDescription = new DefaultDeviceDescription(
-//                    deviceId.uri(),
-//                    Device.Type.SWITCH,
-//                    UNKNOWN, UNKNOWN,
-//                    UNKNOWN, UNKNOWN,
-//                    cid,
-//                    annotations);
-//            providerService.deviceConnected(deviceId, deviceDescription);
+            // Signal the core that a device has been discovered/connected
+
+            providerService.deviceConnected(did, deviceDescription);
         }
 
         // TODO: @Override
@@ -255,7 +268,7 @@ public class RestconfDeviceProvider extends AbstractProvider
 
         for (RestconfDevice device : controller.getDevices()) {
             try {
-                deviceListener.deviceAdded(device.getDevideInfo());
+                deviceListener.deviceAdded(device);
 
             } catch (Exception e) {
                 log.warn("Failed initially adding {} : {}",
@@ -279,7 +292,9 @@ public class RestconfDeviceProvider extends AbstractProvider
                     RestconfDevice device = controller.getDevice(devInfo.getRestconfId());
 
                     if (device != null) {
-                        // TODO: Update device, disreguard, ???
+                        // TODO: Update device if needed (IP Address CANNOT change !!!)
+                        // If new information, may need to kick device back to DISCOVERY
+                        // state.
 
                         // TODO: Log whatever we decide to do
                     } else {
@@ -327,19 +342,11 @@ public class RestconfDeviceProvider extends AbstractProvider
 
         @Override
         public void event(NetworkConfigEvent event) {
-            if ((event.type() == NetworkConfigEvent.Type.CONFIG_ADDED ||
-                    event.type() == NetworkConfigEvent.Type.CONFIG_UPDATED) &&
-                    event.configClass().equals(RestconfProviderConfig.class)) {
+            RestconfProviderConfig cfg = cfgService.getConfig(appId,
+                    RestconfProviderConfig.class);
 
-                RestconfProviderConfig cfg = cfgService.getConfig(appId,
-                        RestconfProviderConfig.class);
-
-                reconfigureNetwork(cfg);
-                log.info("Reconfigured: {}", event.type().toString());
-
-            } else {
-                log.info("Why are we here, is isRelevant not working?");
-            }
+            reconfigureNetwork(cfg);
+            log.info("Reconfigured: {}", event.type().toString());
         }
 
         @Override
@@ -347,8 +354,6 @@ public class RestconfDeviceProvider extends AbstractProvider
             return event.configClass().equals(RestconfProviderConfig.class) &&
                     (event.type() == NetworkConfigEvent.Type.CONFIG_ADDED ||
                             event.type() == NetworkConfigEvent.Type.CONFIG_UPDATED);
-
-            // TODO: Also may want to support NetworkConfigEvent.Type.CONFIG_REMOVED.  Investigate this.
         }
 
         private void reconfigureNetwork(RestconfProviderConfig cfg) {
@@ -359,24 +364,12 @@ public class RestconfDeviceProvider extends AbstractProvider
             try {
                 RestconfDeviceProvider.connectionTimeout = cfg.getConnectionTimeout();
                 RestconfDeviceProvider.eventInterval = cfg.getEventInterval();
-                RestconfDeviceProvider.newNumWorkers = cfg.getNumberOfWorkerThreads();
-
-                // TODO: drop worker threads if not used... otherwise handle changes
 
             } catch (ConfigException e) {
                 log.error("Reconfigure Network: ConfigException during parameter read: {}",
                         e.toString());
             }
-            try {
-                Map<String, RestconfDeviceInfo> devices = cfg.getDeviceInfo();
-
-                // TODO: Test how to best handle new/removed devices after we have already
-                //       started.  Perhaps only look for additions?
-
-            } catch (ConfigException e) {
-                log.error("Reconfigure Network: ConfigException during device read: {}",
-                        e.toString());
-            }
+            connectDevices();
         }
     }
 }

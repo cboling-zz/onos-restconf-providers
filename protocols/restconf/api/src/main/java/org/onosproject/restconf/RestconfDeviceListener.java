@@ -22,9 +22,9 @@ public interface RestconfDeviceListener {
     /**
      * Notifies that the RESTCONF node was added.
      *
-     * @param devInfo Device information
+     * @param device RESTCONF Device object
      */
-    void deviceAdded(RestconfDeviceInfo devInfo);
+    void deviceAdded(RestconfDevice device);
 
     /**
      * Notifies that the RESTCONF node was removed.
