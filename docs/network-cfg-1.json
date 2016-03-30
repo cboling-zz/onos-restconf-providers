@@ -34,6 +34,11 @@
                             "xml",
                             "json"
                         ]
+                    },
+                    {
+                        "username": "root",
+                        "password": "test123",
+                        "ipAddress": "192.168.1.100"
                     }
                 ]
             }
