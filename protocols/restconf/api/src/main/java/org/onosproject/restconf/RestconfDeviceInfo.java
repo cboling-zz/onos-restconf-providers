@@ -33,10 +33,11 @@ public class RestconfDeviceInfo {
     private final String password;
     private final String certificatePath;
     private final IpAddress address;
-    private final short tcpPort;
-    private final short sslPort;
+    private final int tcpPort;
+    private final int sslPort;
     private final String apiRoot;
     private final List<String> mediaTypes;
+    private final int socketTimeout;
 
     // TODO: Do we want to support persistent connections to devices?
     // TODO: Do we want to keep sessions to devices opened for a smaller window of time after
@@ -58,9 +59,9 @@ public class RestconfDeviceInfo {
      * @param apiRoot
      * @param mediaTypes
      */
-    public RestconfDeviceInfo(String hostname, IpAddress ipaddr, short tcpPort,
-                              short sslPort, String username, String password,
-                              String certificatePath,
+    public RestconfDeviceInfo(String hostname, IpAddress ipaddr, int tcpPort,
+                              int sslPort, int socketTimeout,
+                              String username, String password, String certificatePath,
                               String apiRoot, List<String> mediaTypes) {
 
         Preconditions.checkArgument(!apiRoot.equals(""), "Empty RESTCONF API Root");
@@ -80,6 +81,7 @@ public class RestconfDeviceInfo {
         this.address = ipaddr;
         this.tcpPort = tcpPort;
         this.sslPort = sslPort;
+        this.socketTimeout = socketTimeout;
         this.apiRoot = apiRoot;
         this.mediaTypes = mediaTypes;
     }
@@ -129,6 +131,13 @@ public class RestconfDeviceInfo {
     /**
      * @return
      */
+    public int getSocketTimeout() {
+        return socketTimeout;
+    }
+
+    /**
+     * @return
+     */
     public String getApiRoot() {
         return apiRoot;
     }
@@ -143,14 +152,14 @@ public class RestconfDeviceInfo {
     /**
      * @return
      */
-    public short getSslPort() {
+    public int getSslPort() {
         return sslPort;
     }
 
     /**
      * @return
      */
-    public short getTcpPort() {
+    public int getTcpPort() {
         return tcpPort;
     }
 

@@ -49,9 +49,12 @@ import org.slf4j.Logger;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 
+import static org.onlab.util.Tools.groupedThreads;
 import static org.onosproject.net.config.basics.SubjectFactories.APP_SUBJECT_FACTORY;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -103,7 +106,6 @@ public class RestconfDeviceProvider extends AbstractProvider
 
     private InternalDeviceListener deviceListener = new InternalDeviceListener();
 
-
     private final ConfigFactory appConfigFactory =
             new ConfigFactory<ApplicationId, RestconfProviderConfig>(APP_SUBJECT_FACTORY,
                     RestconfProviderConfig.class,
@@ -121,11 +123,13 @@ public class RestconfDeviceProvider extends AbstractProvider
 
     public static int connectionTimeout = RestconfProviderConfig.DEFAULT_CONNECTION_TIMEOUT;
     public static int eventInterval = RestconfProviderConfig.DEFAULT_EVENT_INTERVAL;
+    public static int numWorkers = RestconfProviderConfig.DEFAULT_WORKER_THREADS;
 
     // Probably want to create with just '1', then after reading config (or notify on config update)
     // the number can be increased/decreased as appropriate
-    //    private ExecutorService executor =
-    //            Executors.newFixedThreadPool(numWorkers, groupedThreads("onos/restconfdeviceprovider", "device-installer-%d", log));
+    private ExecutorService executor =
+            Executors.newFixedThreadPool(numWorkers,
+                    groupedThreads("onos/restconfdeviceprovider", "device-installer-%d", log));
 
     //private HashMap<String, ScheduledFuture<?>> executorResults = Maps.newHashMap();
     //private ScheduledExecutorService executor;
@@ -161,13 +165,10 @@ public class RestconfDeviceProvider extends AbstractProvider
 
             localNodeId = clusterService.getLocalNode().id();
 
-            // Connect from persistent storage first
+            // Perform device restore/load on a separate thread since connectivity on a per-
+            // device basis can take times (or may incur timeouts)
 
-            connectInitialDevices();
-
-            // Now any devices in network configuration file
-
-            connectDevices();
+            executor.execute(RestconfDeviceProvider.this::connectDevices);
 
             log.info("Started");
         } catch (Exception ex) {
@@ -223,21 +224,38 @@ public class RestconfDeviceProvider extends AbstractProvider
     @Override
     public void roleChanged(DeviceId deviceId, MastershipRole newRole) {
         if (active) {
-            // TODO: This will be implemented later.
             switch (newRole) {
-//                case MASTER:
-//                    initiateConnection(deviceId, newRole);
-//                    log.debug("Accepting mastership role change to {} for device {}", newRole, deviceId);
-//                    break;
-//                case STANDBY:
-//                    controller.disconnectDevice(deviceId, false);
-//                    providerService.receivedRoleReply(deviceId, newRole, MastershipRole.STANDBY);
-//                    //else no-op
-//                    break;
-//                case NONE:
-//                    controller.disconnectDevice(deviceId, false);
-//                    providerService.receivedRoleReply(deviceId, newRole, MastershipRole.NONE);
-//                    break;
+                case MASTER:
+                    try {
+                        RestconfDevice device = controller.getDevice(new RestId(deviceId));
+
+                        if ((device != null) && isReachable(deviceId)) {
+                            controller.connectDevice(deviceId);
+
+                            log.debug("Accepting mastership role change to {} for device {}",
+                                    newRole, deviceId);
+
+                            providerService.receivedRoleReply(deviceId, newRole,
+                                    MastershipRole.MASTER);
+                        }
+                    } catch (Exception e) {
+                        if (deviceService.getDevice(deviceId) != null) {
+                            providerService.deviceDisconnected(deviceId);
+                        }
+                        deviceKeyAdminService.removeKey(DeviceKeyId.deviceKeyId(deviceId.toString()));
+                        log.warn("Can't connect to RESTCONF device {}: {}", deviceId, e);
+                    }
+                    break;
+
+                case STANDBY:
+                    controller.disconnectDevice(deviceId, false);
+                    providerService.receivedRoleReply(deviceId, newRole, MastershipRole.STANDBY);
+                    break;
+
+                case NONE:
+                    controller.disconnectDevice(deviceId, false);
+                    providerService.receivedRoleReply(deviceId, newRole, MastershipRole.NONE);
+                    break;
                 default:
                     log.error("Unimplemented Mastership state : {}", newRole);
             }
@@ -282,6 +300,10 @@ public class RestconfDeviceProvider extends AbstractProvider
     }
 
     private void connectDevices() {
+        // Connect from persistent storage first
+
+        connectInitialDevices();
+
         // merge any new devices in from configuration file
 
         RestconfProviderConfig cfg = cfgService.getConfig(appId, RestconfProviderConfig.class);
@@ -389,7 +411,8 @@ public class RestconfDeviceProvider extends AbstractProvider
             // TODO: can we extend the device key to also contain an X509 certificate
             //       or other credentials we may need for connectivity?
 
-            // Signal the core that a device has been discovered/connected
+            // Signal the core that a device has been discovered/connected. This should result
+            // in a call to roleChanged to accept mastership for this device
 
             providerService.deviceConnected(did, deviceDescription);
         }

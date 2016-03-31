@@ -15,11 +15,15 @@
  */
 package org.onosproject.restconf.ctl;
 
+import org.onlab.packet.IpAddress;
 import org.onosproject.net.DeviceId;
 import org.onosproject.restconf.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.net.URI;
 
 /**
@@ -32,33 +36,13 @@ public class DefaultRestconfDevice implements RestconfDevice {
 
     private RestconfDeviceInfo deviceInfo;
     private final RestId restId;
-    private State state = State.INITIAL;
-    private String failureReason = "";
+    private RestconfDeviceStateMachine stateMachine;
 
     public DefaultRestconfDevice(RestconfDeviceInfo deviceInfo) {
         this.deviceInfo = deviceInfo;
         this.restId = deviceInfo.getRestconfId();
+        this.stateMachine = new RestconfDeviceStateMachine(DeviceId.deviceId(RestId.uri(restId)));
     }
-//
-//    /**
-//     * Registers a listener for RESTCONF events.
-//     *
-//     * @param listener the listener to notify
-//     */
-//    public void addEventListener(RestconfDeviceListener listener) {
-//
-//        //TODO: Need to implement
-//    }
-//
-//    /**
-//     * Unregisters a listener.
-//     *
-//     * @param listener the listener to unregister
-//     */
-//    public void removeEventListener(RestconfDeviceListener listener) {
-//
-//        //TODO: Need to implement
-//    }
 
     /**
      * Get the device ID for this RESTCONF device
@@ -92,43 +76,42 @@ public class DefaultRestconfDevice implements RestconfDevice {
      *
      * @return Device State
      */
-    public State getState() {
-        return state;
+    public int getState() {
+        return stateMachine.getState();
     }
 
     /**
-     * Transition the device to a new state
+     * Connectivity test to remote device
      *
-     * @param newState new State
+     * @param port Port number to try
      *
-     * @throws RestconfException
+     * @return True if a Socket can be established
      */
-    public void setState(State newState) throws RestconfException {
-        // TODO: Code this as a state machine, but for now, use a nasty set of if/switches
+    private boolean testConnection(int port) {
+        RestconfDeviceInfo info = getDeviceInfo();
+        String address = info.getIpAddress().toString();
+        Socket socket = null;
+        int timeout = info.getSocketTimeout();
 
-        switch (state) {
-            case INITIAL:
-                // Only support transition to discovery
+        try {
+            socket = new Socket();
+            socket.connect(new InetSocketAddress(address, port), timeout);
+            return socket.isConnected() && !socket.isClosed();
 
-                if (newState != State.DISCOVERY) {
-                    throw new RestconfException("Invalid state transistion");
+        } catch (IOException e) {
+            log.info("Device {} is not reachable on port {}: {}", getDeviceId(),
+                    port, e.toString());
+            return false;
+        } finally {
+            if (socket != null) {
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    log.debug("Test Socket failed {} on port {}: {}", getDeviceId(), port,
+                            e.toString());
+                    return false;
                 }
-                throw new RestconfException("TODO: Not yet implemented");
-
-            case DISCOVERY:
-                throw new RestconfException("TODO: Not yet implemented");
-
-            case LIBRARY_POPULATE:
-                throw new RestconfException("TODO: Not yet implemented");
-
-            case ACTIVE:
-                throw new RestconfException("TODO: Not yet implemented");
-
-            case INACTIVE:
-                throw new RestconfException("TODO: Not yet implemented");
-
-            case FAILED:
-                throw new RestconfException("TODO: Not yet implemented");
+            }
         }
     }
 
@@ -138,15 +121,20 @@ public class DefaultRestconfDevice implements RestconfDevice {
      * @return true if we can connect to the device
      */
     public boolean isReachable() {
-        switch (state) {
-            case INITIAL:
-            case DISCOVERY:
-            case INACTIVE:
-            case FAILED:
+        switch (getState()) {
+            case RestconfDeviceStateMachine.IDLE:
+                return testConnection(getDeviceInfo().getSslPort()) ||
+                        testConnection(getDeviceInfo().getTcpPort());
+
+            case RestconfDeviceStateMachine.DISCOVERY:
+            case RestconfDeviceStateMachine.POPULATE:
+            case RestconfDeviceStateMachine.ACTIVE:
+                return true;
+
+            case RestconfDeviceStateMachine.INACTIVE:
+            case RestconfDeviceStateMachine.ERROR:
                 return false;
         }
-        // TODO: Implement for the LIBRARY_POPULATE/ACTIVE States
-
         return false;
     }
 
@@ -156,7 +144,7 @@ public class DefaultRestconfDevice implements RestconfDevice {
      * @return Failure reason (blank if not in a failed or inactive state)
      */
     public String getFailureReason() {
-        return failureReason;
+        return stateMachine.getFailureReason();
     }
 
     /**

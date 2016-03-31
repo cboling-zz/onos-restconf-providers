@@ -41,7 +41,7 @@ public class RestconfProviderConfig extends Config<ApplicationId> {
 
     private static String WORKER_THREADS = "workerThreads";
     private static String EVENT_INTERVAL = "eventInterval";
-    private static String CONNECTION_TIMEOUT = "connectionTimeout";
+    private static String CONNECTION_TIMEOUT = "connectionTimeout"; // Also per-device
     private static String SSL_PREFERRED = "sslPreferred";
 
     public static final String CONFIG_VALUE_ERROR = "Error parsing config value";
@@ -138,8 +138,9 @@ public class RestconfProviderConfig extends Config<ApplicationId> {
                     String password = node.path(PASSWORD).asText("");
                     String certPath = node.path(CERTIFICATE_PATH).asText("");
                     IpAddress address = IpAddress.valueOf(node.path(IP_ADDRESS).asText(""));
-                    short tcpPort = (short) node.path(TCP_PORT).asInt(DEFAULT_TCP_PORT);
-                    short sslPort = (short) node.path(SSL_PORT).asInt(DEFAULT_SSL_PORT);
+                    int tcpPort = node.path(TCP_PORT).asInt(DEFAULT_TCP_PORT);
+                    int sslPort = node.path(SSL_PORT).asInt(DEFAULT_SSL_PORT);
+                    int timeout = get(CONNECTION_TIMEOUT, DEFAULT_CONNECTION_TIMEOUT);
                     String apiRoot = node.path(API_ROOT).asText(DEFAULT_API_ROOT);
                     List<String> mediaTypes = Lists.newArrayList();
 
@@ -150,8 +151,8 @@ public class RestconfProviderConfig extends Config<ApplicationId> {
                         mediaTypes.add(DEFAULT_JSON_MEDIA_TYPE);
                     }
                     RestconfDeviceInfo device = new RestconfDeviceInfo(hostName, address,
-                            tcpPort, sslPort, userName,
-                            password, certPath, apiRoot,
+                            tcpPort, sslPort, timeout,
+                            userName, password, certPath, apiRoot,
                             mediaTypes);
 
                     devicesInfo.put(address.toString(), device);

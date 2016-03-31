@@ -21,57 +21,6 @@ import org.onosproject.net.DeviceId;
  * Created by cboling on 3/24/16.
  */
 public interface RestconfDevice {
-
-    /**
-     * Representation of the RESTCONF device state
-     */
-    enum State {
-        /**
-         * Initial (temporary) state of the device that occurs just after the device
-         * is created by CLI/NetConfig JSON or is being restored from persistent
-         * storage after a Control or RESTCONF protocol driver reset.
-         */
-        INITIAL,
-
-        /**
-         *
-         */
-        DISCOVERY,
-
-        /**
-         *
-         */
-        LIBRARY_POPULATE,
-
-        /**
-         *
-         */
-        ACTIVE,
-
-        /**
-         *
-         */
-        INACTIVE,
-
-        /**
-         *
-         */
-        FAILED
-    }
-//    /**
-//     * Registers a listener for RESTCONF events.
-//     *
-//     * @param listener the listener to notify
-//     */
-//    void addEventListener(RestconfDeviceListener listener);
-//
-//    /**
-//     * Unregisters a listener.
-//     *
-//     * @param listener the listener to unregister
-//     */
-//    void removeEventListener(RestconfDeviceListener listener);
-
     /**
      * Get the device ID for this RESTCONF device
      *
@@ -91,7 +40,7 @@ public interface RestconfDevice {
      *
      * @return Device State
      */
-    State getState();
+    int getState();
 
     /**
      * Transition the device to a new state
@@ -100,7 +49,7 @@ public interface RestconfDevice {
      *
      * @throws RestconfException
      */
-    void setState(State newState) throws RestconfException;
+    //void setState(State newState) throws RestconfException;
 
     /**
      * Do we have connectivity to the device

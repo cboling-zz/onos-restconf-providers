@@ -18,7 +18,7 @@
             "restconf": {
                 "workerThreads": 5,
                 "eventInterval": 5,
-                "connectionTimeout": 15000,
+                "connectionTimeout": 10000,
                 "sslPreferred": "True",
                 "devices": [
                     {
@@ -29,6 +29,7 @@
                         "ipAddress": "192.168.1.100",
                         "tcpPort": 80,
                         "sslPort": 443,
+                        "connectionTimeout": 5000,
                         "apiRoot": "/restconf",
                         "mediaTypes": [
                             "xml",
