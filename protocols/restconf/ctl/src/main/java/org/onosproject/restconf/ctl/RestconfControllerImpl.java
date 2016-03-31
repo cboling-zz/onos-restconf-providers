@@ -113,6 +113,30 @@ public class RestconfControllerImpl implements RestconfController {
     }
 
     /**
+     * Tries to connect to a specific RESTCONF device, if the connection is successful
+     * it creates and adds the device to the ONOS core as a RestconfDevice.
+     *
+     * @param deviceId deviceId of the device to connect
+     * @return NetconfDevice Netconf device
+     * @throws RestconfException when device is not available
+     */
+    public RestconfDevice connectDevice(DeviceId deviceId) throws RestconfException {
+
+        throw new RestconfException("TODO: Need to implement");
+        // TODO: put connectivity guts into the NetconfDevice interface/impl
+    }
+
+    /**
+     * Disconnects a RESTCONF device and removes it from the core.
+     *
+     * @param deviceId id of the device to remove
+     * @param remove   true if device is to be removed from core
+     */
+    public void disconnectDevice(DeviceId deviceId, boolean remove) {
+        // TODO: Implement this
+    }
+
+    /**
      * Send a RESTCONF message to a managed RESTCONF device
      *
      * @param id  Device ID

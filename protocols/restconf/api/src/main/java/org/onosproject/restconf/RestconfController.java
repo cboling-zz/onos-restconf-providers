@@ -15,6 +15,8 @@
  */
 package org.onosproject.restconf;
 
+import org.onosproject.net.DeviceId;
+
 /**
  * Abstraction of an RESTCONF controller.
  *
@@ -53,17 +55,34 @@ public interface RestconfController {
      *
      * @param listener node listener
      */
-    @Deprecated
     void addDeviceListener(RestconfDeviceListener listener);
 
-    // TODO: These are being moved to the RestconfDevice interface
     /**
      * Removes Device Listener.
      *
      * @param listener node listener
      */
-    @Deprecated
     void removeDeviceListener(RestconfDeviceListener listener);
+
+    /**
+     * Tries to connect to a specific RESTCONF device, if the connection is successful
+     * it creates and adds the device to the ONOS core as a RestconfDevice.
+     *
+     * @param deviceId deviceId of the device to connect
+     *
+     * @return NetconfDevice Netconf device
+     *
+     * @throws RestconfException when device is not available
+     */
+    RestconfDevice connectDevice(DeviceId deviceId) throws RestconfException;
+
+    /**
+     * Disconnects a RESTCONF device and removes it from the core.
+     *
+     * @param deviceId id of the device to remove
+     * @param remove   true if device is to be removed from core
+     */
+    void disconnectDevice(DeviceId deviceId, boolean remove);
 
     /**
      * Send a RESTCONF message to a managed RESTCONF device

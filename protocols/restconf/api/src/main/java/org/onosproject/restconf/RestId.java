@@ -17,6 +17,7 @@ package org.onosproject.restconf;
 
 import org.onlab.packet.IpAddress;
 import org.onlab.util.HexString;
+import org.onosproject.net.DeviceId;
 
 import javax.ws.rs.NotSupportedException;
 import java.net.URI;
@@ -53,7 +54,18 @@ public final class RestId {
     }
 
     /**
-     * Constructor from a string.
+     * Constructor from a DeviceID.
+     *
+     * @param did the ID to use.
+     */
+    public RestId(DeviceId did) {
+        URI uri = did.uri();
+        checkArgument(uri.getScheme().equals(SCHEME), "Unsupported URI scheme");
+        this.value = IpAddress.valueOf(uri.getSchemeSpecificPart());
+    }
+
+    /**
+     * Constructor from an IP Address.
      *
      * @param value the value to use.
      */

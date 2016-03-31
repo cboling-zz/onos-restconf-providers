@@ -15,8 +15,28 @@
  */
 package org.onosproject.restconf;
 
+import java.io.IOException;
+
 /**
- * Created by cboling on 3/24/16.
+ * Represents class of errors related to RESTCONF SB protocol.
  */
-public class RestconfException {
+public class RestconfException extends IOException {
+    /**
+     * Constructs an exception with the specified message.
+     *
+     * @param message the message describing the specific nature of the error
+     */
+    public RestconfException(String message) {
+        super(message);
+    }
+
+    /**
+     * Constructs an exception with the specified message and the underlying cause.
+     *
+     * @param message the message describing the specific nature of the error
+     * @param cause   the underlying cause of this error
+     */
+    public RestconfException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

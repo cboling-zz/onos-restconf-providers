@@ -25,9 +25,12 @@ import org.apache.felix.scr.annotations.ReferenceCardinality;
 import org.onlab.packet.ChassisId;
 import org.onlab.packet.IpAddress;
 import org.onlab.util.SharedScheduledExecutors;
+import org.onosproject.cluster.ClusterService;
+import org.onosproject.cluster.NodeId;
 import org.onosproject.core.ApplicationId;
 import org.onosproject.core.CoreService;
 import org.onosproject.incubator.net.config.basics.ConfigException;
+import org.onosproject.mastership.MastershipService;
 import org.onosproject.net.*;
 import org.onosproject.net.config.ConfigFactory;
 import org.onosproject.net.config.NetworkConfigEvent;
@@ -35,6 +38,9 @@ import org.onosproject.net.config.NetworkConfigListener;
 import org.onosproject.net.config.NetworkConfigRegistry;
 import org.onosproject.net.device.*;
 import org.onosproject.net.driver.DriverService;
+import org.onosproject.net.key.DeviceKey;
+import org.onosproject.net.key.DeviceKeyAdminService;
+import org.onosproject.net.key.DeviceKeyId;
 import org.onosproject.net.provider.AbstractProvider;
 import org.onosproject.net.provider.ProviderId;
 import org.onosproject.restconf.*;
@@ -76,6 +82,15 @@ public class RestconfDeviceProvider extends AbstractProvider
     @Reference(cardinality = ReferenceCardinality.MANDATORY_UNARY)
     protected DeviceService deviceService;
 
+    @Reference(cardinality = ReferenceCardinality.MANDATORY_UNARY)
+    protected DeviceKeyAdminService deviceKeyAdminService;
+
+    @Reference(cardinality = ReferenceCardinality.MANDATORY_UNARY)
+    protected MastershipService mastershipService;
+
+    @Reference(cardinality = ReferenceCardinality.MANDATORY_UNARY)
+    protected ClusterService clusterService;
+
     // TODO:Keep this?  -> protected Map<DeviceId, RESTConfDevice> restconfDeviceMap = new ConcurrentHashMap<DeviceId, RESTConfDevice>();
 
     private static final String APP_NAME = "org.onosproject.restconf";
@@ -84,7 +99,10 @@ public class RestconfDeviceProvider extends AbstractProvider
     private static final String UNKNOWN = "unknown";
 
     private DeviceProviderService providerService;
-    private RestconfDeviceListener deviceListener = new InternalDeviceProvider();
+    private RestconfDeviceListener innerNodeListener = new InnerRestconfDeviceListener();
+
+    private InternalDeviceListener deviceListener = new InternalDeviceListener();
+
 
     private final ConfigFactory appConfigFactory =
             new ConfigFactory<ApplicationId, RestconfProviderConfig>(APP_SUBJECT_FACTORY,
@@ -99,18 +117,20 @@ public class RestconfDeviceProvider extends AbstractProvider
 
     private final NetworkConfigListener configListener = new InternalConfigListener();
     private ApplicationId appId;
-    private HashMap<String, ScheduledFuture<?>> executorResults = Maps.newHashMap();
+    private NodeId localNodeId;
 
     public static int connectionTimeout = RestconfProviderConfig.DEFAULT_CONNECTION_TIMEOUT;
     public static int eventInterval = RestconfProviderConfig.DEFAULT_EVENT_INTERVAL;
 
-    // TODO: Make number of initial threads tunable (network config structure)
     // Probably want to create with just '1', then after reading config (or notify on config update)
     // the number can be increased/decreased as appropriate
     //    private ExecutorService executor =
     //            Executors.newFixedThreadPool(numWorkers, groupedThreads("onos/restconfdeviceprovider", "device-installer-%d", log));
 
+    //private HashMap<String, ScheduledFuture<?>> executorResults = Maps.newHashMap();
     //private ScheduledExecutorService executor;
+
+    private boolean active;
 
     /**
      * Create a device provider for the RESTCONF protocol
@@ -121,6 +141,9 @@ public class RestconfDeviceProvider extends AbstractProvider
 
     @Activate
     public void activate() {
+
+        active = true;
+
         // During early debugging, failure during 'activate' can leave this component
         // registered with the ProviderService which can cause errors when reloading
         // the same image to debug the issue. Note that a 'onos-app reinstall' will
@@ -132,8 +155,11 @@ public class RestconfDeviceProvider extends AbstractProvider
             cfgService.registerConfigFactory(appConfigFactory);
             cfgService.addListener(configListener);
 
-            controller.getDevices().forEach(device -> device.addEventListener(deviceListener));
-            //executor = SharedScheduledExecutors.getSingleThreadExecutor();
+            controller.addDeviceListener(innerNodeListener);
+            deviceService.addListener(deviceListener);
+            //controller.getDevices().forEach(device -> device.addEventListener(deviceListener));
+
+            localNodeId = clusterService.getLocalNode().id();
 
             // Connect from persistent storage first
 
@@ -154,12 +180,19 @@ public class RestconfDeviceProvider extends AbstractProvider
 
     @Deactivate
     public void deactivate() {
+        deviceService.removeListener(deviceListener);
+        active = false;
+
+        controller.getDevices().forEach(device -> {
+            DeviceId id = device.getDeviceId();
+            deviceKeyAdminService.removeKey(DeviceKeyId.deviceKeyId(id.toString()));
+            controller.disconnectDevice(id, true);
+        });
+        controller.removeDeviceListener(innerNodeListener);
+        deviceService.removeListener(deviceListener);
         providerRegistry.unregister(this);
         providerService = null;
-
         cfgService.unregisterConfigFactory(appConfigFactory);
-
-        controller.getDevices().forEach(device -> device.removeEventListener(deviceListener));
 
         log.info("Stopped");
     }
@@ -189,7 +222,26 @@ public class RestconfDeviceProvider extends AbstractProvider
      */
     @Override
     public void roleChanged(DeviceId deviceId, MastershipRole newRole) {
-        // TODO: This will be implemented later.
+        if (active) {
+            // TODO: This will be implemented later.
+            switch (newRole) {
+//                case MASTER:
+//                    initiateConnection(deviceId, newRole);
+//                    log.debug("Accepting mastership role change to {} for device {}", newRole, deviceId);
+//                    break;
+//                case STANDBY:
+//                    controller.disconnectDevice(deviceId, false);
+//                    providerService.receivedRoleReply(deviceId, newRole, MastershipRole.STANDBY);
+//                    //else no-op
+//                    break;
+//                case NONE:
+//                    controller.disconnectDevice(deviceId, false);
+//                    providerService.receivedRoleReply(deviceId, newRole, MastershipRole.NONE);
+//                    break;
+                default:
+                    log.error("Unimplemented Mastership state : {}", newRole);
+            }
+        }
     }
 
     /**
@@ -201,17 +253,89 @@ public class RestconfDeviceProvider extends AbstractProvider
      */
     @Override
     public boolean isReachable(DeviceId deviceId) {
-        // TODO: RestconfDevice device = controller.getRestconfDevice(deviceId);
-//        if (device == null) {
-//            log.debug("Requested device id: {} is not associated to any " +
-//                    "RESTCONF Device", deviceId.toString());
-//            return false;
-//        }
-//        return device.isActive();
-        return false;
+        RestconfDevice device = controller.getDevice(new RestId(deviceId));
+
+        if (device == null) {
+            log.debug("Requested device id: {} is not associated to any " +
+                    "RESTCONF Device", deviceId.toString());
+            return false;
+        }
+        return device.isReachable();
     }
 
-    private class InternalDeviceProvider implements RestconfDeviceListener {
+    private void connectInitialDevices() {
+        // TODO: Do we want to handle devices restored from persistent storage separately?
+
+        for (RestconfDevice device : controller.getDevices()) {
+            try {
+                innerNodeListener.deviceAdded(device);
+
+            } catch (Exception e) {
+                log.warn("Failed initially adding {} : {}",
+                        device.getDeviceId().toString(), e.getMessage());
+                log.debug("Error details:", e);
+
+                // disconnect to trigger device-add later
+                // TODO: device.disconnectDevice();
+            }
+        }
+    }
+
+    private void connectDevices() {
+        // merge any new devices in from configuration file
+
+        RestconfProviderConfig cfg = cfgService.getConfig(appId, RestconfProviderConfig.class);
+
+        if (cfg != null) {
+            try {
+                for (RestconfDeviceInfo devInfo : cfg.getDeviceInfo().values()) {
+                    RestconfDevice device = controller.getDevice(devInfo.getRestconfId());
+
+                    if (device != null) {
+                        // If new information, may need to kick device back to DISCOVERY
+                        // state.
+
+                        innerNodeListener.deviceModified(device.getDeviceId(), devInfo);
+                    } else {
+                        innerNodeListener.deviceAdded(controller.createDevice(devInfo));
+                    }
+                }
+            } catch (ConfigException e) {
+                log.error("Cannot read config error " + e);
+            }
+        }
+    }
+
+    /**
+     * Listener for core device events.
+     */
+    private class InternalDeviceListener implements DeviceListener {
+        @Override
+        public void event(DeviceEvent event) {
+            if ((event.type() == DeviceEvent.Type.DEVICE_ADDED)) {
+
+                //executor.execute(() -> discoverPorts(event.subject().id()));
+
+            } else if ((event.type() == DeviceEvent.Type.DEVICE_REMOVED)) {
+
+                log.debug("removing device {}", event.subject().id());
+                deviceService.getDevice(event.subject().id()).annotations().keys();
+                // TODO: controller.disconnectDevice(event.subject().id(), true);
+            }
+        }
+
+        @Override
+        public boolean isRelevant(DeviceEvent event) {
+            if (mastershipService.getMasterFor(event.subject().id()) == null) {
+                return true;
+            }
+            return event.subject().annotations().value(AnnotationKeys.PROTOCOL)
+                    .equals(SCHEME_NAME.toUpperCase()) &&
+                    mastershipService.getMasterFor(event.subject().id()).equals(localNodeId);
+        }
+    }
+
+    private class InnerRestconfDeviceListener implements RestconfDeviceListener {
 
         private static final String IPADDRESS = "ipaddress";
         // TODO: Any other custom annotations?
@@ -256,6 +380,15 @@ public class RestconfDeviceProvider extends AbstractProvider
                     cid,
                     annotations);
 
+            RestconfDeviceInfo info = device.getDeviceInfo();
+
+            deviceKeyAdminService.addKey(
+                    DeviceKey.createDeviceKeyUsingUsernamePassword(
+                            DeviceKeyId.deviceKeyId(did.toString()),
+                            null, info.getUserName(), info.getPassword()));
+            // TODO: can we extend the device key to also contain an X509 certificate
+            //       or other credentials we may need for connectivity?
+
             // Signal the core that a device has been discovered/connected
 
             providerService.deviceConnected(did, deviceDescription);
@@ -288,49 +421,32 @@ public class RestconfDeviceProvider extends AbstractProvider
         }
     }
 
-    private void connectInitialDevices() {
-        // TODO: Do we want to handle devices restored from persistent storage separately?
-
-        for (RestconfDevice device : controller.getDevices()) {
-            try {
-                deviceListener.deviceAdded(device);
-
-            } catch (Exception e) {
-                log.warn("Failed initially adding {} : {}",
-                        device.getDeviceId().toString(), e.getMessage());
-                log.debug("Error details:", e);
-
-                // disconnect to trigger device-add later
-                // TODO: device.disconnectDevice();
-            }
-        }
-    }
-
-    private void connectDevices() {
-
-        // merge any new devices in from configuration file
-
-        RestconfProviderConfig cfg = cfgService.getConfig(appId, RestconfProviderConfig.class);
-
-        if (cfg != null) {
-            try {
-                for (RestconfDeviceInfo devInfo : cfg.getDeviceInfo().values()) {
-                    RestconfDevice device = controller.getDevice(devInfo.getRestconfId());
-
-                    if (device != null) {
-                        // If new information, may need to kick device back to DISCOVERY
-                        // state.
-
-                        deviceListener.deviceModified(device.getDeviceId(), devInfo);
-                    } else {
-                        deviceListener.deviceAdded(controller.createDevice(devInfo));
-                    }
-                }
-            } catch (ConfigException e) {
-                log.error("Cannot read config error " + e);
-            }
-        }
-    }
+//    private class InnerRestconfDeviceListener implements RestconfDeviceListener {
+//
+//        @Override
+//        public void deviceAdded(RestconfDevice device) {
+//            //no-op
+//            log.debug("Restconf device {} added to Restconf subController",
+//                    device.getDeviceId());
+//        }
+//
+//        @Override
+//        public void deviceRemoved(DeviceId deviceId) {
+//            Preconditions.checkNotNull(deviceId, "Device ID is NULL");
+//            log.debug("Restconf device {} removed from Restconf subController", deviceId);
+//            providerService.deviceDisconnected(deviceId);
+//        }
+//
+//        @Override
+//        public void deviceModified(DeviceId deviceId, RestconfDeviceInfo info) {
+//            Preconditions.checkNotNull(deviceId, "Device ID is NULL");
+//            Preconditions.checkNotNull(info, "Device information is NULL");
+//
+//            log.debug("Restconf device {} removed from Restconf subController", deviceId);
+//
+//            // TODO: Handle this
+//        }
+//    }
 
     private class InternalConfigListener implements NetworkConfigListener {
 

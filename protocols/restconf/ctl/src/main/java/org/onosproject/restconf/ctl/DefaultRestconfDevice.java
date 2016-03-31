@@ -39,26 +39,26 @@ public class DefaultRestconfDevice implements RestconfDevice {
         this.deviceInfo = deviceInfo;
         this.restId = deviceInfo.getRestconfId();
     }
-
-    /**
-     * Registers a listener for RESTCONF events.
-     *
-     * @param listener the listener to notify
-     */
-    public void addEventListener(RestconfDeviceListener listener) {
-
-        //TODO: Need to implement
-    }
-
-    /**
-     * Unregisters a listener.
-     *
-     * @param listener the listener to unregister
-     */
-    public void removeEventListener(RestconfDeviceListener listener) {
-
-        //TODO: Need to implement
-    }
+//
+//    /**
+//     * Registers a listener for RESTCONF events.
+//     *
+//     * @param listener the listener to notify
+//     */
+//    public void addEventListener(RestconfDeviceListener listener) {
+//
+//        //TODO: Need to implement
+//    }
+//
+//    /**
+//     * Unregisters a listener.
+//     *
+//     * @param listener the listener to unregister
+//     */
+//    public void removeEventListener(RestconfDeviceListener listener) {
+//
+//        //TODO: Need to implement
+//    }
 
     /**
      * Get the device ID for this RESTCONF device
@@ -94,6 +94,60 @@ public class DefaultRestconfDevice implements RestconfDevice {
      */
     public State getState() {
         return state;
+    }
+
+    /**
+     * Transition the device to a new state
+     *
+     * @param newState new State
+     *
+     * @throws RestconfException
+     */
+    public void setState(State newState) throws RestconfException {
+        // TODO: Code this as a state machine, but for now, use a nasty set of if/switches
+
+        switch (state) {
+            case INITIAL:
+                // Only support transition to discovery
+
+                if (newState != State.DISCOVERY) {
+                    throw new RestconfException("Invalid state transistion");
+                }
+                throw new RestconfException("TODO: Not yet implemented");
+
+            case DISCOVERY:
+                throw new RestconfException("TODO: Not yet implemented");
+
+            case LIBRARY_POPULATE:
+                throw new RestconfException("TODO: Not yet implemented");
+
+            case ACTIVE:
+                throw new RestconfException("TODO: Not yet implemented");
+
+            case INACTIVE:
+                throw new RestconfException("TODO: Not yet implemented");
+
+            case FAILED:
+                throw new RestconfException("TODO: Not yet implemented");
+        }
+    }
+
+    /**
+     * Do we have connectivity to the device
+     *
+     * @return true if we can connect to the device
+     */
+    public boolean isReachable() {
+        switch (state) {
+            case INITIAL:
+            case DISCOVERY:
+            case INACTIVE:
+            case FAILED:
+                return false;
+        }
+        // TODO: Implement for the LIBRARY_POPULATE/ACTIVE States
+
+        return false;
     }
 
     /**

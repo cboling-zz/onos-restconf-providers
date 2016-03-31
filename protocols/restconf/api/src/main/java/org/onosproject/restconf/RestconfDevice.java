@@ -58,19 +58,19 @@ public interface RestconfDevice {
          */
         FAILED
     }
-    /**
-     * Registers a listener for RESTCONF events.
-     *
-     * @param listener the listener to notify
-     */
-    void addEventListener(RestconfDeviceListener listener);
-
-    /**
-     * Unregisters a listener.
-     *
-     * @param listener the listener to unregister
-     */
-    void removeEventListener(RestconfDeviceListener listener);
+//    /**
+//     * Registers a listener for RESTCONF events.
+//     *
+//     * @param listener the listener to notify
+//     */
+//    void addEventListener(RestconfDeviceListener listener);
+//
+//    /**
+//     * Unregisters a listener.
+//     *
+//     * @param listener the listener to unregister
+//     */
+//    void removeEventListener(RestconfDeviceListener listener);
 
     /**
      * Get the device ID for this RESTCONF device
@@ -92,6 +92,22 @@ public interface RestconfDevice {
      * @return Device State
      */
     State getState();
+
+    /**
+     * Transition the device to a new state
+     *
+     * @param newState new State
+     *
+     * @throws RestconfException
+     */
+    void setState(State newState) throws RestconfException;
+
+    /**
+     * Do we have connectivity to the device
+     *
+     * @return true if we can connect to the device
+     */
+    boolean isReachable();
 
     /**
      * Get reason the device is in the FAILED or INACTIVE state
