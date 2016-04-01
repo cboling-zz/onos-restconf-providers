@@ -19,7 +19,7 @@
     <feature name="${project.artifactId}" version="${project.version}"
              description="${project.description}">
         <feature>onos-api</feature>
-        <bundle>mvn:io.netty/netty/3.9.2.Final</bundle>
+        <bundle>mvn:io.netty/netty/${netty.version}</bundle>
         <bundle>mvn:${project.groupId}/onos-restconf-api/${project.version}</bundle>
         <bundle>mvn:${project.groupId}/onos-restconf-ctl/${project.version}</bundle>
         <bundle>mvn:${project.groupId}/onos-restconf-provider-device/${project.version}</bundle>
