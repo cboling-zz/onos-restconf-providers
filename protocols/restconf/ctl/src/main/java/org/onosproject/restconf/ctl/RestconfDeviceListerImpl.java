@@ -15,7 +15,9 @@
  */
 package org.onosproject.restconf.ctl;
 
+import org.onosproject.net.DeviceId;
 import org.onosproject.restconf.RestId;
+import org.onosproject.restconf.RestconfDevice;
 import org.onosproject.restconf.RestconfDeviceInfo;
 import org.onosproject.restconf.RestconfDeviceListener;
 
@@ -37,9 +39,9 @@ public class RestconfDeviceListerImpl implements RestconfDeviceListener {
     /**
      * Notifies that the RESTCONF node was added.
      *
-     * @param devInfo Device information
+     * @param device RESTCONF Device object
      */
-    public void deviceAdded(RestconfDeviceInfo devInfo) {
+    public void deviceAdded(RestconfDevice device) {
         // TODO: Implement this
 
         // Create device ID (may need to be port of RestconfDeviceInfo)
@@ -54,7 +56,17 @@ public class RestconfDeviceListerImpl implements RestconfDeviceListener {
      *
      * @param id Device ID
      */
-    public void deviceRemoved(RestId id) {
+    public void deviceRemoved(DeviceId id) {
+        // TODO: Implement this
+    }
+
+    /**
+     * Notifies that the RESTCONF node was removed.
+     *
+     * @param id   Device ID
+     * @param info Updated device information
+     */
+    public void deviceModified(DeviceId id, RestconfDeviceInfo info) {
         // TODO: Implement this
     }
 }
