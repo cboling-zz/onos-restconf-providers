@@ -15,11 +15,20 @@
  */
 package org.onosproject.restconf.ctl;
 
+import com.mastfrog.acteur.headers.HeaderValueType;
+import com.mastfrog.netty.http.client.HttpClient;
+import com.mastfrog.netty.http.client.HttpRequestBuilder;
+import com.mastfrog.netty.http.client.ResponseFuture;
+import com.mastfrog.netty.http.client.ResponseHandler;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import org.joda.time.Duration;
 import org.onosproject.net.DeviceId;
+import org.onosproject.restconf.RestconfDevice;
+import org.onosproject.restconf.RestconfDeviceInfo;
 import org.onosproject.restconf.RestconfDeviceStateMachineException;
 import org.slf4j.Logger;
-
-import java.net.Socket;
+import com.mastfrog.acteur.headers.Headers;
 
 import static org.slf4j.LoggerFactory.getLogger;
 import static com.google.common.base.MoreObjects.toStringHelper;
@@ -49,11 +58,16 @@ public class RestconfDeviceStateMachine {
 
     private final Logger log = getLogger(getClass());
 
+    static final String rootResource = ".well-known/host-meta";
+    static final String rootResourceFormat = "application/xrd+xml";
+
     private int currentState = IDLE;
     private int retries = 0;
-    private Socket socket = null;       // TODO: Replace with appropriate class (HTTP/meta/...)
-    private DeviceId deviceId;
     private String failureReason = "";
+
+    private RestconfDevice device;
+    private DeviceId deviceId;
+    private Duration connectTimeout;
 
     private State[] states = {
             new Idle(), new Discovery(), new Populate(),
@@ -63,8 +77,12 @@ public class RestconfDeviceStateMachine {
             "IDLE", "DISCOVERY", "POPULATE", "ACTIVE", "INACTIVE", "FAILED"
     };
 
-    public RestconfDeviceStateMachine(DeviceId did) {
-        deviceId = did;
+    public RestconfDeviceStateMachine(RestconfDevice device) {
+        RestconfDeviceInfo info = device.getDeviceInfo();
+
+        this.device = device;
+        deviceId = device.getDeviceId();
+        connectTimeout = Duration.millis(info.getSocketTimeout());
     }
 
     /**
@@ -167,11 +185,16 @@ public class RestconfDeviceStateMachine {
         public void error(String reason) throws RestconfDeviceStateMachineException {
             log.warn("ERROR transition from this state is not allowed.");
         }
+
+        public void receiveMessage(HttpResponseStatus status, HttpHeaders headers, String response) {
+            log.info("Message reception in this state is ignored");
+        }
     }
 
     class Idle extends State {
         private final Logger log = getLogger(getClass());
         private String name = "IDLE_STATE";
+        private HttpClient client = null;
 
         /**
          * A device in the IDLE state has received a connect message.  It should initiate
@@ -179,7 +202,35 @@ public class RestconfDeviceStateMachine {
          */
         @Override
         public void connect() {
-            log.warn("TODO: Implement this");
+            log.info("connect: entry");
+
+            // Create async HTTP Client and attempt to discover the Root Resource.
+
+            // TODO: Support SSL
+            // TODO: Support more than basic credentials
+
+            client = HttpClient.builder()
+                    .followRedirects()
+                    .setTimeoweut(connectTimeout)
+                    .build();
+
+            String url = device.getBaseURL() + rootResource;
+
+            HttpRequestBuilder builder = client.get()
+                    .setURL(url);
+
+            ResponseFuture future = builder.execute(new ResponseHandler<String>(String.class) {
+                protected void receive(HttpResponseStatus status, HttpHeaders headers,
+                                       String response) {
+                    receiveMessage(status, headers, response);
+                }
+            });
+            //public static final HeaderValueType<String> ACCEPT = new StringHeader("Accept".toString());
+        }
+
+        @Override
+        public void receiveMessage(HttpResponseStatus status, HttpHeaders headers, String response) {
+            log.info("TODO: Implement this");
         }
     }
 

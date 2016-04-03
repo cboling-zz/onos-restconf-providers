@@ -26,7 +26,7 @@
                         "username": "root",
                         "password": "test",
                         "x509Path": "",
-                        "ipAddress": "192.168.1.100",
+                        "ipAddress": "199.168.1.100",
                         "tcpPort": 80,
                         "sslPort": 443,
                         "connectionTimeout": 5000,
@@ -37,9 +37,9 @@
                         ]
                     },
                     {
-                        "username": "root",
-                        "password": "test123",
-                        "ipAddress": "192.168.1.100"
+                        "hostname": "twitter.com",
+                        "ipAddress": "199.59.149.230"
+                        "notes": "This is for testing the fetch of .well-known/host-meta"
                     }
                 ]
             }

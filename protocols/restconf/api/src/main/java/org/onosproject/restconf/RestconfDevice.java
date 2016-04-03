@@ -43,13 +43,11 @@ public interface RestconfDevice {
     int getState();
 
     /**
-     * Transition the device to a new state
+     * Get the base URL for this device
      *
-     * @param newState new State
-     *
-     * @throws RestconfException
+     * @return http[s]://<ip-addr>:<port>/
      */
-    //void setState(State newState) throws RestconfException;
+    String getBaseURL();
 
     /**
      * Do we have connectivity to the device

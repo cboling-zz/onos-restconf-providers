@@ -35,7 +35,18 @@
 
     <description>ONOS RESTConf protocol adapter</description>
     <url>http://bcsw.net</url>
-
+    <scm>
+        <url>https://github.com/cboling/onos-restconf-providers</url>
+        <connection>scm:git:https://github.com/cboling/onos-restconf-providers.git</connection>
+        <developerConnection>git@github.com/cboling/onos-restconf-providers.git</developerConnection>
+    </scm>
+    <developers>
+        <developer>
+            <name>Chip Boling</name>
+            <email>chip@bcsw.net</email>
+            <url>https://bcsw.net</url>
+        </developer>
+    </developers>
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
@@ -57,6 +68,7 @@
         <netty4.version>4.0.33.Final</netty4.version>
         <junit.version>4.12</junit.version>
         <guava.version>19.0</guava.version>
+        <joda.version>2.9</joda.version>
     </properties>
 
     <modules>

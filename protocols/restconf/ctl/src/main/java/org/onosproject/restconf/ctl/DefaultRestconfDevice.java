@@ -38,10 +38,16 @@ public class DefaultRestconfDevice implements RestconfDevice {
     private final RestId restId;
     private RestconfDeviceStateMachine stateMachine;
 
+
+    /**
+     * Constructor for a RESTCONF device
+     *
+     * @param deviceInfo Initial device information
+     */
     public DefaultRestconfDevice(RestconfDeviceInfo deviceInfo) {
         this.deviceInfo = deviceInfo;
         this.restId = deviceInfo.getRestconfId();
-        this.stateMachine = new RestconfDeviceStateMachine(DeviceId.deviceId(RestId.uri(restId)));
+        this.stateMachine = new RestconfDeviceStateMachine(this);
     }
 
     /**
@@ -81,6 +87,19 @@ public class DefaultRestconfDevice implements RestconfDevice {
     }
 
     /**
+     * Get the base URL for this device
+     *
+     * @return http[s]://<ip-addr>:<port>/
+     */
+    public String getBaseURL() {
+        boolean isSSL = false; // TODO: Support SSL sometime with fallback (or preference for) plain-old TCP
+        String moniker = isSSL ? "https" : "http";
+        int port = isSSL ? deviceInfo.getSslPort() : deviceInfo.getTcpPort();
+
+        return String.format("%s://%s:%d/", moniker, deviceInfo.getIpAddress(), port);
+    }
+
+    /**
      * Connectivity test to remote device
      *
      * @param port Port number to try
@@ -109,7 +128,6 @@ public class DefaultRestconfDevice implements RestconfDevice {
                 } catch (IOException e) {
                     log.debug("Test Socket failed {} on port {}: {}", getDeviceId(), port,
                             e.toString());
-                    return false;
                 }
             }
         }
