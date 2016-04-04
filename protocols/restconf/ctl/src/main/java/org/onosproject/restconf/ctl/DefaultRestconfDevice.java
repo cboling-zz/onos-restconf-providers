@@ -38,7 +38,6 @@ public class DefaultRestconfDevice implements RestconfDevice {
     private final RestId restId;
     private RestconfDeviceStateMachine stateMachine;
 
-
     /**
      * Constructor for a RESTCONF device
      *

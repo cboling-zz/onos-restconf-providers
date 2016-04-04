@@ -14,6 +14,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static org.onosproject.net.config.Config.FieldPresence.MANDATORY;
+import static org.onosproject.net.config.Config.FieldPresence.OPTIONAL;
+
 /**
  * Configuration for RESTCONF provider.
  */
@@ -59,11 +62,36 @@ public class RestconfProviderConfig extends Config<ApplicationId> {
     private static String SSL_PORT = "sslPort";
     private static String API_ROOT = "apiRoot";
     private static String MEDIA_TYPES = "mediaTypes";
+    private static String NOTES = "notes";
+
+    private static String hostRegEx = "^(?=.{1,255}$)[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}"
+            + "[0-9A-Za-z])?(?:\\.[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?)*\\.?$";
+    private static String filePathRegEx = "^(/[^/ ]*)+/?$";
 
     // TODO: Need a number of times we fail on a permanent redirect 'GET' request before we
     //       start to rediscover from the base URI.
     // TODO: For 302 (Temporary redirects) need a default 'rediscover'/'revert' timeout.
     // TODO: For 302, should we also look at any TTL/cache info in the header
+
+    @Override
+    public boolean isValid() {
+        return hasOnlyFields(WORKER_THREADS, CONNECTION_TIMEOUT, EVENT_INTERVAL,
+                SSL_PREFERRED, DEVICES, HOSTNAME, USERNAME, PASSWORD, CERTIFICATE_PATH,
+                IP_ADDRESS, TCP_PORT, SSL_PORT, API_ROOT, MEDIA_TYPES, NOTES)
+                && isNumber(WORKER_THREADS, OPTIONAL, 1)
+                && isNumber(CONNECTION_TIMEOUT, OPTIONAL, 50)
+                && isNumber(EVENT_INTERVAL, OPTIONAL, 1, 60)
+                && isBoolean(SSL_PREFERRED, OPTIONAL)
+                && isString(HOSTNAME, OPTIONAL, hostRegEx)
+                && isString(USERNAME, OPTIONAL)
+                && isString(PASSWORD, OPTIONAL)
+                && isString(CERTIFICATE_PATH, OPTIONAL, filePathRegEx)
+                && isIpAddress(IP_ADDRESS, MANDATORY)
+                && isNumber(TCP_PORT, OPTIONAL, 0, 65535)
+                && isNumber(SSL_PORT, OPTIONAL, 0, 65535)
+                && isString(API_ROOT, OPTIONAL)
+                && isString(NOTES, OPTIONAL);
+    }
 
     /**
      * The number of worker threads for device discovery and maintenance
@@ -143,6 +171,10 @@ public class RestconfProviderConfig extends Config<ApplicationId> {
                     int timeout = get(CONNECTION_TIMEOUT, DEFAULT_CONNECTION_TIMEOUT);
                     String apiRoot = node.path(API_ROOT).asText(DEFAULT_API_ROOT);
                     List<String> mediaTypes = Lists.newArrayList();
+
+                    // The 'notes' section is mainly to allow some comments to be added
+                    // per-device to the config JSON, not necessarily the device that we
+                    // will create.
 
                     if (node.has(MEDIA_TYPES)) {
                         node.forEach(mtype -> mediaTypes.add(node.asText()));

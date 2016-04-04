@@ -47,6 +47,40 @@
             <artifactId>netty-http-client</artifactId>
             <version>1.6.4</version>
         </dependency>
+        <!--<dependency>-->
+        <!--<groupId>org.onosproject</groupId>-->
+        <!--<artifactId>onlab-junit</artifactId>-->
+        <!--<scope>test</scope>-->
+        <!--</dependency>-->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava-testlib</artifactId>
+            <version>${guava.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.easymock</groupId>
+            <artifactId>easymock</artifactId>
+            <version>${easymock.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!--<dependency>-->
+        <!--<groupId>org.glassfish.jersey.containers</groupId>-->
+        <!--<artifactId>jersey-container-servlet</artifactId>-->
+        <!--<version>${jersey.version}</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+        <!--<groupId>org.glassfish.jersey.test-framework</groupId>-->
+        <!--<artifactId>jersey-test-framework-core</artifactId>-->
+        <!--<version>${jersey.version}</version>-->
+        <!--<scope>test</scope>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+        <!--<groupId>org.glassfish.jersey.test-framework.providers</groupId>-->
+        <!--<artifactId>jersey-test-framework-provider-grizzly2</artifactId>-->
+        <!--<version>${jersey.version}</version>-->
+        <!--<scope>test</scope>-->
+        <!--</dependency>-->
     </dependencies>
 
     <build>

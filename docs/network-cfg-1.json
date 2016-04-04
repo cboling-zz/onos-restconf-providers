@@ -37,9 +37,10 @@
                         ]
                     },
                     {
-                        "hostname": "twitter.com",
-                        "ipAddress": "199.59.149.230"
-                        "notes": "This is for testing the fetch of .well-known/host-meta"
+                        "hostname": "bcsw.net",
+                        "notes": "This is for testing the fetch of .well-known/host-meta",
+                        "ipAddress": "10.0.3.1",
+                        "tcpPort": 8080
                     }
                 ]
             }

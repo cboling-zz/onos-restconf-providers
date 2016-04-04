@@ -211,7 +211,7 @@ public class RestconfDeviceStateMachine {
 
             client = HttpClient.builder()
                     .followRedirects()
-                    .setTimeoweut(connectTimeout)
+                    .setTimeout(connectTimeout)
                     .build();
 
             String url = device.getBaseURL() + rootResource;

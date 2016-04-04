@@ -288,6 +288,7 @@ public class RestconfDeviceProvider extends AbstractProvider
             try {
                 innerNodeListener.deviceAdded(device);
 
+
             } catch (Exception e) {
                 log.warn("Failed initially adding {} : {}",
                         device.getDeviceId().toString(), e.getMessage());

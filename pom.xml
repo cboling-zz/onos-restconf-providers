@@ -61,6 +61,7 @@
         <osgi.version>4.3.1</osgi.version>
         <karaf.version>3.0.5</karaf.version>
         <jersey.version>1.19</jersey.version>
+        <!--<jersey.version>2.22.2</jersey.version>-->
         <jackson.version>2.7.0</jackson.version>
         <slf4j.version>1.7.13</slf4j.version>
         <felix.version>1.9.12</felix.version>
@@ -69,6 +70,7 @@
         <junit.version>4.12</junit.version>
         <guava.version>19.0</guava.version>
         <joda.version>2.9</joda.version>
+        <easymock.version>3.4</easymock.version>
     </properties>
 
     <modules>
