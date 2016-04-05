@@ -18,7 +18,7 @@ package org.onosproject.restconf;
 import org.onosproject.net.DeviceId;
 
 /**
- * Created by cboling on 3/24/16.
+ * RESTCONF Device interface
  */
 public interface RestconfDevice {
     /**
@@ -34,6 +34,34 @@ public interface RestconfDevice {
      * @return RESTCONF specific ID
      */
     RestId getRestconfId();
+
+    /**
+     * Start the device state machine to begin the discover process.
+     * <p>
+     * This transitions the device into the 'DISCOVERY' state regardless of current state
+     * unless already in the 'DISCOVERY' state.
+     */
+    void start();
+
+    /**
+     * Set the Administrative state of the device to either UP or DOWN
+     * <p>
+     * The default state for a device is UP which allows it to participate with this
+     * provider over the RESTCONF protocol. You can place a device in the DOWN state
+     * to disable the RESTCONF protocol as needed (during shutdown, to maintain it in a
+     * standby mode, perform maintenance, ...)
+     *
+     * @param setAdminUp If true, the administrative state of the device will be placed in the
+     *                   UP state.  Down otherwise.
+     */
+    void setAdminState(boolean setAdminUp);
+
+    /**
+     * Get the ADMIN state for this device
+     *
+     * @return current ADMIN UP state.  true = UP, false = down
+     */
+    boolean getAdminStateUp();
 
     /**
      * Get the current state of the device

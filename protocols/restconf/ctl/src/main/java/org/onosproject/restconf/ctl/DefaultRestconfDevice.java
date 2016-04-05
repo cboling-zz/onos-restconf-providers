@@ -26,17 +26,20 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.URI;
 
+import static com.google.common.base.MoreObjects.toStringHelper;
+
 /**
- * Created by cboling on 3/24/16.
+ * RESTCONF Device Implementation
  */
 public class DefaultRestconfDevice implements RestconfDevice {
 
-    public static final Logger log = LoggerFactory
-            .getLogger(DefaultRestconfDevice.class);
+    public static final Logger log = LoggerFactory.getLogger(DefaultRestconfDevice.class);
 
     private RestconfDeviceInfo deviceInfo;
     private final RestId restId;
+    private final DeviceId deviceId;
     private RestconfDeviceStateMachine stateMachine;
+    private boolean isAdminUp;
 
     /**
      * Constructor for a RESTCONF device
@@ -44,8 +47,10 @@ public class DefaultRestconfDevice implements RestconfDevice {
      * @param deviceInfo Initial device information
      */
     public DefaultRestconfDevice(RestconfDeviceInfo deviceInfo) {
+        this.isAdminUp = true;
         this.deviceInfo = deviceInfo;
         this.restId = deviceInfo.getRestconfId();
+        this.deviceId = DeviceId.deviceId(RestId.uri(restId));
         this.stateMachine = new RestconfDeviceStateMachine(this);
     }
 
@@ -54,8 +59,9 @@ public class DefaultRestconfDevice implements RestconfDevice {
      *
      * @return device ID
      */
+    @Override
     public DeviceId getDeviceId() {
-        return DeviceId.deviceId(RestId.uri(restId));
+        return deviceId;
     }
 
     /**
@@ -63,6 +69,7 @@ public class DefaultRestconfDevice implements RestconfDevice {
      *
      * @return RESTCONF specific ID
      */
+    @Override
     public RestId getRestconfId() {
         return restId;
     }
@@ -72,6 +79,7 @@ public class DefaultRestconfDevice implements RestconfDevice {
      *
      * @return device info
      */
+    @Override
     public RestconfDeviceInfo getDeviceInfo() {
         return deviceInfo;
     }
@@ -81,8 +89,56 @@ public class DefaultRestconfDevice implements RestconfDevice {
      *
      * @return Device State
      */
+    @Override
     public int getState() {
         return stateMachine.getState();
+    }
+
+    /**
+     * Start the device state machine to begin the discover process
+     *
+     * This transitions the device into the 'DISCOVERY' state regardless of current state
+     * unless already in the 'DISCOVERY' state.
+     */
+    @Override
+    public void start() {
+        // Transition the state machine to the initial 'DISCOVERY' state
+
+        try {
+            stateMachine.connect();
+        } catch (RestconfDeviceStateMachineException ex) {
+            log.error("Illegal start/restart of device state. Device: {], Message: {}",
+                    restId.toString(), ex.toString());
+        }
+    }
+
+    /**
+     * Set the Administrative state of the device to either UP or DOWN
+     * <p>
+     * The default state for a device is UP which allows it to participate with this
+     * provider over the RESTCONF protocol. You can place a device in the DOWN state
+     * to disable the RESTCONF protocol as needed (during shutdown, to maintain it in a
+     * standby mode, perform maintenance, ...)
+     *
+     * @param setAdminUp If true, the administrative state of the device will be placed in the
+     *                   UP state.  Down otherwise.
+     */
+    public void setAdminState(boolean setAdminUp) {
+
+        if (setAdminUp != isAdminUp) {
+            // TODO: Implement this.
+
+            isAdminUp = setAdminUp;
+        }
+    }
+
+    /**
+     * Get the ADMIN state for this device
+     *
+     * @return current ADMIN UP state.  true = UP, false = down
+     */
+    public boolean getAdminStateUp() {
+        return isAdminUp;
     }
 
     /**
@@ -90,6 +146,7 @@ public class DefaultRestconfDevice implements RestconfDevice {
      *
      * @return http[s]://<ip-addr>:<port>/
      */
+    @Override
     public String getBaseURL() {
         boolean isSSL = false; // TODO: Support SSL sometime with fallback (or preference for) plain-old TCP
         String moniker = isSSL ? "https" : "http";
@@ -137,6 +194,7 @@ public class DefaultRestconfDevice implements RestconfDevice {
      *
      * @return true if we can connect to the device
      */
+    @Override
     public boolean isReachable() {
         switch (getState()) {
             case RestconfDeviceStateMachine.IDLE:
@@ -160,6 +218,7 @@ public class DefaultRestconfDevice implements RestconfDevice {
      *
      * @return Failure reason (blank if not in a failed or inactive state)
      */
+    @Override
     public String getFailureReason() {
         return stateMachine.getFailureReason();
     }
@@ -173,7 +232,32 @@ public class DefaultRestconfDevice implements RestconfDevice {
      *
      * @param msg the message to write
      */
+    @Override
     public void sendMsg(Byte[] msg) {
         //TODO: Need to implement
+    }
+
+    @Override
+    public int hashCode() {
+        return deviceId.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof DefaultRestconfDevice) {
+            DefaultRestconfDevice otherDev = (DefaultRestconfDevice) obj;
+
+            return deviceId.equals(otherDev.deviceId);
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return toStringHelper(this)
+                .add("DeviceId", deviceId)
+                .add("State", stateMachine.getStateAsText())
+                .add("AdminStatus", isAdminUp ? "UP" : "DOWN")
+                .toString();
     }
 }
