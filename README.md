@@ -91,14 +91,39 @@ If new device information is received via NetworkConfig JSON while the device is
 will transition back to the discovery state.
 
 ## LibraryPopulation
-
+TODO: Lots of work needed here
 
 ##
 
 ## Teardown
 
 ## Final
-This state is entered when a RESTCONF device needs to be delted and any allocated resources released. It
-is typically not visible to the outside world.
+This state is entered when a RESTCONF device needs to be deleted and any allocated resources released. It
+is typically not visible to the outside world. A variety
 
+---------------------------------------------------------------------------------------------------------
+# Testing
 
+To assist in the development of this provider, I created a python *testDevice* flask program to
+implement a mock RESTCONF device.
+
+## Dependencies
+
+Currently, the *testDevice* depends up both the **flask** and **xrd** python packages.
+
+## Runtime options
+
+When ran on the command line with no options (*$ ./testDevice*), the mock RESTCONF device will present
+a single device accessible on any local IP address over port 8080.  This mock device should provide
+a valid XRD response to a http://<ip-add>/.well-known/host-meta GET request that provides the RESTCONF
+Root Resource Directory.  The Root Resource Directory API provides both required entry points (data and
+operations) as well as the optional yang-library-version entry point.
+
+Currently, only the implementation of the example Jukebox Library is provided but as this project
+matures, I hope to add and support a few other standard (and more useful) YANG modules.
+
+### JSON Configuration during runtime
+
+To simplify repeatedly running unit tests, a JSON interface is provided on the test device to
+allow you to programatically set/clear error conditions and other runtime options for the
+test device
