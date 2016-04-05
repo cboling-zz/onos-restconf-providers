@@ -281,6 +281,18 @@ public class RestconfDeviceProvider extends AbstractProvider
         return device.isReachable();
     }
 
+    /**
+     * Administratively enables or disables a port.
+     *
+     * @param deviceId   device identifier
+     * @param portNumber device identifier
+     * @param enable     true if port is to be enabled, false to disable
+     */
+    @Override
+    public void changePortState(DeviceId deviceId, PortNumber portNumber, boolean enable) {
+        // TODO: Implement this
+    }
+
     private void connectInitialDevices() {
         // TODO: Do we want to handle devices restored from persistent storage separately?
 
@@ -416,6 +428,10 @@ public class RestconfDeviceProvider extends AbstractProvider
             // in a call to roleChanged to accept mastership for this device
 
             providerService.deviceConnected(did, deviceDescription);
+
+            // Initiate device State Machine startup
+
+            device.start();
         }
 
         /**
