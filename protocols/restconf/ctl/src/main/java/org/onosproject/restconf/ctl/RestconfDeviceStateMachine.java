@@ -125,7 +125,7 @@ public class RestconfDeviceStateMachine {
     //    state ->  IDLE     | DISCOVERY  | POPULATE  |  ACTIVE   |  INACTIVE |  FAILED
     // input
     //---v-------------------------------------------------------------------------------
-    // CONNECT     DISCOVERY |   _        |   _       | DISCOVERY | DISCOVERY | DISCOVERY
+    // CONNECT     DISCOVERY |   _        | DISCOVERY | DISCOVERY | DISCOVERY | DISCOVERY
     //
     // DOWNLOAD      -       |  POPULATE  |   _       |   _       |   _       |   _
     //
@@ -142,7 +142,7 @@ public class RestconfDeviceStateMachine {
 
     private static final int[] idleTransition = {DISCOVERY, IDLE, IDLE, IDLE, IDLE, IDLE};
     private static final int[] discoveryTransition = {DISCOVERY, POPULATE, DISCOVERY, DISCOVERY, DISCOVERY, FAILED};
-    private static final int[] populateTransition = {POPULATE, POPULATE, ACTIVE, POPULATE, POPULATE, FAILED};
+    private static final int[] populateTransition = {DISCOVERY, POPULATE, ACTIVE, POPULATE, POPULATE, FAILED};
     private static final int[] activeTransition = {DISCOVERY, ACTIVE, ACTIVE, INACTIVE, ACTIVE, FAILED};
     private static final int[] inactiveTransition = {DISCOVERY, INACTIVE, INACTIVE, INACTIVE, ACTIVE, FAILED};
     private static final int[] failedTransition = {DISCOVERY, FAILED, FAILED, FAILED, FAILED, FAILED};
