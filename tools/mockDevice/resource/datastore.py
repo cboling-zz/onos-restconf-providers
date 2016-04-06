@@ -13,24 +13,22 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-from flask import Blueprint, render_template, abort
+from flask import Blueprint, abort, url_for
 from jinja2 import TemplateNotFound
 import os.path
-
-from globals import root_resource
+from datetime import datetime
 
 # from testDevice import app            # TODO: Clean this up later
-
-__basePath = os.path.join('/', root_resource, 'data')
+# __basePath = os.path.join('/', root_resource, 'data')
 
 # Look into http://flask.pocoo.org/docs/0.10/views/
 # also look at: http://flask.pocoo.org/docs/0.10/blueprints/
 # http://stackoverflow.com/questions/13317536/get-a-list-of-all-routes-defined-in-the-app
 
-dataStore = Blueprint('dataStore', __name__, url_prefix=__basePath)
+dataStore = Blueprint('dataStore', __name__)
 
 
-@dataStore.route('/', defaults={'': 'index'})
+@dataStore.route('/', defaults={'module': '-all-'})
 @dataStore.route('/<module>')
 def show(module):
     """
@@ -38,6 +36,8 @@ def show(module):
     """
     try:
         # return render_template('pages/%s.html' % module)
+        if module is None:
+            module = 'None'
         return 'hello world: %s' % module
     except TemplateNotFound:
         abort(404)
@@ -50,6 +50,7 @@ class DataStore:
     methods = ['GET']
     fullPath = ''
     theApp = None
+    lastModifiedTimestamp = datetime.utcnow()
 
     def __init__(self, path):
         """
@@ -68,7 +69,31 @@ class DataStore:
         """
         return self.path
 
-    def get(self):
-        pass
+    @property
+    def last_modified(self):
+        """
+        :return: (datetime) the UTC timestamp that this tree was last modified
+        """
+        return self.lastModified
 
-# app.add_url_rule(__basePath, view_func=DataStore.as_view('show_data_tree'))
+    @last_modified.setter
+    def last_modified(self, value):
+        """
+        Set the last modified time.  Derived class should call their base class with
+        the same 'value' so that it peculates up the tree.
+        :param value: (datetime) new last modified timestamp (UTC)
+        """
+        self.lastModifiedTimestamp = value
+
+    def get(self):
+        # walk all the modules and return them
+
+        urls = []
+        for rule in app.url_map.iter_rules():
+            options = {}
+            for arg in rule.arguments:
+                options[arg] = "[{0}]".format(arg)
+            url = url_for(rule.endpoint, **options)
+            urls.append(url)
+
+            # TODO: Do something with the urls

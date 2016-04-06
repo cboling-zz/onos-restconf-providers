@@ -93,7 +93,7 @@ will transition back to the discovery state.
 ## LibraryPopulation
 TODO: Lots of work needed here
 
-##
+## TODO: more to come
 
 ## Teardown
 
@@ -104,16 +104,16 @@ is typically not visible to the outside world. A variety
 ---------------------------------------------------------------------------------------------------------
 # Testing
 
-To assist in the development of this provider, I created a python *testDevice* flask program to
+To assist in the development of this provider, I created a python *mockDevice* flask program to
 implement a mock RESTCONF device.
 
 ## Dependencies
 
-Currently, the *testDevice* depends up both the **flask** and **xrd** python packages.
+Currently, the *mockDevice* depends up both the **flask** and **xrd** python packages.
 
 ## Runtime options
 
-When ran on the command line with no options (*$ ./testDevice*), the mock RESTCONF device will present
+When ran on the command line with no options (*$ ./mockDevice*), the mock RESTCONF device will present
 a single device accessible on any local IP address over port 8080.  This mock device should provide
 a valid XRD response to a http://<ip-add>/.well-known/host-meta GET request that provides the RESTCONF
 Root Resource Directory.  The Root Resource Directory API provides both required entry points (data and
@@ -127,3 +127,9 @@ matures, I hope to add and support a few other standard (and more useful) YANG m
 To simplify repeatedly running unit tests, a JSON interface is provided on the test device to
 allow you to programatically set/clear error conditions and other runtime options for the
 test device
+
+--verbose / -v          Output verbose information, default = False
+
+--root_resource / -r    RESTCONF Root Resource, default = 'top/restconf'
+
+--http_port / -p        HTTP Port number, default = 8080

@@ -22,5 +22,5 @@ DEFAULT_ROOT_RESOURCE = 'top/restconf'
 
 # Globals
 
-http_port = DEFAULT_HTTP_PORT
-root_resource = DEFAULT_ROOT_RESOURCE
+# http_port = DEFAULT_HTTP_PORT
+# root_resource = DEFAULT_ROOT_RESOURCE

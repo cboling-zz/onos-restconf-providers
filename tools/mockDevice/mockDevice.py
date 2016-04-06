@@ -16,14 +16,30 @@
 #
 from flask import Flask, Response
 from xrd import Element, XRD, Link
-from globals import root_resource, http_port
+from globals import DEFAULT_ROOT_RESOURCE, DEFAULT_HTTP_PORT
 from resource.datastore import dataStore
-import sys
+
 import argparse
 
-app = Flask(__name__)
-app.register_blueprint(dataStore)
+###########################################################################
+# Parse the command line
 
+parser = argparse.ArgumentParser(description='Mock RESTCONF Device')
+parser.add_argument('--verbose', '-v', action='store_true', default=False,
+                    help='Output verbose information')
+parser.add_argument('--root_resource', '-r', action='store', default=DEFAULT_ROOT_RESOURCE,
+                    help='RESTCONF Root Resource')
+parser.add_argument('--http_port', '-p', action='store', default=DEFAULT_HTTP_PORT,
+                    help='HTTP Port number')
+
+args = parser.parse_args()
+
+app = Flask(__name__)
+__prefix = '/%s/data' % args.root_resource
+app.register_blueprint(dataStore, url_prefix=__prefix)
+
+
+###########################################################################
 
 @app.route('/')
 def index():
@@ -47,7 +63,7 @@ def get_host_meta():
 
     # Add the link for RESTCONF
 
-    xrd_obj.links.append(Link(rel='restconf', href=root_resource))
+    xrd_obj.links.append(Link(rel='restconf', href=args.root_resource))
 
     # Add some extra links here as well
 
@@ -76,4 +92,4 @@ def do_reset():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=http_port)
+    app.run(debug=True, port=args.http_port)
