@@ -16,8 +16,13 @@
 #
 from flask import Flask, Response
 from xrd import Element, XRD, Link
+from globals import root_resource, http_port
+from resource.datastore import dataStore
+import sys
+import argparse
 
 app = Flask(__name__)
+app.register_blueprint(dataStore)
 
 
 @app.route('/')
@@ -42,7 +47,7 @@ def get_host_meta():
 
     # Add the link for RESTCONF
 
-    xrd_obj.links.append(Link(rel='restconf', href='top/restconf'))
+    xrd_obj.links.append(Link(rel='restconf', href=root_resource))
 
     # Add some extra links here as well
 
@@ -71,4 +76,4 @@ def do_reset():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8080)
+    app.run(debug=True, port=http_port)
