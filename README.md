@@ -109,7 +109,17 @@ implement a mock RESTCONF device.
 
 ## Dependencies
 
-Currently, the *mockDevice* depends up both the **flask** and **xrd** python packages.
+Currently, the *mockDevice* depends up both the **flask** and **xrd** python packages.  The tools for generating
+test code depend upon **pyang** and **pyangbind**.  All are distributed through PyPI and can be installed with *pip*.
+
+The versions used for initial testing are
+
+|-------------|---------|
+|  Flask      |  0.10.0 |
+|  xrd        |  0.1    |
+|  pyang      |  1.6    |
+|  pyangbind  |  0.4.1  |
+|-------------|---------|
 
 ## Runtime options
 
