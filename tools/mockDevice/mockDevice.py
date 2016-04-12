@@ -16,9 +16,15 @@
 #
 from flask import Flask, Response
 from xrd import Element, XRD, Link
-from globals import DEFAULT_ROOT_RESOURCE, DEFAULT_HTTP_PORT
+from globals import DEFAULT_ROOT_RESOURCE, DEFAULT_HTTP_PORT, GENERATED_DIR_NAME
 from resource.datastore import dataStore
 
+try:
+    from generated import *
+except ImportError:
+    print 'Did not find generated code subdirectory with any YANG models'
+
+import os
 import argparse
 
 ###########################################################################
@@ -38,17 +44,75 @@ app = Flask(__name__)
 __prefix = '/%s/data' % args.root_resource
 app.register_blueprint(dataStore, url_prefix=__prefix)
 
-
 ###########################################################################
-# Import the models in the generated directory
 
-# models = []     TODO: Implement this
+generated_dir = GENERATED_DIR_NAME  # Generated subdirectory name
+models = []  # List of YANG modes we dynamically imported
 
-# Instantiate the models the first time so we can generate all the paths within
-# them so we can create extension methods that provide for RESTCONF required
-# methods
 
-###########################################################################
+def dynamic_import(_package, _class):
+    """
+    Dynamically import a class based on a variable
+
+    :param _package: (string) The package prefix(es)
+    :param _class: (string) The class name you are looking for
+
+    :return:  The module to import
+    """
+    full_path = _package + '.' + _class
+    components = full_path.split('.')
+    module = __import__(components[0])
+    for component in components[1:]:
+        module = getattr(module, component)
+    return module
+
+
+def import_models():
+    """
+    Import the models in the generated directory.
+
+    The 'generated' directory is expected to be a subdirectory the directory that
+    contains this file. It typically is a symbolic link over to the 'modules'
+    generated-code subdirectory.
+    """
+    gen_dir = os.path.join(os.path.realpath(__file__), generated_dir)
+
+    if os.path.exists(gen_dir) and os.path.isdir(gen_dir):
+        print 'The generatedDir is {}' % gen_dir
+
+        # Walk all the files in the generated code directory and look for python files
+
+        files = [f for f in os.listdir(gen_dir) if os.isfile(os.path.join(gen_dir, f))]
+        for filename in files:
+            file_parts = os.path.splitext(v)
+            if file_parts[1].lower() is '.py':
+
+                # The class name for the model is the same as the first part of the filename
+
+                model = file[0]
+                print "Found model '{}' in '{}'" % (model, filename)
+                package = generated_dir
+                module = model
+                _class = model
+
+                try:
+                    # yang_model = dynamic_import(package, _class)
+                    yang_module = __import__('{}.{}' % (package, module), fromlist=[_class])
+                    yang_model = getattr(yang_module, _class)
+
+                    #      TODO: Implement the rest of this
+                    # Basically we want to walk the model and for each 'config' element, we want
+                    # to set up an extension that makes use of the restconfConfigHelper class.
+                    # We then add this
+
+                except ImportError:
+                    print 'Import Error while attempting to import class {} from {}.{}' % (model, package, module)
+
+                    # Instantiate the models the first time so we can generate all the paths within
+                    # them so we can create extension methods that provide for RESTCONF required
+                    # methods
+                    ###########################################################################
+
 
 @app.route('/')
 def index():
@@ -101,4 +165,5 @@ def do_reset():
 
 
 if __name__ == '__main__':
+    import_models()
     app.run(debug=True, port=args.http_port)

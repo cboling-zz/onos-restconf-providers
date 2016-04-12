@@ -1,4 +1,3 @@
-#!/usr/bin/python
 #
 # Copyright 2015 - 2016 Boling Consulting Solutions, bcsw.net
 #
@@ -14,14 +13,10 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-##########################################################
-# Default values
-
-DEFAULT_HTTP_PORT = 8080
-DEFAULT_ROOT_RESOURCE = 'top/restconf'
-GENERATED_DIR_NAME = 'generated'
-
-# Globals
-
-# http_port = DEFAULT_HTTP_PORT
-# root_resource = DEFAULT_ROOT_RESOURCE
+#####################################################################################
+#
+#  Leave this file in the 'generated-code' directory.  We symlink this over into the
+# tools 'mockDevice' module and use it as a python package to import any generated
+# code into the mock RESTCONF device
+#
+#####################################################################################
