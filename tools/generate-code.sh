@@ -11,6 +11,7 @@ RESTCONF_MODULE_BASEDIR=$(pwd)/../modules
 RESTCONF_MODULE_OUTDIR=${RESTCONF_MODULE_BASEDIR}/generated-code
 RESTCONF_MODULES="toaster.yang example-jukebox.yang"
 #RESTCONF_MODULES="toaster.yang"
+PYBIND_OPTS="--use-extmethods --build-rpcs"
 
 for module in ${RESTCONF_MODULES}
 do
@@ -23,5 +24,5 @@ do
     # Generate the code now
     echo "Generating code for '${module}' to file '${module%%.*}.py'"
 
-    pyang --plugindir ${PYBINDPLUGIN} -f pybind ${PYBIND_OPTS} -o ${outFile} ${inFile}
+    pyang --plugindir ${PYBINDPLUGIN} -f pybind ${PYBIND_OPTS} -p ${RESTCONF_MODULE_BASEDIR} -o ${outFile} ${inFile}
 done

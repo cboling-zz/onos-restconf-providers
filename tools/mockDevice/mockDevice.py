@@ -40,6 +40,15 @@ app.register_blueprint(dataStore, url_prefix=__prefix)
 
 
 ###########################################################################
+# Import the models in the generated directory
+
+# models = []     TODO: Implement this
+
+# Instantiate the models the first time so we can generate all the paths within
+# them so we can create extension methods that provide for RESTCONF required
+# methods
+
+###########################################################################
 
 @app.route('/')
 def index():
