@@ -78,7 +78,7 @@ def import_models():
     gen_dir = os.path.join(os.path.realpath(__file__), generated_dir)
 
     if os.path.exists(gen_dir) and os.path.isdir(gen_dir):
-        print 'The generatedDir is {}' % gen_dir
+        print 'The generatedDir is %s' % gen_dir
 
         # Walk all the files in the generated code directory and look for python files
 
@@ -90,14 +90,14 @@ def import_models():
                 # The class name for the model is the same as the first part of the filename
 
                 model = file[0]
-                print "Found model '{}' in '{}'" % (model, filename)
+                print "Found model '%s' in '%s'" % (model, filename)
                 package = generated_dir
                 module = model
                 _class = model
 
                 try:
                     # yang_model = dynamic_import(package, _class)
-                    yang_module = __import__('{}.{}' % (package, module), fromlist=[_class])
+                    yang_module = __import__('%s.%s' % (package, module), fromlist=[_class])
                     yang_model = getattr(yang_module, _class)
 
                     #      TODO: Implement the rest of this
@@ -106,7 +106,7 @@ def import_models():
                     # We then add this
 
                 except ImportError:
-                    print 'Import Error while attempting to import class {} from {}.{}' % (model, package, module)
+                    print 'Import Error while attempting to import class %s from %s.%s' % (model, package, module)
 
                     # Instantiate the models the first time so we can generate all the paths within
                     # them so we can create extension methods that provide for RESTCONF required
