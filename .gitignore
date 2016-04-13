@@ -1,3 +1,7 @@
+/.installed
+/tools/pyangbind
+/tools/pyang
+/modules/generated-code
 # Intellij
 .idea/
 *.iml
