@@ -49,9 +49,9 @@ class yc_toaster_toaster__toaster(PybindBase):
       yang_type='DisplayString')
     self.__toasterStatus = YANGDynClass(base=RestrictedClassType(base_type=unicode, restriction_type="dict_key",
                                                                  restriction_arg={u'down': {'value': 2},
-                                                                                  u'up'  : {'value': 1}}, ),
-                                        is_leaf=True, yang_name="toasterStatus", parent=self,
-                                        path_helper=self._path_helper, extmethods=self._extmethods, register_paths=True,
+                                                                                  u'up': {'value': 1}}, ), is_leaf=True,
+                                        yang_name="toasterStatus", parent=self, path_helper=self._path_helper,
+                                        extmethods=self._extmethods, register_paths=True,
                                         namespace='http://netconfcentral.org/ns/toaster', defining_module='toaster',
                                         yang_type='enumeration')
 
@@ -107,8 +107,8 @@ class yc_toaster_toaster__toaster(PybindBase):
                        yang_type='DisplayString')
     except (TypeError, ValueError):
       raise ValueError({
-        'error-string'  : """toasterManufacturer must be of a type compatible with DisplayString""",
-        'defined-type'  : "toaster:DisplayString",
+        'error-string': """toasterManufacturer must be of a type compatible with DisplayString""",
+        'defined-type': "toaster:DisplayString",
         'generated-type': """YANGDynClass(base=RestrictedClassType(base_type=unicode, restriction_dict={'length': [u'0 .. 255']}), is_leaf=True, yang_name="toasterManufacturer", parent=self, path_helper=self._path_helper, extmethods=self._extmethods, register_paths=True, namespace='http://netconfcentral.org/ns/toaster', defining_module='toaster', yang_type='DisplayString')""",
       })
 
@@ -152,8 +152,8 @@ Radiant Automatic.
                        yang_type='DisplayString')
     except (TypeError, ValueError):
       raise ValueError({
-        'error-string'  : """toasterModelNumber must be of a type compatible with DisplayString""",
-        'defined-type'  : "toaster:DisplayString",
+        'error-string': """toasterModelNumber must be of a type compatible with DisplayString""",
+        'defined-type': "toaster:DisplayString",
         'generated-type': """YANGDynClass(base=RestrictedClassType(base_type=unicode, restriction_dict={'length': [u'0 .. 255']}), is_leaf=True, yang_name="toasterModelNumber", parent=self, path_helper=self._path_helper, extmethods=self._extmethods, register_paths=True, namespace='http://netconfcentral.org/ns/toaster', defining_module='toaster', yang_type='DisplayString')""",
       })
 
@@ -198,8 +198,8 @@ the toaster.
                        yang_type='enumeration')
     except (TypeError, ValueError):
       raise ValueError({
-        'error-string'  : """toasterStatus must be of a type compatible with enumeration""",
-        'defined-type'  : "toaster:enumeration",
+        'error-string': """toasterStatus must be of a type compatible with enumeration""",
+        'defined-type': "toaster:enumeration",
         'generated-type': """YANGDynClass(base=RestrictedClassType(base_type=unicode,                                     restriction_type="dict_key",                                     restriction_arg={u'down': {'value': 2}, u'up': {'value': 1}},), is_leaf=True, yang_name="toasterStatus", parent=self, path_helper=self._path_helper, extmethods=self._extmethods, register_paths=True, namespace='http://netconfcentral.org/ns/toaster', defining_module='toaster', yang_type='enumeration')""",
       })
 
@@ -210,9 +210,9 @@ the toaster.
   def _unset_toasterStatus(self):
     self.__toasterStatus = YANGDynClass(base=RestrictedClassType(base_type=unicode, restriction_type="dict_key",
                                                                  restriction_arg={u'down': {'value': 2},
-                                                                                  u'up'  : {'value': 1}}, ),
-                                        is_leaf=True, yang_name="toasterStatus", parent=self,
-                                        path_helper=self._path_helper, extmethods=self._extmethods, register_paths=True,
+                                                                                  u'up': {'value': 1}}, ), is_leaf=True,
+                                        yang_name="toasterStatus", parent=self, path_helper=self._path_helper,
+                                        extmethods=self._extmethods, register_paths=True,
                                         namespace='http://netconfcentral.org/ns/toaster', defining_module='toaster',
                                         yang_type='enumeration')
 
@@ -221,7 +221,7 @@ the toaster.
   toasterStatus = property(_get_toasterStatus)
 
   _pyangbind_elements = {'toasterManufacturer': toasterManufacturer, 'toasterModelNumber': toasterModelNumber,
-                         'toasterStatus'      : toasterStatus,}
+                         'toasterStatus': toasterStatus,}
 
 
 class toaster(PybindBase):
@@ -307,8 +307,8 @@ class toaster(PybindBase):
                        yang_type='container')
     except (TypeError, ValueError):
       raise ValueError({
-        'error-string'  : """toaster must be of a type compatible with container""",
-        'defined-type'  : "container",
+        'error-string': """toaster must be of a type compatible with container""",
+        'defined-type': "container",
         'generated-type': """YANGDynClass(base=yc_toaster_toaster__toaster, is_container='container', yang_name="toaster", parent=self, path_helper=self._path_helper, extmethods=self._extmethods, register_paths=True, namespace='http://netconfcentral.org/ns/toaster', defining_module='toaster', yang_type='container')""",
       })
 
@@ -357,30 +357,30 @@ class yc_input_toaster__toaster_rpc_make_toast_input(PybindBase):
       self._extmethods = False
     self.__toasterToastType = YANGDynClass(base=RestrictedClassType(base_type=unicode, restriction_type="dict_key",
                                                                     restriction_arg={
-                                                                      u'white-bread'        : {'@module'   : u'toaster',
+                                                                      u'white-bread': {'@module': u'toaster',
+                                                                                       '@namespace': u'http://netconfcentral.org/ns/toaster'},
+                                                                      u'toast:wheat-bread': {'@module': u'toaster',
+                                                                                             '@namespace': u'http://netconfcentral.org/ns/toaster'},
+                                                                      u'frozen-bagel': {'@module': u'toaster',
+                                                                                        '@namespace': u'http://netconfcentral.org/ns/toaster'},
+                                                                      u'wonder-bread': {'@module': u'toaster',
+                                                                                        '@namespace': u'http://netconfcentral.org/ns/toaster'},
+                                                                      u'toast:frozen-bagel': {'@module': u'toaster',
+                                                                                              '@namespace': u'http://netconfcentral.org/ns/toaster'},
+                                                                      u'toast:hash-brown': {'@module': u'toaster',
+                                                                                            '@namespace': u'http://netconfcentral.org/ns/toaster'},
+                                                                      u'toast:wonder-bread': {'@module': u'toaster',
+                                                                                              '@namespace': u'http://netconfcentral.org/ns/toaster'},
+                                                                      u'toast:white-bread': {'@module': u'toaster',
+                                                                                             '@namespace': u'http://netconfcentral.org/ns/toaster'},
+                                                                      u'hash-brown': {'@module': u'toaster',
+                                                                                      '@namespace': u'http://netconfcentral.org/ns/toaster'},
+                                                                      u'frozen-waffle': {'@module': u'toaster',
+                                                                                         '@namespace': u'http://netconfcentral.org/ns/toaster'},
+                                                                      u'toast:frozen-waffle': {'@module': u'toaster',
                                                                                                '@namespace': u'http://netconfcentral.org/ns/toaster'},
-                                                                      u'toast:wheat-bread'  : {'@module'   : u'toaster',
-                                                                                               '@namespace': u'http://netconfcentral.org/ns/toaster'},
-                                                                      u'frozen-bagel'       : {'@module'   : u'toaster',
-                                                                                               '@namespace': u'http://netconfcentral.org/ns/toaster'},
-                                                                      u'wonder-bread'       : {'@module'   : u'toaster',
-                                                                                               '@namespace': u'http://netconfcentral.org/ns/toaster'},
-                                                                      u'toast:frozen-bagel' : {'@module'   : u'toaster',
-                                                                                               '@namespace': u'http://netconfcentral.org/ns/toaster'},
-                                                                      u'toast:hash-brown'   : {'@module'   : u'toaster',
-                                                                                               '@namespace': u'http://netconfcentral.org/ns/toaster'},
-                                                                      u'toast:wonder-bread' : {'@module'   : u'toaster',
-                                                                                               '@namespace': u'http://netconfcentral.org/ns/toaster'},
-                                                                      u'toast:white-bread'  : {'@module'   : u'toaster',
-                                                                                               '@namespace': u'http://netconfcentral.org/ns/toaster'},
-                                                                      u'hash-brown'         : {'@module'   : u'toaster',
-                                                                                               '@namespace': u'http://netconfcentral.org/ns/toaster'},
-                                                                      u'frozen-waffle'      : {'@module'   : u'toaster',
-                                                                                               '@namespace': u'http://netconfcentral.org/ns/toaster'},
-                                                                      u'toast:frozen-waffle': {'@module'   : u'toaster',
-                                                                                               '@namespace': u'http://netconfcentral.org/ns/toaster'},
-                                                                      u'wheat-bread'        : {'@module'   : u'toaster',
-                                                                                               '@namespace': u'http://netconfcentral.org/ns/toaster'}}, ),
+                                                                      u'wheat-bread': {'@module': u'toaster',
+                                                                                       '@namespace': u'http://netconfcentral.org/ns/toaster'}}, ),
                                            default=unicode("toast:wheat-bread"), is_leaf=True,
                                            yang_name="toasterToastType", parent=self, path_helper=self._path_helper,
                                            extmethods=self._extmethods, register_paths=False,
@@ -449,8 +449,8 @@ lightly.
                        namespace='http://netconfcentral.org/ns/toaster', defining_module='toaster', yang_type='uint32')
     except (TypeError, ValueError):
       raise ValueError({
-        'error-string'  : """toasterDoneness must be of a type compatible with uint32""",
-        'defined-type'  : "uint32",
+        'error-string': """toasterDoneness must be of a type compatible with uint32""",
+        'defined-type': "uint32",
         'generated-type': """YANGDynClass(base=RestrictedClassType(base_type=np.uint32, restriction_dict={'range': [u'1 .. 10']}), default=np.uint32(5), is_leaf=True, yang_name="toasterDoneness", parent=self, path_helper=self._path_helper, extmethods=self._extmethods, register_paths=False, namespace='http://netconfcentral.org/ns/toaster', defining_module='toaster', yang_type='uint32')""",
       })
 
@@ -496,26 +496,26 @@ the required doneness.
     """
     try:
       t = YANGDynClass(v, base=RestrictedClassType(base_type=unicode, restriction_type="dict_key", restriction_arg={
-        u'white-bread'        : {'@module': u'toaster', '@namespace': u'http://netconfcentral.org/ns/toaster'},
-        u'toast:wheat-bread'  : {'@module': u'toaster', '@namespace': u'http://netconfcentral.org/ns/toaster'},
-        u'frozen-bagel'       : {'@module': u'toaster', '@namespace': u'http://netconfcentral.org/ns/toaster'},
-        u'wonder-bread'       : {'@module': u'toaster', '@namespace': u'http://netconfcentral.org/ns/toaster'},
-        u'toast:frozen-bagel' : {'@module': u'toaster', '@namespace': u'http://netconfcentral.org/ns/toaster'},
-        u'toast:hash-brown'   : {'@module': u'toaster', '@namespace': u'http://netconfcentral.org/ns/toaster'},
-        u'toast:wonder-bread' : {'@module': u'toaster', '@namespace': u'http://netconfcentral.org/ns/toaster'},
-        u'toast:white-bread'  : {'@module': u'toaster', '@namespace': u'http://netconfcentral.org/ns/toaster'},
-        u'hash-brown'         : {'@module': u'toaster', '@namespace': u'http://netconfcentral.org/ns/toaster'},
-        u'frozen-waffle'      : {'@module': u'toaster', '@namespace': u'http://netconfcentral.org/ns/toaster'},
+        u'white-bread': {'@module': u'toaster', '@namespace': u'http://netconfcentral.org/ns/toaster'},
+        u'toast:wheat-bread': {'@module': u'toaster', '@namespace': u'http://netconfcentral.org/ns/toaster'},
+        u'frozen-bagel': {'@module': u'toaster', '@namespace': u'http://netconfcentral.org/ns/toaster'},
+        u'wonder-bread': {'@module': u'toaster', '@namespace': u'http://netconfcentral.org/ns/toaster'},
+        u'toast:frozen-bagel': {'@module': u'toaster', '@namespace': u'http://netconfcentral.org/ns/toaster'},
+        u'toast:hash-brown': {'@module': u'toaster', '@namespace': u'http://netconfcentral.org/ns/toaster'},
+        u'toast:wonder-bread': {'@module': u'toaster', '@namespace': u'http://netconfcentral.org/ns/toaster'},
+        u'toast:white-bread': {'@module': u'toaster', '@namespace': u'http://netconfcentral.org/ns/toaster'},
+        u'hash-brown': {'@module': u'toaster', '@namespace': u'http://netconfcentral.org/ns/toaster'},
+        u'frozen-waffle': {'@module': u'toaster', '@namespace': u'http://netconfcentral.org/ns/toaster'},
         u'toast:frozen-waffle': {'@module': u'toaster', '@namespace': u'http://netconfcentral.org/ns/toaster'},
-        u'wheat-bread'        : {'@module': u'toaster', '@namespace': u'http://netconfcentral.org/ns/toaster'}}, ),
+        u'wheat-bread': {'@module': u'toaster', '@namespace': u'http://netconfcentral.org/ns/toaster'}}, ),
                        default=unicode("toast:wheat-bread"), is_leaf=True, yang_name="toasterToastType", parent=self,
                        path_helper=self._path_helper, extmethods=self._extmethods, register_paths=False,
                        namespace='http://netconfcentral.org/ns/toaster', defining_module='toaster',
                        yang_type='identityref')
     except (TypeError, ValueError):
       raise ValueError({
-        'error-string'  : """toasterToastType must be of a type compatible with identityref""",
-        'defined-type'  : "toaster:identityref",
+        'error-string': """toasterToastType must be of a type compatible with identityref""",
+        'defined-type': "toaster:identityref",
         'generated-type': """YANGDynClass(base=RestrictedClassType(base_type=unicode, restriction_type="dict_key", restriction_arg={u'white-bread': {'@module': u'toaster', '@namespace': u'http://netconfcentral.org/ns/toaster'}, u'toast:wheat-bread': {'@module': u'toaster', '@namespace': u'http://netconfcentral.org/ns/toaster'}, u'frozen-bagel': {'@module': u'toaster', '@namespace': u'http://netconfcentral.org/ns/toaster'}, u'wonder-bread': {'@module': u'toaster', '@namespace': u'http://netconfcentral.org/ns/toaster'}, u'toast:frozen-bagel': {'@module': u'toaster', '@namespace': u'http://netconfcentral.org/ns/toaster'}, u'toast:hash-brown': {'@module': u'toaster', '@namespace': u'http://netconfcentral.org/ns/toaster'}, u'toast:wonder-bread': {'@module': u'toaster', '@namespace': u'http://netconfcentral.org/ns/toaster'}, u'toast:white-bread': {'@module': u'toaster', '@namespace': u'http://netconfcentral.org/ns/toaster'}, u'hash-brown': {'@module': u'toaster', '@namespace': u'http://netconfcentral.org/ns/toaster'}, u'frozen-waffle': {'@module': u'toaster', '@namespace': u'http://netconfcentral.org/ns/toaster'}, u'toast:frozen-waffle': {'@module': u'toaster', '@namespace': u'http://netconfcentral.org/ns/toaster'}, u'wheat-bread': {'@module': u'toaster', '@namespace': u'http://netconfcentral.org/ns/toaster'}},), default=unicode("toast:wheat-bread"), is_leaf=True, yang_name="toasterToastType", parent=self, path_helper=self._path_helper, extmethods=self._extmethods, register_paths=False, namespace='http://netconfcentral.org/ns/toaster', defining_module='toaster', yang_type='identityref')""",
       })
 
@@ -526,30 +526,30 @@ the required doneness.
   def _unset_toasterToastType(self):
     self.__toasterToastType = YANGDynClass(base=RestrictedClassType(base_type=unicode, restriction_type="dict_key",
                                                                     restriction_arg={
-                                                                      u'white-bread'        : {'@module'   : u'toaster',
+                                                                      u'white-bread': {'@module': u'toaster',
+                                                                                       '@namespace': u'http://netconfcentral.org/ns/toaster'},
+                                                                      u'toast:wheat-bread': {'@module': u'toaster',
+                                                                                             '@namespace': u'http://netconfcentral.org/ns/toaster'},
+                                                                      u'frozen-bagel': {'@module': u'toaster',
+                                                                                        '@namespace': u'http://netconfcentral.org/ns/toaster'},
+                                                                      u'wonder-bread': {'@module': u'toaster',
+                                                                                        '@namespace': u'http://netconfcentral.org/ns/toaster'},
+                                                                      u'toast:frozen-bagel': {'@module': u'toaster',
+                                                                                              '@namespace': u'http://netconfcentral.org/ns/toaster'},
+                                                                      u'toast:hash-brown': {'@module': u'toaster',
+                                                                                            '@namespace': u'http://netconfcentral.org/ns/toaster'},
+                                                                      u'toast:wonder-bread': {'@module': u'toaster',
+                                                                                              '@namespace': u'http://netconfcentral.org/ns/toaster'},
+                                                                      u'toast:white-bread': {'@module': u'toaster',
+                                                                                             '@namespace': u'http://netconfcentral.org/ns/toaster'},
+                                                                      u'hash-brown': {'@module': u'toaster',
+                                                                                      '@namespace': u'http://netconfcentral.org/ns/toaster'},
+                                                                      u'frozen-waffle': {'@module': u'toaster',
+                                                                                         '@namespace': u'http://netconfcentral.org/ns/toaster'},
+                                                                      u'toast:frozen-waffle': {'@module': u'toaster',
                                                                                                '@namespace': u'http://netconfcentral.org/ns/toaster'},
-                                                                      u'toast:wheat-bread'  : {'@module'   : u'toaster',
-                                                                                               '@namespace': u'http://netconfcentral.org/ns/toaster'},
-                                                                      u'frozen-bagel'       : {'@module'   : u'toaster',
-                                                                                               '@namespace': u'http://netconfcentral.org/ns/toaster'},
-                                                                      u'wonder-bread'       : {'@module'   : u'toaster',
-                                                                                               '@namespace': u'http://netconfcentral.org/ns/toaster'},
-                                                                      u'toast:frozen-bagel' : {'@module'   : u'toaster',
-                                                                                               '@namespace': u'http://netconfcentral.org/ns/toaster'},
-                                                                      u'toast:hash-brown'   : {'@module'   : u'toaster',
-                                                                                               '@namespace': u'http://netconfcentral.org/ns/toaster'},
-                                                                      u'toast:wonder-bread' : {'@module'   : u'toaster',
-                                                                                               '@namespace': u'http://netconfcentral.org/ns/toaster'},
-                                                                      u'toast:white-bread'  : {'@module'   : u'toaster',
-                                                                                               '@namespace': u'http://netconfcentral.org/ns/toaster'},
-                                                                      u'hash-brown'         : {'@module'   : u'toaster',
-                                                                                               '@namespace': u'http://netconfcentral.org/ns/toaster'},
-                                                                      u'frozen-waffle'      : {'@module'   : u'toaster',
-                                                                                               '@namespace': u'http://netconfcentral.org/ns/toaster'},
-                                                                      u'toast:frozen-waffle': {'@module'   : u'toaster',
-                                                                                               '@namespace': u'http://netconfcentral.org/ns/toaster'},
-                                                                      u'wheat-bread'        : {'@module'   : u'toaster',
-                                                                                               '@namespace': u'http://netconfcentral.org/ns/toaster'}}, ),
+                                                                      u'wheat-bread': {'@module': u'toaster',
+                                                                                       '@namespace': u'http://netconfcentral.org/ns/toaster'}}, ),
                                            default=unicode("toast:wheat-bread"), is_leaf=True,
                                            yang_name="toasterToastType", parent=self, path_helper=self._path_helper,
                                            extmethods=self._extmethods, register_paths=False,
@@ -646,8 +646,8 @@ if the toaster service is disabled.
                        namespace='http://netconfcentral.org/ns/toaster', defining_module='toaster', yang_type='input')
     except (TypeError, ValueError):
       raise ValueError({
-        'error-string'  : """input must be of a type compatible with input""",
-        'defined-type'  : "toaster:input",
+        'error-string': """input must be of a type compatible with input""",
+        'defined-type': "toaster:input",
         'generated-type': """YANGDynClass(base=yc_input_toaster__toaster_rpc_make_toast_input, is_leaf=True, yang_name="input", parent=self, path_helper=self._path_helper, extmethods=self._extmethods, register_paths=False, namespace='http://netconfcentral.org/ns/toaster', defining_module='toaster', yang_type='input')""",
       })
 
@@ -780,8 +780,8 @@ if the toaster service is disabled.
                        namespace='http://netconfcentral.org/ns/toaster', defining_module='toaster', yang_type='rpc')
     except (TypeError, ValueError):
       raise ValueError({
-        'error-string'  : """make_toast must be of a type compatible with rpc""",
-        'defined-type'  : "rpc",
+        'error-string': """make_toast must be of a type compatible with rpc""",
+        'defined-type': "rpc",
         'generated-type': """YANGDynClass(base=yc_make_toast_toaster__toaster_rpc_make_toast, is_leaf=True, yang_name="make-toast", parent=self, path_helper=self._path_helper, extmethods=self._extmethods, register_paths=False, namespace='http://netconfcentral.org/ns/toaster', defining_module='toaster', yang_type='rpc')""",
       })
 
@@ -795,6 +795,7 @@ if the toaster service is disabled.
                                      extmethods=self._extmethods, register_paths=False,
                                      namespace='http://netconfcentral.org/ns/toaster', defining_module='toaster',
                                      yang_type='rpc')
+
 
   def _get_cancel_toast(self):
     """
@@ -825,8 +826,8 @@ if the toaster service is disabled.
                        namespace='http://netconfcentral.org/ns/toaster', defining_module='toaster', yang_type='rpc')
     except (TypeError, ValueError):
       raise ValueError({
-        'error-string'  : """cancel_toast must be of a type compatible with rpc""",
-        'defined-type'  : "rpc",
+        'error-string': """cancel_toast must be of a type compatible with rpc""",
+        'defined-type': "rpc",
         'generated-type': """YANGDynClass(base=yc_cancel_toast_toaster__toaster_rpc_cancel_toast, is_leaf=True, yang_name="cancel-toast", parent=self, path_helper=self._path_helper, extmethods=self._extmethods, register_paths=False, namespace='http://netconfcentral.org/ns/toaster', defining_module='toaster', yang_type='rpc')""",
       })
 

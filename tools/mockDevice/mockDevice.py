@@ -75,43 +75,57 @@ def import_models():
     contains this file. It typically is a symbolic link over to the 'modules'
     generated-code subdirectory.
     """
-    gen_dir = os.path.join(os.path.realpath(__file__), generated_dir)
+    gen_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), generated_dir)
 
     if os.path.exists(gen_dir) and os.path.isdir(gen_dir):
-        print 'The generatedDir is %s' % gen_dir
+        if args.verbose > 0:
+            print 'The generatedDir is %s' % gen_dir
 
         # Walk all the files in the generated code directory and look for python files
 
-        files = [f for f in os.listdir(gen_dir) if os.isfile(os.path.join(gen_dir, f))]
+        files = [f for f in os.listdir(gen_dir)
+                 if os.path.isfile(os.path.join(gen_dir, f)) and
+                 f.split('.')[-1].lower() == 'py' and
+                 f != '__init__.py'
+                 ]
+
+        if args.verbose > 0:
+            print 'The list of python files in the generated directory is: %s' % files
+
         for filename in files:
-            file_parts = os.path.splitext(v)
-            if file_parts[1].lower() is '.py':
+            # The class name for the model is the same as the first part of the filename
 
-                # The class name for the model is the same as the first part of the filename
-
-                model = file[0]
+            model = str.split(filename, '.')[0]
+            if args.verbose > 0:
                 print "Found model '%s' in '%s'" % (model, filename)
-                package = generated_dir
-                module = model
-                _class = model
+            package = generated_dir
+            module = model
+            _class = model
 
-                try:
-                    # yang_model = dynamic_import(package, _class)
-                    yang_module = __import__('%s.%s' % (package, module), fromlist=[_class])
-                    yang_model = getattr(yang_module, _class)
+            try:
+                # yang_model = dynamic_import(package, _class)
+
+                if args.verbose > 0:
+                    print 'Dynamic import -> from %s.%s import %s' % (package, module, _class)
+
+                yang_module = __import__('%s.%s' % (package, module), fromlist=[_class])
+                yang_model = getattr(yang_module, _class)
+
+                if args.verbose > 0:
+                    print 'Yang class imported: %s' % yang_model
 
                     #      TODO: Implement the rest of this
                     # Basically we want to walk the model and for each 'config' element, we want
                     # to set up an extension that makes use of the restconfConfigHelper class.
                     # We then add this
 
-                except ImportError:
-                    print 'Import Error while attempting to import class %s from %s.%s' % (model, package, module)
+            except ImportError:
+                print 'Import Error while attempting to import class %s from %s.%s' % (model, package, module)
 
-                    # Instantiate the models the first time so we can generate all the paths within
-                    # them so we can create extension methods that provide for RESTCONF required
-                    # methods
-                    ###########################################################################
+                # Instantiate the models the first time so we can generate all the paths within
+                # them so we can create extension methods that provide for RESTCONF required
+                # methods
+                ###########################################################################
 
 
 @app.route('/')
@@ -125,6 +139,9 @@ def get_host_meta():
     This function services the well-known host-meta XRD data for RESTCONF
     API root discovery.
     """
+    if args.verbose > 0:
+        print 'get_host_meta: entry'
+
     xrd_obj = XRD()
 
     # Add a few extra elements and links before RESTCONF to help make sure
@@ -148,6 +165,7 @@ def get_host_meta():
     # Convert to XML, pretty-print it to aid in debugging
 
     xrd_doc = xrd_obj.to_xml()
+
     return Response(xrd_doc.toprettyxml(indent=' '), mimetype='application/xrd+xml')
 
 
@@ -161,9 +179,15 @@ def do_reset():
     with variables to alter the behaviour (for a particular test) and then call
     this to reset items back to normal so you can do more tests.
     """
-    pass  # TODO: Need to implement
+    if args.verbose > 0:
+        print 'TODO: Need to implement configuration reset capability'
 
+    return
 
 if __name__ == '__main__':
     import_models()
+
+    if args.verbose > 0:
+        print 'Starting up web server on port %d' % args.http_port
+
     app.run(debug=True, port=args.http_port)
