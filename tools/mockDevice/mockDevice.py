@@ -17,7 +17,11 @@
 from flask import Flask, Response
 from xrd import Element, XRD, Link
 from globals import DEFAULT_ROOT_RESOURCE, DEFAULT_HTTP_PORT, GENERATED_DIR_NAME
+from pyangbind.lib.yangtypes import RestrictedPrecisionDecimalType, RestrictedClassType, TypedListType
+from pyangbind.lib.yangtypes import YANGBool, YANGListType, YANGDynClass, ReferenceType
+from pyangbind.lib.base import PybindBase
 from resource.datastore import dataStore
+import pprint
 
 try:
     from generated import *
@@ -50,24 +54,53 @@ generated_dir = GENERATED_DIR_NAME  # Generated subdirectory name
 models = []  # List of YANG modes we dynamically imported
 
 
-def dynamic_import(_package, _class):
+def _get_extmethods(element, path_base='', extmethods=None):
     """
-    Dynamically import a class based on a variable
+    A recursive function to convert a yang model into a extmethods dictionary
 
-    :param _package: (string) The package prefix(es)
-    :param _class: (string) The class name you are looking for
+    :param element: (list of YANGDynClass) Child elements of a the model instance
+    :param path_base: (dict) Existing dictionary of elements
+    :param extmethods: (dict) Existing dictionary of elements
 
-    :return:  The module to import
+    :return: (dict) A Pyangbind compatible extmethods dictionary
     """
-    full_path = _package + '.' + _class
-    components = full_path.split('.')
-    module = __import__(components[0])
-    for component in components[1:]:
-        module = getattr(module, component)
-    return module
+    extmethods = extmethods if extmethods is not None else {}
+
+    if element is None:
+        return extmethods
+
+    if isinstance(element, dict):
+        print '%s is a dictionary of length %d' % (element, len(element))
+
+        for key, value in element.items():
+            path = path_base + '/' + key
+            config = False  # TODO Not really what we want
+            extmethods[path] = config
+            return _get_extmethods(value, path_base=path, extmethods=extmethods)
+
+    elif isinstance(element, PybindBase):
+        print '  is config: %s' % 'True' if element._is_config else 'False'
+        print '     is key: %s' % 'True' if element._is_keyval else 'False'
+        print ' is default: %s' % 'True' if element.default() else 'False'
+        print 'has changed: %s' % 'True' if element._changed() else 'False'
+        return extmethods
+
+    # elif isinstance(value, list) or isinstance(value, tuple):
+    #     for v in value:
+    #         for d in _get_extmethods(v,
+    #                                  path_base=path_base + '%s/' % key,
+    #                                  extmethods=extmethods):
+    #             return d
+    else:
+        return extmethods
+        #
+        #
+        # if type(element) is YANGDynClass:
+        #     print 'It is the base YANG type'
+        #     yield extmethods
 
 
-def import_models():
+def _import_models():
     """
     Import the models in the generated directory.
 
@@ -114,10 +147,18 @@ def import_models():
                 if args.verbose > 0:
                     print 'Yang class imported: %s' % yang_model
 
-                    #      TODO: Implement the rest of this
-                    # Basically we want to walk the model and for each 'config' element, we want
-                    # to set up an extension that makes use of the restconfConfigHelper class.
-                    # We then add this
+                # Create an instance of this yang model.  This will be an YANG Container object
+                # that derives from the PybindBase.  We want to walk it and extract the paths
+                # for all configuration nodes and return a dictionary compatible with pyangbind
+                # extmethod
+
+                extmethods = _get_extmethods(yang_model().elements())
+                pprint.PrettyPrinter(indent=4).pprint(extmethods)
+
+                # Get a dictionary of the top level container. Do not filter out any children
+
+                container_dict = yang_model().get()
+                pprint.PrettyPrinter(indent=4).pprint(container_dict)
 
             except ImportError:
                 print 'Import Error while attempting to import class %s from %s.%s' % (model, package, module)
@@ -185,7 +226,7 @@ def do_reset():
     return
 
 if __name__ == '__main__':
-    import_models()
+    _import_models()
 
     if args.verbose > 0:
         print 'Starting up web server on port %d' % args.http_port
