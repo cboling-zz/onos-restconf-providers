@@ -15,9 +15,10 @@
 #
 from datetime import datetime
 from uuid import uuid4
+from restconfDataHelper import RestconfDataHelper
 
 
-class RestconfConfigHelper(object):
+class RestconfConfigHelper(RestconfDataHelper):
     """
     Provides RESTCONF required properties/capabilities for each node in a YANG data model
     that is a configuration data resource.
@@ -28,16 +29,23 @@ class RestconfConfigHelper(object):
     """
     lastModifiedTimestamp = datetime.utcnow()
     eTag = str(uuid4())
-    parent = None
 
     def __init__(self, parent=None):
         """
         :param parent: (restconfConfigHelper) The first ancestor of this configuration node
         """
+        super(RestconfDataHelper.self).__init__(parent)
         # TODO: Look into YANG specification and see if there are any other options/params we may want to pass in
-        self.parent = parent
 
-    def get_last_modified_timestamp(self, *args, **kwargs):
+    @property
+    def is_config(self):
+        """
+        :returns: (Boolean) True if this item is configurable
+        """
+        return True
+
+    @property
+    def last_modified_timestamp(self):
         """
         Provides the last change time (used in "Last-Modified" header) for this resource.
 
@@ -47,6 +55,19 @@ class RestconfConfigHelper(object):
         :return: (datetime) the UTC timestamp that this tree was last modified
         """
         return self.lastModifiedTimestamp
+
+    @last_modified_timestamp.setter
+    def last_modified_timestamp(self, updateTime):
+        """
+        Allows setting of the timestamp to a specific value.
+
+        Normally, you would use the 'set_modified' method as it sets any ancestor times
+        to the current time as well
+
+        :param updateTime: (dateTime) Optional argument that specifies the update time. This is often
+                                      used when recursing up the ancestor list.
+        """
+        self.set_modified(updateTime=updateTime)
 
     def set_modified(self, *args, **kwargs):
         """
@@ -64,9 +85,17 @@ class RestconfConfigHelper(object):
         # Any change of a configuration item requires update of any ancestor data resources as well
 
         if self.parent is not None:
-            self.parent.set_modified(updateTime=self.lastModifiedTimestamp)
+            try:
+                self.parent.set_modified(updateTime=self.lastModifiedTimestamp)
 
-    def get_entity_tag(self, *args, **kwargs):
+            except AttributeError:
+                # All ancestors of a configurable item should be derived from this class and
+                # support setting of the timestamp!
+                print 'Ancestor of this object is not a RestconfConfigHelper object'
+                raise
+
+    @property
+    def entity_tag(self):
         """
         Provides the entity tag (used by the "If-Match" header) for this resource.
 
