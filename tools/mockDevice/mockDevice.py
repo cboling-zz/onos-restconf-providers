@@ -17,9 +17,8 @@
 from flask import Flask, Response
 from xrd import Element, XRD, Link
 from globals import DEFAULT_ROOT_RESOURCE, DEFAULT_HTTP_PORT, GENERATED_DIR_NAME
-from pyangbind.lib.base import PybindBase
-from pyangbind.lib.yangtypes import YANGDynClass
 from resource.datastore import dataStore
+from yangModel import YangModel
 import pprint
 
 try:
@@ -53,50 +52,6 @@ generated_dir = GENERATED_DIR_NAME  # Generated subdirectory name
 models = []  # List of YANG modes we dynamically imported
 
 
-def _get_extmethods(element, path_base=''):
-    """
-    A recursive function to convert a yang model into a extmethods dictionary
-
-    :param element: (list of YANGDynClass) Child elements of a the model instance
-    :param path_base: (dict) Existing dictionary of elements
-
-    :return: (dict) A Pyangbind compatible extmethods dictionary
-    """
-    extmethods = {}
-
-    if element is None:
-        return extmethods
-
-    if isinstance(element, dict):
-        # print '%s is a dictionary of length %d' % (element, len(element))
-
-        for key, value in element.items():
-            path = path_base + '/' + key
-            config = True
-
-            try:
-                if value._is_leaf:  # Protected, but I really need to know
-                    config = value.flags.writeable
-
-            except AttributeError:
-                pass  # Was another dictionary item or did not have a writeable flag
-
-            # Add this to our path
-            extmethods[path] = config
-            extmethods.update(_get_extmethods(value, path_base=path))
-
-    return extmethods
-
-
-def _fix_extmethods(extmethods):
-    """
-    Walk through the methods and fix up any parents that have no children that
-    are writeable.
-    """
-    # TODO: Need to implement
-    return extmethods
-
-
 def _import_models():
     """
     Import the models in the generated directory.
@@ -111,56 +66,24 @@ def _import_models():
         if args.verbose > 0:
             print 'The generatedDir is %s' % gen_dir
 
-        # Walk all the files in the generated code directory and look for python files
+        # Walk all the files in the generated code directory and look for YIN XM files
+        # and use that to determine the python code-generated names
 
-        files = [f for f in os.listdir(gen_dir)
-                 if os.path.isfile(os.path.join(gen_dir, f)) and
-                 f.split('.')[-1].lower() == 'py' and
-                 f != '__init__.py'
-                 ]
+        xml_files = [f for f in os.listdir(gen_dir)
+                     if os.path.isfile(os.path.join(gen_dir, f)) and
+                     f.split('.')[-1].lower() == 'xml'
+                     ]
 
         if args.verbose > 0:
-            print 'The list of python files in the generated directory is: %s' % files
+            print 'The list of XML files in the generated directory is: %s' % xml_files
 
-        for filename in files:
+        for filename in xml_files:
             # The class name for the model is the same as the first part of the filename
 
-            model = str.split(filename, '.')[0]
+            model = YangModel(generated_dir, filename, verbose=args.verbose)
+
             if args.verbose > 0:
-                print "Found model '%s' in '%s'" % (model, filename)
-            package = generated_dir
-            module = model
-            _class = model
-
-            try:
-                # yang_model = dynamic_import(package, _class)
-
-                if args.verbose > 0:
-                    print 'Dynamic import -> from %s.%s import %s' % (package, module, _class)
-
-                yang_module = __import__('%s.%s' % (package, module), fromlist=[_class])
-                yang_model = getattr(yang_module, _class)
-
-                if args.verbose > 0:
-                    print 'Yang class imported: %s' % yang_model
-
-                # Create an instance of this yang model.  This will be an YANG Container object
-                # that derives from the PybindBase.  We want to walk it and extract the paths
-                # for all configuration nodes and return a dictionary compatible with pyangbind
-                # extmethod
-
-                extmethods = _get_extmethods(yang_model().get())
-                pprint.PrettyPrinter(indent=4).pprint(extmethods)
-
-                # Get a dictionary of the top level container. Do not filter out any children
-
-            except ImportError:
-                print 'Import Error while attempting to import class %s from %s.%s' % (model, package, module)
-
-                # Instantiate the models the first time so we can generate all the paths within
-                # them so we can create extension methods that provide for RESTCONF required
-                # methods
-                ###########################################################################
+                print "Found model '%s' in '%s'" % (model.module_name, filename)
 
 
 @app.route('/')
