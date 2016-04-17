@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="example-jukebox"
+        xmlns="urn:ietf:params:xml:ns:yang:yin:1"
+        xmlns:jbox="http://example.com/ns/example-jukebox">
+    <namespace uri="http://example.com/ns/example-jukebox"/>
+    <prefix value="jbox"/>
+    <organization>
+        <text>
+            Example, Inc.
+        </text>
+    </organization>
+    <contact>
+        <text>
+            support at example.com
+        </text>
+    </contact>
+    <description>
+        <text>
+            Example Jukebox Data Model Module
+        </text>
+    </description>
+    <revision date="2015-04-04">
+        <description>
+            <text>
+                Initial version.
+            </text>
+        </description>
+        <reference>
+            <text>
+                example.com document 1-4673
+            </text>
+        </reference>
+    </revision>
+    <identity name="genre">
+        <description>
+            <text>
+                Base for all genre types
+            </text>
+        </description>
+    </identity>
+    <identity name="alternative">
+        <base name="genre"/>
+        <description>
+            <text>
+                Alternative music
+            </text>
+        </description>
+    </identity>
+    <identity name="blues">
+        <base name="genre"/>
+        <description>
+            <text>
+                Blues music
+            </text>
+        </description>
+    </identity>
+    <identity name="country">
+        <base name="genre"/>
+        <description>
+            <text>
+                Country music
+            </text>
+        </description>
+    </identity>
+    <identity name="jazz">
+        <base name="genre"/>
+        <description>
+            <text>
+                Jazz music
+            </text>
+        </description>
+    </identity>
+    <identity name="pop">
+        <base name="genre"/>
+        <description>
+            <text>
+                Pop music
+            </text>
+        </description>
+    </identity>
+    <identity name="rock">
+        <base name="genre"/>
+        <description>
+            <text>
+                Rock music
+            </text>
+        </description>
+    </identity>
+    <rpc name="play">
+        <description>
+            <text>
+                Control function for the jukebox player
+            </text>
+        </description>
+        <input>
+            <leaf name="playlist">
+                <type name="string"/>
+                <mandatory value="true"/>
+                <description>
+                    <text>
+                        playlist name
+                    </text>
+                </description>
+            </leaf>
+            <leaf name="song-number">
+                <type name="uint32"/>
+                <mandatory value="true"/>
+                <description>
+                    <text>
+                        Song number in playlist to play
+                    </text>
+                </description>
+            </leaf>
+        </input>
+    </rpc>
+    <container name="jukebox">
+        <presence value="An empty container indicates that the jukebox&#10;service is available"/>
+        <description>
+            <text>
+                Represents a jukebox resource, with a library, playlists,
+                and a play operation.
+            </text>
+        </description>
+        <container name="library">
+            <description>
+                <text>
+                    Represents the jukebox library resource.
+                </text>
+            </description>
+            <list name="artist">
+                <key value="name"/>
+                <description>
+                    <text>
+                        Represents one artist resource within the
+                        jukebox library resource.
+                    </text>
+                </description>
+                <leaf name="name">
+                    <type name="string">
+                        <length value="1 .. max"/>
+                    </type>
+                    <description>
+                        <text>
+                            The name of the artist.
+                        </text>
+                    </description>
+                </leaf>
+                <list name="album">
+                    <key value="name"/>
+                    <description>
+                        <text>
+                            Represents one album resource within one
+                            artist resource, within the jukebox library.
+                        </text>
+                    </description>
+                    <leaf name="name">
+                        <type name="string">
+                            <length value="1 .. max"/>
+                        </type>
+                        <description>
+                            <text>
+                                The name of the album.
+                            </text>
+                        </description>
+                    </leaf>
+                    <leaf name="genre">
+                        <type name="identityref">
+                            <base name="genre"/>
+                        </type>
+                        <description>
+                            <text>
+                                The genre identifying the type of music on
+                                the album.
+                            </text>
+                        </description>
+                    </leaf>
+                    <leaf name="year">
+                        <type name="uint16">
+                            <range value="1900 .. max"/>
+                        </type>
+                        <description>
+                            <text>
+                                The year the album was released
+                            </text>
+                        </description>
+                    </leaf>
+                    <container name="admin">
+                        <description>
+                            <text>
+                                Administrative information for the album.
+                            </text>
+                        </description>
+                        <leaf name="label">
+                            <type name="string"/>
+                            <description>
+                                <text>
+                                    The label that released the album.
+                                </text>
+                            </description>
+                        </leaf>
+                        <leaf name="catalogue-number">
+                            <type name="string"/>
+                            <description>
+                                <text>
+                                    The album's catalogue number.
+                                </text>
+                            </description>
+                        </leaf>
+                    </container>
+                    <list name="song">
+                        <key value="name"/>
+                        <description>
+                            <text>
+                                Represents one song resource within one
+                                album resource, within the jukebox library.
+                            </text>
+                        </description>
+                        <leaf name="name">
+                            <type name="string">
+                                <length value="1 .. max"/>
+                            </type>
+                            <description>
+                                <text>
+                                    The name of the song
+                                </text>
+                            </description>
+                        </leaf>
+                        <leaf name="location">
+                            <type name="string"/>
+                            <mandatory value="true"/>
+                            <description>
+                                <text>
+                                    The file location string of the
+                                    media file for the song
+                                </text>
+                            </description>
+                        </leaf>
+                        <leaf name="format">
+                            <type name="string"/>
+                            <description>
+                                <text>
+                                    An identifier string for the media type
+                                    for the file associated with the
+                                    'location' leaf for this entry.
+                                </text>
+                            </description>
+                        </leaf>
+                        <leaf name="length">
+                            <type name="uint32"/>
+                            <units name="seconds"/>
+                            <description>
+                                <text>
+                                    The duration of this song in seconds.
+                                </text>
+                            </description>
+                        </leaf>
+                    </list>
+                </list>
+            </list>
+            <leaf name="artist-count">
+                <type name="uint32"/>
+                <units name="songs"/>
+                <config value="false"/>
+                <description>
+                    <text>
+                        Number of artists in the library
+                    </text>
+                </description>
+            </leaf>
+            <leaf name="album-count">
+                <type name="uint32"/>
+                <units name="albums"/>
+                <config value="false"/>
+                <description>
+                    <text>
+                        Number of albums in the library
+                    </text>
+                </description>
+            </leaf>
+            <leaf name="song-count">
+                <type name="uint32"/>
+                <units name="songs"/>
+                <config value="false"/>
+                <description>
+                    <text>
+                        Number of songs in the library
+                    </text>
+                </description>
+            </leaf>
+        </container>
+        <list name="playlist">
+            <key value="name"/>
+            <description>
+                <text>
+                    Example configuration data resource
+                </text>
+            </description>
+            <leaf name="name">
+                <type name="string"/>
+                <description>
+                    <text>
+                        The name of the playlist.
+                    </text>
+                </description>
+            </leaf>
+            <leaf name="description">
+                <type name="string"/>
+                <description>
+                    <text>
+                        A comment describing the playlist.
+                    </text>
+                </description>
+            </leaf>
+            <list name="song">
+                <key value="index"/>
+                <ordered-by value="user"/>
+                <description>
+                    <text>
+                        Example nested configuration data resource
+                    </text>
+                </description>
+                <leaf name="index">
+                    <type name="uint32"/>
+                    <description>
+                        <text>
+                            An arbitrary integer index for this playlist song.
+                        </text>
+                    </description>
+                </leaf>
+                <leaf name="id">
+                    <type name="leafref">
+                        <path value="/jbox:jukebox/jbox:library/jbox:artist/jbox:album/jbox:song/jbox:name"/>
+                    </type>
+                    <mandatory value="true"/>
+                    <description>
+                        <text>
+                            Song identifier. Must identify an instance of
+                            /jukebox/library/artist/album/song/name.
+                        </text>
+                    </description>
+                </leaf>
+            </list>
+        </list>
+        <container name="player">
+            <description>
+                <text>
+                    Represents the jukebox player resource.
+                </text>
+            </description>
+            <leaf name="gap">
+                <type name="decimal64">
+                    <fraction-digits value="1"/>
+                    <range value="0.0 .. 2.0"/>
+                </type>
+                <units name="tenths of seconds"/>
+                <description>
+                    <text>
+                        Time gap between each song
+                    </text>
+                </description>
+            </leaf>
+        </container>
+    </container>
+</module>
