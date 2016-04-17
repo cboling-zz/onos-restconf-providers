@@ -18,6 +18,7 @@ from pyangbind.lib.base import PybindBase
 from pyangbind.lib.yangtypes import YANGDynClass
 from pyangbind.lib.yangtypes import YANGListType, TypedListType
 
+import os
 import pprint
 
 
@@ -28,13 +29,13 @@ class YangModel:
     _extmethods = None
     _yang_class = None
 
-    def __init__(self, model_dir, yin_file, verbose=False):
+    def __init__(self, yin_path, yin_file, model_dir, verbose=False):
         """
         TODO: Document this
         """
-        self.yin = YINFile(yin_file)
-        self.dir = model_dir
-        self.verbose = verbose
+        self.yin = YINFile(os.path.join(yin_path, yin_file))
+        self.model_dir = model_dir
+        self.verbose = verbose  # gen_dir, filename, generated_dir,
 
         # Import the model
         self._import_models()
@@ -53,7 +54,7 @@ class YangModel:
         TODO: Document this
         """
         if self._extmethods is None:
-            self._extmethods = self._get_extmethods()
+            self._extmethods = self._get_extmethods(self._yang_class().get())
 
         return self._extmethods
 
@@ -61,7 +62,7 @@ class YangModel:
         """
         TODO: Document this
         """
-        package = self.dir
+        package = self.model_dir
         module = self.yin.module_name
         _class = self.yin.module_name
 
@@ -75,18 +76,11 @@ class YangModel:
             if self.verbose > 0:
                 print 'YANG class imported: %s' % self._yang_class
 
-            # Create an instance of this yang model.  This will be an YANG Container object
-            # that derives from the PybindBase.  We want to walk it and extract the paths
-            # for all configuration nodes and return a dictionary compatible with pyangbind
-            # extmethod
-
-            extmethods = self._get_extmethods(self._yang_class().get())
-            pprint.PrettyPrinter(indent=4).pprint(extmethods)
-
-            # Get a dictionary of the top level container. Do not filter out any children
+                # TODO: This yang class is basic, we need to append the extmethods to it so we can support
+                # everything we want to do
 
         except ImportError:
-            print 'Import Error while attempting to import class %s from %s.%s' % (model, package, module)
+            print 'Import Error while attempting to import class %s from %s.%s' % (_class, package, module)
 
             # Instantiate the models the first time so we can generate all the paths within
             # them so we can create extension methods that provide for RESTCONF required

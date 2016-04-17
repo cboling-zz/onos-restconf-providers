@@ -40,7 +40,6 @@ class YINFile:
             container_tag = 'container'
 
         self.containers = self.root.findall(container_tag)
-        pass
 
     @property
     def file_path(self):

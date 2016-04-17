@@ -48,8 +48,8 @@ app.register_blueprint(dataStore, url_prefix=__prefix)
 
 ###########################################################################
 
-generated_dir = GENERATED_DIR_NAME  # Generated subdirectory name
-models = []  # List of YANG modes we dynamically imported
+_generated_dir = GENERATED_DIR_NAME  # Generated subdirectory name
+_models = []  # List of YANG models we dynamically imported
 
 
 def _import_models():
@@ -60,7 +60,7 @@ def _import_models():
     contains this file. It typically is a symbolic link over to the 'modules'
     generated-code subdirectory.
     """
-    gen_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), generated_dir)
+    gen_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), _generated_dir)
 
     if os.path.exists(gen_dir) and os.path.isdir(gen_dir):
         if args.verbose > 0:
@@ -80,10 +80,12 @@ def _import_models():
         for filename in xml_files:
             # The class name for the model is the same as the first part of the filename
 
-            model = YangModel(generated_dir, filename, verbose=args.verbose)
+            model = YangModel(gen_dir, filename, _generated_dir, verbose=args.verbose)
 
             if args.verbose > 0:
                 print "Found model '%s' in '%s'" % (model.module_name, filename)
+
+            _models.append(model)
 
 
 @app.route('/')
