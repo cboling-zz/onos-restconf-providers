@@ -9,7 +9,7 @@ PYBINDPLUGIN=`/usr/bin/env python -c \
 
 RESTCONF_MODULE_BASEDIR=$(pwd)/../modules
 RESTCONF_MODULE_OUTDIR=${RESTCONF_MODULE_BASEDIR}/generated-code
-RESTCONF_MODULES="toaster.yang example-jukebox.yang"
+RESTCONF_MODULES="toaster.yang example-jukebox.yang ietf-interfaces.yang"
 #RESTCONF_MODULES="toaster.yang"
 PYBIND_OPTS="--use-extmethods --build-rpcs"
 PYIN_OPTS="--format=yin --yin-canonical --yin-pretty-strings --trim-yin"
