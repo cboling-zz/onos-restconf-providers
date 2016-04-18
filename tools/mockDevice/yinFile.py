@@ -70,6 +70,17 @@ class YINFile:
         """
         return self.namespace
 
+    def get_name_wo_namespace(self, fullname):
+        """
+        Extracts the simple name of an item without the namespace
+
+        :param fullname: (string) Namespace + an element name
+
+        :return: (string) Name without the namespace
+
+        """
+        return fullname.replace(self.namespace, '')
+
     @property
     def containers(self):
         """
@@ -85,7 +96,7 @@ class YINFile:
         """
         pass
 
-    def get_extmethods(self, element, path_base=''):
+    def get_extmethods(self, root, element, path_base=''):
         """
         A recursive function to convert a yang model into a extmethods dictionary
 
@@ -104,6 +115,25 @@ class YINFile:
             for key, value in element.items():
                 path = path_base + '/' + key
                 config = True
+
+                # root.findall('./*[@name]')   Returns all children with a 'name' attribute
+                # root.findall('./*[@name]')[0]  First matching child
+                # root.findall('./*[@name]')[0].tag    -> first child tag such as string '{urn:ietf:params:xml:ns:yang:yin:1}identity'
+                # root.findall('./*[@name]')[0].attrib -> first child attribute value such as dict {'name': 'genre'}
+
+                # keywords = ['{urn:ietf:params:xml:ns:yang:yin:1}container','{urn:ietf:params:xml:ns:yang:yin:1}list','{urn:ietf:params:xml:ns:yang:yin:1}leaf']
+                # xyz = [ x for x in root.findall('./*[@name]') if x.tag in keywords ]
+                # xyz is a list of all children who have a name attribute and the tag is the namespace+keyword value
+
+                # key = 'jukebox'
+                # abc = [ x for x in root.findall('./*[@name]') if x.tag in keywords and x.attrib['name'] == key ]
+                # print abc
+                # [<Element '{urn:ietf:params:xml:ns:yang:yin:1}container' at 0x7f3b41cb0810>]
+
+                # self.get_name_wo_namespace()
+
+                # NOTES:
+                # For containers, a 'presence'  is explicitly for config
 
                 yang_name = getattr(value, "yang_name") if hasattr(element, "yang_name") else None
                 is_container = hasattr(value, "get")
