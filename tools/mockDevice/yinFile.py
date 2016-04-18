@@ -15,6 +15,9 @@
 #
 import xml.etree.ElementTree
 from xml.etree.ElementTree import QName
+from pyangbind.lib.base import PybindBase
+from pyangbind.lib.yangtypes import YANGDynClass
+from pyangbind.lib.yangtypes import YANGListType, TypedListType
 import pprint
 
 
@@ -82,11 +85,11 @@ class YINFile:
         """
         pass
 
-    def _get_extmethods(element, path_base=''):
+    def get_extmethods(self, element, path_base=''):
         """
         A recursive function to convert a yang model into a extmethods dictionary
 
-        :param element: (list of YANGDynClass) Child elements of a the model instance
+        :param element: (dict) Child elements (YANGBaseClass or more dict) of a the model instance
         :param path_base: (dict) Existing dictionary of elements
 
         :return: (dict) A Pyangbind compatible extmethods dictionary
@@ -97,10 +100,6 @@ class YINFile:
             return extmethods
 
         if isinstance(element, dict):
-            # print '%s is a dictionary of length %d' % (element, len(element))
-
-            # yang_name = getattr(element, "yang_name") if hasattr(element, "yang_name") else None
-            # is_container = hasattr(element, "get")
 
             for key, value in element.items():
                 path = path_base + '/' + key
@@ -118,14 +117,7 @@ class YINFile:
 
                 # Add this to our path
                 extmethods[path] = config
-                extmethods.update(_get_extmethods(value, path_base=path))
+                extmethods.update(self.get_extmethods(value, path_base=path))
 
         return extmethods
 
-    def _fix_extmethods(extmethods):
-        """
-        Walk through the methods and fix up any parents that have no children that
-        are writeable.
-        """
-        # TODO: Need to implement
-        return extmethods
