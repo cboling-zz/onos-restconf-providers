@@ -18,7 +18,7 @@
 # Default values
 
 DEFAULT_HTTP_PORT = 8080
-DEFAULT_ROOT_RESOURCE = 'top/restconf'
+DEFAULT_ROOT_RESOURCE = 'restconf'
 GENERATED_DIR_NAME = 'generated'
 
 # Globals
