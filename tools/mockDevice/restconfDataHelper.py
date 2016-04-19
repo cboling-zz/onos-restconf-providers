@@ -23,12 +23,14 @@ class RestconfDataHelper(object):
     parent = None
     isContainer = False
 
-    def __init__(self, parent=None):
+    def __init__(self, node, parent=None):
         """
+        :param node: (ElementTree Element) The YIN node for this node
         :param parent: (RestconfHelper) The first ancestor of this node
         """
         # TODO: Look into YANG specification and see if there are any other options/params we may want to pass in
         self.parent = parent
+        self.yin_node = node
 
     @property
     def is_config(self):

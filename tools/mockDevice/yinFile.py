@@ -15,11 +15,9 @@
 #
 import xml.etree.ElementTree
 from xml.etree.ElementTree import QName
-from pyangbind.lib.base import PybindBase
-from pyangbind.lib.yangtypes import YANGDynClass
-from pyangbind.lib.yangtypes import YANGListType, TypedListType
-import pprint
 import datetime
+from restconfConfigHelper import RestconfConfigHelper
+from restconfStatusHelper import RestconfStatusHelper
 
 
 class YINFile:
@@ -43,28 +41,25 @@ class YINFile:
                            # that it could use 'refine' and change the 'config' value
                            ]
 
-    def __init__(self, file_path):
+    def __init__(self, file_path, verbose=False):
         """
         Initializer
 
         :param file_path: (string) Path to YIN file
+        :param: verbose (integer) Flag indicating if verbose output is to be presented
         """
         self._path = file_path
-        self._root = xml.etree.ElementTree.parse(file_path).getroot()
-        if self.root.tag[0] == "{":
-            self._namespace, _ignore1, _ignore2 = self.root.tag[1:].partition("}")
+        self._verbose = verbose
+
+        self._root = xml.etree.ElementTree.parse(file_path).getroot()  # Locate the 'module' root node
+
+        if self._root.tag[0] == "{":
+            self._namespace, _ignore1, _ignore2 = self._root.tag[1:].partition("}")
 
         self._keywords = [self.get_name_with_namespace(kw) for kw in self._important_keywords]
 
-        pass  # Verify keywords above
-        # if self.root.tag[0] == "{":
-        #     self.namespace, _ignore1, _ignore2 = self.root.tag[1:].partition("}")
-        #     container_tag = str(QName(self.namespace, 'container'))
-        # else:
-        #     container_tag = 'container'
-        #
-        # self.containers = self.root.findall(container_tag)
-
+    def __str__(self):
+        return 'YINFile: %s' % self.file_path
 
     @property
     def file_path(self):
@@ -139,7 +134,7 @@ class YINFile:
         return datetime.datetime.strptime('%Y-%m-%d', rev_list[0].attrib['date']) \
             if 'date' in rev_list[0].attrib else None
 
-    def get_extmethods(self, value, node=None, path_base=''):
+    def get_extmethods(self, value, node=None, path_base='', parent_helper=None):
         """
         A recursive function to convert a yang model into a extmethods dictionary
 
@@ -147,7 +142,10 @@ class YINFile:
         :param path_base: (dict) The pyangbind extmethods base path for this value/node
         :param node: (ElementTree element) The XML element in the YIN file that corresponds to the
                                            value parameter
+        :param parent_helper: (restconfDataHelper) Parent RESTCONF data helper object
 
+
+        restconfConfigHelper
         :returns: (dict) A pyangbind compatible extmethods dictionary
         """
         extmethods = {}
@@ -168,50 +166,41 @@ class YINFile:
 
             path = path_base + '/' + key
 
-            item_node = self._root.find('./*[@%s]' % key)
-            config = True
+            # Get the associated YIN node.  Should match only one
+            # TODO: Change to just a 'find' if it holds true we only find one
 
-            # root.findall('./*[@name]')   Returns all children with a 'name' attribute
-            # root.findall('./*[@name]')[0]  First matching child
-            # root.findall('./*[@name]')[0].tag    -> first child tag such as string '{urn:ietf:params:xml:ns:yang:yin:1}identity'
-            # root.findall('./*[@name]')[0].attrib -> first child attribute value such as dict {'name': 'genre'}
+            node_list = [n for n in node.findall('./*[@name]')
+                         if n.tag in self._keywords and n.attrib['name'] == key
+                         ]
 
-            # keywords = ['{urn:ietf:params:xml:ns:yang:yin:1}container','{urn:ietf:params:xml:ns:yang:yin:1}list','{urn:ietf:params:xml:ns:yang:yin:1}leaf']
-            # xyz = [ x for x in root.findall('./*[@name]') if x.tag in keywords ]
-            # xyz is a list of all children who have a name attribute and the tag is the namespace+keyword value
+            if len(node_list) == 0:
+                # TODO should this be an error?
+                continue
 
-            # key = 'jukebox'
-            # abc = [ x for x in root.findall('./*[@name]') if x.tag in keywords and x.attrib['name'] == key ]
-            # print abc
-            # [<Element '{urn:ietf:params:xml:ns:yang:yin:1}container' at 0x7f3b41cb0810>]
+            if len(node_list) > 1:
+                # TODO should this be an error?
+                print('node list is greater than one')
 
-            # _important_keywords
+            key_node = node_list[0]
+            config = parent_helper is None or parent_helper.is_config
 
-            # self.get_name_wo_namespace()
+            # If config is true for ancestor, see if it is true for this node as well
 
-            # NOTES:
-            # For containers, a 'presence'  is explicitly for config
-            #
-            # yang_name = getattr(val, "yang_name") if hasattr(value, "yang_name") else None
-            # is_container = hasattr(val, "get")
+            if config:
+                config_node = key_node.find('./%s' % self.get_name_with_namespace('config'))
+                config = config_node is None or config_node.attrib['value'].lower() != 'false'
 
-            try:
-                if item._is_leaf:  # Protected, but I really need to know
-                    config = item.flags.writeable
+            helper = RestconfConfigHelper(key_node, parent_helper) if config \
+                else RestconfStatusHelper(key_node, parent_helper)
 
-            except AttributeError:
-                pass  # Was another dictionary item or did not have a writeable flag
+            extmethods[path] = helper
 
-            # Add this to our path
-            extmethods[path] = config
-            extmethods.update(self.get_extmethods(value=item, node=node, path_base=path))
+            if self._verbose > 0:
+                print 'Node %s is%s a config node' % (self.get_name_wo_namespace(key_node.tag),
+                                                      '' if config else ' not')
+            # Recurse and add to list
+
+            extmethods.update(self.get_extmethods(value=item, node=key_node, path_base=path, parent_helper=helper))
 
         return extmethods
 
-        # Special processing notes on determining types and characteristics we might want to exploit:
-        #
-        # If 'container' then the 'presense' statement indicates that the container itself is for configuration data.
-        #    so if not found, we will need to look into the children to see if any of them are NOT config-false.
-        #    A container can also have the 'config' value present
-        #
-        # Default 'config' choice is true. Once 'config' is false, all children are considered 'config' false

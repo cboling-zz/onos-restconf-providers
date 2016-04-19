@@ -30,12 +30,17 @@ class RestconfConfigHelper(RestconfDataHelper):
     lastModifiedTimestamp = datetime.utcnow()
     eTag = str(uuid4())
 
-    def __init__(self, parent=None):
+    def __init__(self, node, parent=None):
         """
+        :param node: (ElementTree Element) The YIN node for this node
         :param parent: (restconfConfigHelper) The first ancestor of this configuration node
         """
-        super(RestconfDataHelper.self).__init__(parent)
+        RestconfDataHelper.__init__(self, node, parent=parent)
         # TODO: Look into YANG specification and see if there are any other options/params we may want to pass in
+
+    def __str__(self):
+        return 'RestconfConfigHelper: %s, LastModified: %s' % (self.yin_node.attrib['name'],
+                                                               self.last_modified_timestamp)
 
     @property
     def is_config(self):

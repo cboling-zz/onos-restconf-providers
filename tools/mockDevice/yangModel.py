@@ -37,12 +37,14 @@ class YangModel:
                                    Used in constructing the import statement.
         :param: verbose (integer) Flag indicating if verbose output is to be presented
         """
-        self._yin = YINFile(os.path.join(yin_path, yin_file))
-        self.verbose = verbose
+        self._yin = YINFile(os.path.join(yin_path, yin_file), verbose)
+        self._verbose = verbose
 
         # Import the model
         self._import_models(model_dir)
-        pass
+
+    def __str__(self):
+        return 'YangModel: %s' % self.name
 
     @property
     def name(self):
@@ -76,13 +78,13 @@ class YangModel:
         _class = self.package_name
 
         try:
-            if self.verbose > 0:
+            if self._verbose > 0:
                 print 'Dynamic import -> from %s.%s import %s' % (package, module, _class)
 
             yang_module = __import__('%s.%s' % (package, module), fromlist=[_class])
             yang_class = getattr(yang_module, _class)
 
-            if self.verbose > 0:
+            if self._verbose > 0:
                 print 'YANG class initially imported: %s' % yang_class
 
             # Construct the extmethods for all appropriate nodes in the class and then
@@ -99,4 +101,56 @@ class YangModel:
 
         except ImportError:
             print 'Import Error while attempting to import class %s from %s.%s' % (_class, package, module)
-            raise
+
+            # Instantiate the models the first time so we can generate all the paths within
+            # them so we can create extension methods that provide for RESTCONF required
+            # methods
+            ###########################################################################
+
+    def _get_extmethods(self, element, path_base=''):
+        """
+        A recursive function to convert a yang model into a extmethods dictionary
+
+        :param element: (list of YANGDynClass) Child elements of a the model instance
+        :param path_base: (dict) Existing dictionary of elements
+
+        :return: (dict) A Pyangbind compatible extmethods dictionary
+        """
+        extmethods = {}
+
+        if element is None:
+            return extmethods
+
+        if isinstance(element, dict):
+            # print '%s is a dictionary of length %d' % (element, len(element))
+
+            # yang_name = getattr(element, "yang_name") if hasattr(element, "yang_name") else None
+            # is_container = hasattr(element, "get")
+
+            for key, value in element.items():
+                path = path_base + '/' + key
+                config = True
+
+                yang_name = getattr(value, "yang_name") if hasattr(element, "yang_name") else None
+                is_container = hasattr(value, "get")
+
+                try:
+                    if value._is_leaf:  # Protected, but I really need to know
+                        config = value.flags.writeable
+
+                except AttributeError:
+                    pass  # Was another dictionary item or did not have a writeable flag
+
+                # Add this to our path
+                extmethods[path] = config
+                extmethods.update(self._get_extmethods(value, path_base=path))
+
+        return extmethods
+
+    def _fix_extmethods(self, extmethods):
+        """
+        Walk through the methods and fix up any parents that have no children that
+        are writeable.
+        """
+        # TODO: Need to implement
+        return extmethods

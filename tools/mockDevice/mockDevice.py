@@ -49,7 +49,6 @@ app.register_blueprint(dataStore, url_prefix=__prefix)
 ###########################################################################
 
 _generated_dir = GENERATED_DIR_NAME  # Generated subdirectory name
-_models = []  # List of YANG models we dynamically imported
 
 
 def _import_models():
@@ -59,7 +58,11 @@ def _import_models():
     The 'generated' directory is expected to be a subdirectory the directory that
     contains this file. It typically is a symbolic link over to the 'modules'
     generated-code subdirectory.
+
+    :returns: (list of YangModel) List of imported YANG Models
     """
+    models = []  # List of YANG models we dynamically imported
+
     gen_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), _generated_dir)
 
     if os.path.exists(gen_dir) and os.path.isdir(gen_dir):
@@ -83,9 +86,28 @@ def _import_models():
             model = YangModel(gen_dir, filename, _generated_dir, verbose=args.verbose)
 
             if args.verbose > 0:
-                print "Found model '%s' in '%s'" % (model.module_name, filename)
+                print "Found model '%s' in '%s'" % (model.name, filename)
 
-            _models.append(model)
+            models.append(model)
+
+    if args.verbose:
+        print('_import_models found %d YANG models', len(models))
+
+    return models
+
+
+def _register_models(models):
+    """
+    Register any imported YANG modes with flask
+
+    :param models: (list of YangModel) Imported YANG models
+    """
+
+    for model in models:
+        if args.verbose:
+            print('Registering YANG models %s with flask', model.name)
+
+        pass  # TODO: Need to implement
 
 
 @app.route('/')
@@ -145,7 +167,10 @@ def do_reset():
     return
 
 if __name__ == '__main__':
-    _import_models()
+
+    # Import any models found in the generated subdirectory
+
+    _register_models(_import_models())
 
     if args.verbose > 0:
         print 'Starting up web server on port %d' % args.http_port
