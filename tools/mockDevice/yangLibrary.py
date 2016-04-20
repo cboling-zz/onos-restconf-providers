@@ -14,7 +14,47 @@
 #   limitations under the License.
 #
 from ietf_yang_library import ietf_yang_library
-import pyangbind.lib.pybindJSON as pybindJSON
+from mockDevice import app
+from dataModels import data_models
+
+yang_library = None
+
+
+def register_yang_library_version(root_resource, verbose=False):
+    """
+    This mandatory leaf identifies the revision date of the
+    "ietf-yang-library" YANG module that is implemented by this server.
+
+    :param root_resource: TODO: Comment this
+    :param verbose: (int) Enables verbose output
+    """
+    yang_ibrary = YangLibrary(data_models)
+
+    for model in data_models:
+        pass
+
+    # TODO The IETF YANG Library modules supports notifications.  Do we want to support this?
+
+    # Register with flask
+
+    lib_dir = root_resource + '/yang-library-version'
+    app.add_url_rule(lib_dir, view_func=_yang_library_get, methods=['GET'])
+
+
+def _yang_library_get():
+    # Look at the Accept header.  Expect one of the following two
+    #  application/yang.data+xml (default)
+    #  application/yang.data+json
+    return
+    pass
+
+
+def _yang_library_get_modules_state():
+    # Look at the Accept header.  Expect one of the following two
+    #  application/yang.data+xml (default)
+    #  application/yang.data+json
+    return
+    pass
 
 
 class YangLibrary(object):

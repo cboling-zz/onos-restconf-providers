@@ -14,20 +14,21 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-from flask import Flask, Response, request
+from flask import Flask, Response
 from xrd import Element, XRD, Link
 from globals import DEFAULT_ROOT_RESOURCE, DEFAULT_HTTP_PORT, GENERATED_DIR_NAME
 from resource.datastore import dataStore
-from yangModel import YangModel
-from yangLibrary import YangLibrary
-import pprint
+from dataModels import register_data_models
+from yangLibrary import register_yang_library_version
+from apiResource import register_top_level_resource
+
+# import pprint
 
 try:
     from generated import *
 except ImportError:
     print 'Did not find generated code subdirectory with any YANG models'
 
-import os
 import argparse
 
 ###########################################################################
@@ -51,172 +52,10 @@ app.register_blueprint(dataStore, url_prefix=__prefix)
 
 _generated_dir = GENERATED_DIR_NAME  # Generated subdirectory name
 
-_data_models = None
-_operations = None
-_yangLibrary = None
+# RESTCONF API Resources
 
-
-def _import_models():
-    """
-    Import the models in the generated directory.
-
-    The 'generated' directory is expected to be a subdirectory the directory that
-    contains this file. It typically is a symbolic link over to the 'modules'
-    generated-code subdirectory.
-
-    :returns: (list of YangModel) List of imported YANG Models
-    """
-    models = []  # List of YANG models we dynamically imported
-
-    gen_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), _generated_dir)
-
-    if os.path.exists(gen_dir) and os.path.isdir(gen_dir):
-        if args.verbose > 0:
-            print 'The generatedDir is %s' % gen_dir
-
-        # Walk all the files in the generated code directory and look for YIN XM files
-        # and use that to determine the python code-generated names
-
-        xml_files = [f for f in os.listdir(gen_dir)
-                     if os.path.isfile(os.path.join(gen_dir, f)) and
-                     f.split('.')[-1].lower() == 'xml'
-                     ]
-
-        if args.verbose > 0:
-            print 'The list of XML files in the generated directory is: %s' % xml_files
-
-        for filename in xml_files:
-            # The class name for the model is the same as the first part of the filename
-
-            model = YangModel(gen_dir, filename, _generated_dir, verbose=args.verbose)
-
-            if args.verbose > 0:
-                print "Found model '%s' in '%s'" % (model.name, filename)
-
-            models.append(model)
-
-    if args.verbose:
-        print('_import_models found %d YANG models', len(models))
-
-    return models
-
-
-def _register_models(models):
-    """
-    Register any imported YANG modes with flask
-
-    :param models: (list of YangModel) Imported YANG models
-    """
-    data_dir = args.root_resource + '/data'
-
-    for model in models:
-        if args.verbose:
-            print('Registering YANG models %s with flask', model.name)
-
-        # for container in mode.
-        container = 'test'
-        model_dir = '%s/%s:%s' % (data_dir, model.name, container)
-
-        pass  # TODO: Need to implement
-
-        # app.add_url_rule
-        #
-        #     Basically this example::
-        #
-        #     @app.route('/')
-        #     def index():
-        #         pass
-        #
-        # Is equivalent to the following::
-        #
-        # def index():
-        #     pass
-        # app.add_url_rule('/', 'index', index)
-        #
-        # :param rule: the URL rule as string
-        # :param endpoint: the endpoint for the registered URL rule.  Flask
-        #                   itself assumes the name of the view function as
-        #                   endpoint
-        # :param view_func: the function to call when serving a request to the
-        #                   provided endpoint
-        # :param options: the options to be forwarded to the underlying
-        # :class:`~werkzeug.routing.Rule` object.  A change
-        # to Werkzeug is handling of method options.  methods
-        # is a list of methods this rule should be limited
-        # to (`GET`, `POST` etc.).  By default a rule
-        # just listens for `GET` (and implicitly `HEAD`).
-        # Starting with Flask 0.6, `OPTIONS` is implicitly
-        # added and handled by the standard request handling.
-
-
-def _yang_library_get():
-    # Look at the Accept header.  Expect one of the following two
-    #  application/yang.data+xml (default)
-    #  application/yang.data+json
-    return
-    pass
-
-
-def _yang_library_get_modules_state():
-    # Look at the Accept header.  Expect one of the following two
-    #  application/yang.data+xml (default)
-    #  application/yang.data+json
-    return
-    pass
-
-
-def _register_yang_library_version(models):
-    """
-    This mandatory leaf identifies the revision date of the
-    "ietf-yang-library" YANG module that is implemented by this server.
-
-    :param models: (list of YangModel) Imported YANG models
-    """
-    _yangLibrary = YangLibrary(models)
-
-    for model in models:
-        pass
-
-    # TODO The IETF YANG Library modules supports notifications.  Do we want to support this?
-
-    # Register with flask
-
-    lib_dir = args.root_resource + '/yang-library-version'
-    app.add_url_rule(lib_dir, view_func=_yang_library_get, methods=['GET'])
-
-
-def _top_level_api_get():
-    # Look at the Accept header.  Expect one of the following two
-    #  application/yang.data+xml (default)
-    #  application/yang.data+json
-    allowed = ['application/yang.data+xml', 'application/yang.data+json']
-
-    accepted = request.headers.get('Accept', 'application/yang.data+xml')
-
-    if accepted not in allowed:
-        pass  # TODO
-
-    result = {}
-
-    if _data_models is not None:
-        result['data'] = {}  # TODO go further
-
-    if _operations is not None:
-        result['operations'] = {}  # TODO go further
-
-    if _yangLibrary is not None:
-        result['yang-library-version'] = {}  # TODO go further
-
-    i
-    pass
-
-
-def _register_top_level_resource():
-    """
-    Retrieve the Top-level API Resource
-    """
-    # Register with flask
-    app.add_url_rule(args.root_resource, view_func=_top_level_api_get, methods=['GET'])
+operations = None  # TODO Not yet implemented
+notifications = None  # TODO Not yet implemented
 
 
 @app.route('/')
@@ -277,11 +116,18 @@ def do_reset():
 
 if __name__ == '__main__':
 
-    # Import any models found in the generated subdirectory
+    # Import and register any data models found in the generated subdirectory
 
-    _register_models(_import_models())
-    _register_yang_library_version()
-    _register_top_level_resource()
+    register_data_models(_generated_dir, args.root_resource, verbose=args.verbose)
+
+    # The yang library version needs to be created/registered after any data models are imported
+
+    register_yang_library_version(args.root_resource, verbose=args.verbose)
+
+    # Create/register the top level API resource last since it is dependent on all its
+    # children being in place
+
+    register_top_level_resource(args.root_resource, verbose=args.verbose)
 
     if args.verbose > 0:
         print 'Starting up web server on port %d' % args.http_port
