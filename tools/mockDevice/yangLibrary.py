@@ -13,9 +13,15 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
+from ietf_yang_library import ietf_yang_library
+import pyangbind.lib.pybindJSON as pybindJSON
 
 
 class YangLibrary(object):
     """
     Class that provides the contents of the {+restconf}/yang-library-version
     """
+
+    def __init__(self):
+        self.lib_class = ietf_yang_library()
+        pass
