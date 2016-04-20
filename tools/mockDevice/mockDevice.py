@@ -103,11 +103,63 @@ def _register_models(models):
     :param models: (list of YangModel) Imported YANG models
     """
 
+    data_dir = args.root_resource + '/data'
+
     for model in models:
         if args.verbose:
             print('Registering YANG models %s with flask', model.name)
 
+        # for container in mode.
+        container = 'test'
+        model_dir = '%s/%s:%s' % (data_dir, model.name, container)
+
         pass  # TODO: Need to implement
+
+        # app.add_url_rule
+        #
+        #     Basically this example::
+        #
+        #     @app.route('/')
+        #     def index():
+        #         pass
+        #
+        # Is equivalent to the following::
+        #
+        # def index():
+        #     pass
+        # app.add_url_rule('/', 'index', index)
+        #
+        # :param rule: the URL rule as string
+        # :param endpoint: the endpoint for the registered URL rule.  Flask
+        #                   itself assumes the name of the view function as
+        #                   endpoint
+        # :param view_func: the function to call when serving a request to the
+        #                   provided endpoint
+        # :param options: the options to be forwarded to the underlying
+        # :class:`~werkzeug.routing.Rule` object.  A change
+        # to Werkzeug is handling of method options.  methods
+        # is a list of methods this rule should be limited
+        # to (`GET`, `POST` etc.).  By default a rule
+        # just listens for `GET` (and implicitly `HEAD`).
+        # Starting with Flask 0.6, `OPTIONS` is implicitly
+        # added and handled by the standard request handling.
+
+
+def _yang_library_get():
+    # Look at the Accept header.  Expect one of the following two
+    #  application/yang.data+xml
+    #  application/yang.data+json
+
+    pass
+
+
+def _register_yang_library_version():
+    """
+    This mandatory leaf identifies the revision date of the
+    "ietf-yang-library" YANG module that is implemented by this server.
+    """
+    lib_dir = args.root_resource + '/yang-library-version'
+    app.add_url_rule(lib_dir, view_func=_yang_library_get, methods=['GET'])
 
 
 @app.route('/')
@@ -171,6 +223,7 @@ if __name__ == '__main__':
     # Import any models found in the generated subdirectory
 
     _register_models(_import_models())
+    _register_yang_library_version()
 
     if args.verbose > 0:
         print 'Starting up web server on port %d' % args.http_port
