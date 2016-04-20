@@ -14,11 +14,12 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-from flask import Flask, Response
+from flask import Flask, Response, request
 from xrd import Element, XRD, Link
 from globals import DEFAULT_ROOT_RESOURCE, DEFAULT_HTTP_PORT, GENERATED_DIR_NAME
 from resource.datastore import dataStore
 from yangModel import YangModel
+from yangLibrary import YangLibrary
 import pprint
 
 try:
@@ -49,6 +50,10 @@ app.register_blueprint(dataStore, url_prefix=__prefix)
 ###########################################################################
 
 _generated_dir = GENERATED_DIR_NAME  # Generated subdirectory name
+
+_data_models = None
+_operations = None
+_yangLibrary = None
 
 
 def _import_models():
@@ -102,7 +107,6 @@ def _register_models(models):
 
     :param models: (list of YangModel) Imported YANG models
     """
-
     data_dir = args.root_resource + '/data'
 
     for model in models:
@@ -147,19 +151,72 @@ def _register_models(models):
 
 def _yang_library_get():
     # Look at the Accept header.  Expect one of the following two
-    #  application/yang.data+xml
+    #  application/yang.data+xml (default)
     #  application/yang.data+json
-
+    return
     pass
 
 
-def _register_yang_library_version():
+def _yang_library_get_modules_state():
+    # Look at the Accept header.  Expect one of the following two
+    #  application/yang.data+xml (default)
+    #  application/yang.data+json
+    return
+    pass
+
+
+def _register_yang_library_version(models):
     """
     This mandatory leaf identifies the revision date of the
     "ietf-yang-library" YANG module that is implemented by this server.
+
+    :param models: (list of YangModel) Imported YANG models
     """
+    _yangLibrary = YangLibrary(models)
+
+    for model in models:
+        pass
+
+    # TODO The IETF YANG Library modules supports notifications.  Do we want to support this?
+
+    # Register with flask
+
     lib_dir = args.root_resource + '/yang-library-version'
     app.add_url_rule(lib_dir, view_func=_yang_library_get, methods=['GET'])
+
+
+def _top_level_api_get():
+    # Look at the Accept header.  Expect one of the following two
+    #  application/yang.data+xml (default)
+    #  application/yang.data+json
+    allowed = ['application/yang.data+xml', 'application/yang.data+json']
+
+    accepted = request.headers.get('Accept', 'application/yang.data+xml')
+
+    if accepted not in allowed:
+        pass  # TODO
+
+    result = {}
+
+    if _data_models is not None:
+        result['data'] = {}  # TODO go further
+
+    if _operations is not None:
+        result['operations'] = {}  # TODO go further
+
+    if _yangLibrary is not None:
+        result['yang-library-version'] = {}  # TODO go further
+
+    i
+    pass
+
+
+def _register_top_level_resource():
+    """
+    Retrieve the Top-level API Resource
+    """
+    # Register with flask
+    app.add_url_rule(args.root_resource, view_func=_top_level_api_get, methods=['GET'])
 
 
 @app.route('/')
@@ -224,6 +281,7 @@ if __name__ == '__main__':
 
     _register_models(_import_models())
     _register_yang_library_version()
+    _register_top_level_resource()
 
     if args.verbose > 0:
         print 'Starting up web server on port %d' % args.http_port

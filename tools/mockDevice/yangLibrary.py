@@ -22,6 +22,7 @@ class YangLibrary(object):
     Class that provides the contents of the {+restconf}/yang-library-version
     """
 
-    def __init__(self):
+    def __init__(self, models):
         self.lib_class = ietf_yang_library()
+        self._models = models
         pass
