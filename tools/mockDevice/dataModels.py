@@ -76,53 +76,37 @@ def register_data_models(model_dir, root_resource, verbose=False):
 
     _import_data_models(model_dir, verbose=False)
 
-    # Now register them
+    # Now register a base URL to catch them all
+    # TODO: Work with the regular expression custom converter and see if we can get it to do better parsing
 
-    data_dir = '/%s/data' % root_resource
+    data_base = '/%s/data' % root_resource
+    data_url = '/%s/data<wildcard:path>' % root_resource
+    app.add_url_rule(data_url, view_func=_data_get, methods=['GET'])
 
     for model in data_models:
         if verbose:
-            print 'Registering YANG models %s with flask' % model.name
+            print '[%s] Registering YANG model path' % model.name
 
-        @app.route('/<regex("[abcABC0-9]{4,6}"):uid>-<slug>/')
-
-        model_dir = '%s/<regex(%s:):container>' % (data_dir, model.name)
-
+        model_dir = '%s/%s' % (data_base, model.name)
         _path_to_model[model_dir] = model
 
-        app.add_url_rule(model_url, view_func=_data_get, methods=['GET'])
 
-        # app.add_url_rule
-        #
-        #     Basically this example::
-        #
-        #     @app.route('/')
-        #     def index():
-        #         pass
-        #
-        # Is equivalent to the following::
-        #
-        # def index():
-        #     pass
-        # app.add_url_rule('/', 'index', index)
-        #
-        # :param rule: the URL rule as string
-        # :param endpoint: the endpoint for the registered URL rule.  Flask
-        #                   itself assumes the name of the view function as
-        #                   endpoint
-        # :param view_func: the function to call when serving a request to the
-        #                   provided endpoint
-        # :param options: the options to be forwarded to the underlying
-        # :class:`~werkzeug.routing.Rule` object.  A change
-        # to Werkzeug is handling of method options.  methods
-        # is a list of methods this rule should be limited
-        # to (`GET`, `POST` etc.).  By default a rule
-        # just listens for `GET` (and implicitly `HEAD`).
-        # Starting with Flask 0.6, `OPTIONS` is implicitly
-        # added and handled by the standard request handling.
+def _data_get(path):
+    """
+    Perform a GET operation on {+restconf}/data...
 
+    The 'path' parameter is provided to us by a custom converter that allows us to trap items
+    after the 'path' in the URL above.  For instance the following that are not marked '404 NOT FOUND'
+    below should be passed to us.
 
-def _data_get(container):
+    .../data                         -> path = ''
+    .../data/                        -> path = '/'
+    .../data/toaster                 -> path = '/toaster'
+    .../data/example-jukebox:jukebox -> path = '/example-jukebox:jukebox'
+    .../datastuff                    -> 404 NOT FOUND
+
+    :param path: The url path following the 'data' in the url.
+    """
     # Look at the Accept header.  Expect one of the following two
     #  application/yang.data+xml (default)
     #  application/yang.data+json

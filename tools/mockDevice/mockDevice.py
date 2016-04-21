@@ -120,6 +120,12 @@ class RegexConverter(BaseConverter):
         super(RegexConverter, self).__init__(url_map)
         self.regex = items[0]
 
+
+class WildcardConverter(BaseConverter):
+    regex = r'(|/.*?)'
+    weight = 200
+
+
 if __name__ == '__main__':
     from dataModels import register_data_models
     from yangLibrary import register_yang_library_version
@@ -128,6 +134,7 @@ if __name__ == '__main__':
     # Our URLs can get complex
 
     app.url_map.converters['regex'] = RegexConverter
+    app.url_map.converters['wildcard'] = WildcardConverter
 
     # Import and register any data models found in the generated subdirectory
 
