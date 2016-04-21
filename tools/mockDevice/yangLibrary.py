@@ -13,6 +13,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
+from flask import Response, request
 from ietf_yang_library import ietf_yang_library
 from mockDevice import app
 from dataModels import data_models
@@ -37,7 +38,7 @@ def register_yang_library_version(root_resource, verbose=False):
 
     # Register with flask
 
-    lib_dir = root_resource + '/yang-library-version'
+    lib_dir = '/%s/yang-library-version:modules' % root_resource
     app.add_url_rule(lib_dir, view_func=_yang_library_get, methods=['GET'])
 
 
@@ -45,17 +46,10 @@ def _yang_library_get():
     # Look at the Accept header.  Expect one of the following two
     #  application/yang.data+xml (default)
     #  application/yang.data+json
+    allowed = ['application/yang.data+xml', 'application/yang.data+json']
+    accepted = request.headers.get('Accept', 'application/yang.data+xml')
     return
     pass
-
-
-def _yang_library_get_modules_state():
-    # Look at the Accept header.  Expect one of the following two
-    #  application/yang.data+xml (default)
-    #  application/yang.data+json
-    return
-    pass
-
 
 class YangLibrary(object):
     """

@@ -13,11 +13,13 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
+from flask import Response, request
 from yangModel import YangModel
 import os
 from mockDevice import app
 
-data_models = None
+data_models = []  # List of YANG models we dynamically imported
+_path_to_model = {}  # Dictionary of base directory to YANG model
 
 
 def _import_data_models(model_dir, verbose=False):
@@ -30,11 +32,7 @@ def _import_data_models(model_dir, verbose=False):
 
     :param model_dir: (string) Directory containing code-generated models
     :param verbose: (int) Enables verbose output
-
-    :returns: (list of YangModel) List of imported YANG Models
     """
-    models = []  # List of YANG models we dynamically imported
-
     gen_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), model_dir)
 
     if os.path.exists(gen_dir) and os.path.isdir(gen_dir):
@@ -60,12 +58,10 @@ def _import_data_models(model_dir, verbose=False):
             if verbose > 0:
                 print "Found model '%s' in '%s'" % (model.name, filename)
 
-            models.append(model)
+            data_models.append(model)
 
     if verbose:
-        print('_import_models found %d YANG models', len(models))
-
-    return models
+        print('_import_models found %d YANG models', len(data_models))
 
 
 def register_data_models(model_dir, root_resource, verbose=False):
@@ -78,21 +74,23 @@ def register_data_models(model_dir, root_resource, verbose=False):
     """
     # Import them first
 
-    models = _import_data_models(model_dir, verbose=False)
+    _import_data_models(model_dir, verbose=False)
 
     # Now register them
 
-    data_dir = root_resource + '/data'
+    data_dir = '/%s/data' % root_resource
 
-    for model in models:
+    for model in data_models:
         if verbose:
-            print('Registering YANG models %s with flask', model.name)
+            print 'Registering YANG models %s with flask' % model.name
 
-        # for container in mode.
-        container = 'test'
-        model_dir = '%s/%s:%s' % (data_dir, model.name, container)
+        @app.route('/<regex("[abcABC0-9]{4,6}"):uid>-<slug>/')
 
-        pass  # TODO: Need to implement
+        model_dir = '%s/<regex(%s:):container>' % (data_dir, model.name)
+
+        _path_to_model[model_dir] = model
+
+        app.add_url_rule(model_url, view_func=_data_get, methods=['GET'])
 
         # app.add_url_rule
         #
@@ -122,3 +120,13 @@ def register_data_models(model_dir, root_resource, verbose=False):
         # just listens for `GET` (and implicitly `HEAD`).
         # Starting with Flask 0.6, `OPTIONS` is implicitly
         # added and handled by the standard request handling.
+
+
+def _data_get(container):
+    # Look at the Accept header.  Expect one of the following two
+    #  application/yang.data+xml (default)
+    #  application/yang.data+json
+    allowed = ['application/yang.data+xml', 'application/yang.data+json']
+    accepted = request.headers.get('Accept', 'application/yang.data+xml')
+    return
+    pass

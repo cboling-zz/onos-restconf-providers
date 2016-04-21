@@ -13,15 +13,15 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-from flask import Flask, Response, request
-from mockDevice import app, operations, yangLibrary
+from flask import Response, request
+from mockDevice import app, operations
 from dataModels import data_models
 from yangLibrary import yang_library
 
 from globals import DEFAULT_ROOT_RESOURCE, DEFAULT_HTTP_PORT, GENERATED_DIR_NAME
 from resource.datastore import dataStore
 from yangModel import YangModel
-from yangLibrary import YangLibrary
+from yangLibrary import YangLibrary, yang_library
 
 
 def register_top_level_resource(root_resource, verbose=False):
@@ -50,7 +50,8 @@ def _top_level_api_get():
     if operations is not None:
         result['operations'] = {}  # TODO go further
 
-    if yangLibrary is not None:
+    # Schema Resource is optional
+    if yang_library is not None:
         result['yang-library-version'] = {}  # TODO go further
 
     # TODO Notifications?

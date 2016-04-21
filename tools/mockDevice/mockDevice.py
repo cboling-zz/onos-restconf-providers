@@ -15,12 +15,10 @@
 #   limitations under the License.
 #
 from flask import Flask, Response
+from werkzeug.routing import BaseConverter
 from xrd import Element, XRD, Link
 from globals import DEFAULT_ROOT_RESOURCE, DEFAULT_HTTP_PORT, GENERATED_DIR_NAME
 from resource.datastore import dataStore
-from dataModels import register_data_models
-from yangLibrary import register_yang_library_version
-from apiResource import register_top_level_resource
 
 # import pprint
 
@@ -41,6 +39,8 @@ parser.add_argument('--root_resource', '-r', action='store', default=DEFAULT_ROO
                     help='RESTCONF Root Resource')
 parser.add_argument('--http_port', '-p', action='store', default=DEFAULT_HTTP_PORT,
                     help='HTTP Port number')
+parser.add_argument('--disable_schema', '-s', action='store_true', default=False,
+                    help='Disable support for RESTCONF optional schema resource')
 
 args = parser.parse_args()
 
@@ -114,7 +114,20 @@ def do_reset():
 
     return
 
+
+class RegexConverter(BaseConverter):
+    def __init__(self, url_map, *items):
+        super(RegexConverter, self).__init__(url_map)
+        self.regex = items[0]
+
 if __name__ == '__main__':
+    from dataModels import register_data_models
+    from yangLibrary import register_yang_library_version
+    from apiResource import register_top_level_resource
+
+    # Our URLs can get complex
+
+    app.url_map.converters['regex'] = RegexConverter
 
     # Import and register any data models found in the generated subdirectory
 
@@ -122,7 +135,8 @@ if __name__ == '__main__':
 
     # The yang library version needs to be created/registered after any data models are imported
 
-    register_yang_library_version(args.root_resource, verbose=args.verbose)
+    if not args.disable_schema:
+        register_yang_library_version(args.root_resource, verbose=args.verbose)
 
     # Create/register the top level API resource last since it is dependent on all its
     # children being in place
