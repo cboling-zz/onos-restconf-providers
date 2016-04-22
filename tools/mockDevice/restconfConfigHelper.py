@@ -16,7 +16,7 @@
 from datetime import datetime
 from uuid import uuid4
 from restconfDataHelper import RestconfDataHelper
-
+from dataModels import update_datastore
 
 class RestconfConfigHelper(RestconfDataHelper):
     """
@@ -84,8 +84,12 @@ class RestconfConfigHelper(RestconfDataHelper):
         :param updateTime: (dateTime) Optional argument that specifies the update time. This is often
                                       used when recursing up the ancestor list.
         """
+
         self.lastModifiedTimestamp = kwargs.get('updateTime', datetime.utcnow())
         self.eTag = str(uuid4())  # update the eTag
+
+        # Also update the root datastore resource
+        update_datastore(self.lastModifiedTimestamp, self.eTag)
 
         # Any change of a configuration item requires update of any ancestor data resources as well
 

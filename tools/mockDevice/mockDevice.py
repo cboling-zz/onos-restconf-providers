@@ -122,6 +122,9 @@ class RegexConverter(BaseConverter):
 
 
 class WildcardConverter(BaseConverter):
+    #
+    # Match empty OR slash followed by zero or more characters
+
     regex = r'(|/.*?)'
     weight = 200
 
