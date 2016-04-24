@@ -41,6 +41,9 @@ parser.add_argument('--http_port', '-p', action='store', default=DEFAULT_HTTP_PO
                     help='HTTP Port number')
 parser.add_argument('--disable_schema', '-s', action='store_true', default=False,
                     help='Disable support for RESTCONF optional schema resource')
+parser.add_argument('--default_xml', '-x', action='store_true', default=False,
+                    help='Specifies that XML encoding is the default if not specified otherwise '
+                         'by the clients "Accept" header, default is JSON')
 
 args = parser.parse_args()
 
@@ -56,6 +59,24 @@ _generated_dir = GENERATED_DIR_NAME  # Generated subdirectory name
 
 operations = None  # TODO Not yet implemented
 notifications = None  # TODO Not yet implemented
+
+# Some other args that dependent models need access to
+default_json = not args.default_xml
+
+
+def default_encoding_json():
+    """
+    :returns: (boolean) Flag indicating, if true, the default content encoded is JSON
+    """
+    global default_json
+    return default_json
+
+
+def default_encoding_xml():
+    """
+    :returns: (boolean) Flag indicating, if true, the default content encoded is XML
+    """
+    return not default_encoding_json()
 
 
 @app.route('/')
