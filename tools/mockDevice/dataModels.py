@@ -123,95 +123,44 @@ def _data_get(path):
     .../data/example-jukebox:jukebox -> path = '/example-jukebox:jukebox'
     .../datastuff                    -> 404 NOT FOUND
 
-    The "api-path" Augmented Backus-Naur Form (ABNF) syntax is used to
-    construct RESTCONF path identifiers:
-
-     api-path = '/' |
-                ('/' api-identifier
-                0 * ('/' (api-identifier | list-instance )))
-
-    api-identifier = [module-name ":"] identifier      ;; note 1
-
-    module-name = identifier
-
-    list-instance = api-identifier '=' key-value [',' key-value]*
-
-    key-value = string       ;; note 1
-
-    string = <a quoted or unquoted string>
-
-        # An identifier MUST NOT start with
-        # (('X'|'x) ('M'|'m') ('L'|'l'))
-
-    identifier = (ALPHA / '_')
-                 *(ALPHA / DIGIT / '_' / '-' / '.')
-
-    Note 1: The syntax for "api-identifier" and "key-value" MUST conform
-    to the JSON identifier encoding rules in Section 4 of
-    [I-D.ietf-netmod-yang-json].
-
-    A RESTCONF data resource identifier is not an XPath expression. It
-    is encoded from left to right, starting with the top-level data node,
-    according to the "api-path" rule in Section 3.5.1.1. The node name
-    of each ancestor of the target resource node is encoded in order,
-    ending with the node name for the target resource. If a node in the
-    path is defined in another module than its parent node, then module
-    name followed by a colon character (":") is prepended to the node
-    name in the resource identifier. See Section 3.5.1.1 for details.
-
-    If a data node in the path expression is a YANG leaf-list node, then
-    the leaf-list value MUST be encoded according to the following rules:
-
-    o The instance-identifier for the leaf-list MUST be encoded using
-      one path segment [RFC3986].
-
-    o The path segment is constructed by having the leaf-list name,
-      followed by an "=" character, followed by the leaf-list value.
-      (e.g., /restconf/data/top-leaflist=fred).
-
-    If a data node in the path expression is a YANG list node, then the
-    key values for the list (if any) MUST be encoded according to the
-    following rules:
-
-    o The key leaf values for a data resource representing a YANG list
-      MUST be encoded using one path segment [RFC3986].
-
-    o If there is only one key leaf value, the path segment is
-      constructed by having the list name, followed by an "=" character,
-      followed by the single key leaf value.
-
-    o If there are multiple key leaf values, the path segment is
-      constructed by having the list name, followed by the value of each
-      leaf identified in the "key" statement, encoded in the order
-      specified in the YANG "key" statement. Each key leaf value except
-      the last one is followed by a comma character.
-
-    o The key value is specified as a string, using the canonical
-      representation for the YANG data type. Any reserved characters
-      MUST be percent-encoded, according to [RFC3986], section 2.1.
-
-    o All the components in the "key" statement MUST be encoded.
-      Partial instance identifiers are not supported.
-
-    o Since missing key values are not allowed, two consecutive commas
-      are interpreted as a zero-length string. (example:
-      list=foo,,baz).
-
-    o The "list-instance" ABNF rule defined in Section 3.5.1.1
-      represents the syntax of a list instance identifier.
-
-    o Resource URI values returned in Location headers for data
-      resources MUST identify the module name, even if there are no
-      conflicting local names when the resource is created. This
-      ensures the correct resource will be identified even if the server
-      loads a new module that the old client does not know about.
-
     :param path: The url path following the 'data' in the url.
     """
     # Look at the Accept header.  Expect one of the following two
-    #  application/yang.data+xml (default)
+    #  application/yang.data+xml
     #  application/yang.data+json
     allowed = ['application/yang.data+xml', 'application/yang.data+json']
     accepted = request.headers.get('Accept', 'application/yang.data+xml')
     return
     pass
+
+    # TODO: Below is a list of tests/steps we need to perform for client requests
+    #
+    # Query parameters for GET requests:
+    #
+    #   content, depth, fields, filter, start-time, stop-time, with-defaults
+
+    #  5.2 Message Encoding
+    #   RESTCONF messages are encoded in HTTP according to [RFC7230]. The
+    #   "utf-8" character set is used for all messages. RESTCONF message
+    #   content is sent in the HTTP message-body
+    #
+    # The server MUST support the "Accept" header and "406 Not Acceptable"
+    # status-line, as defined in [RFC7231]. Response output content
+    # encoding format is identified with the Accept header in the request.
+    #
+    # If it is not specified, the request input encoding format SHOULD be
+    # used, or the server MAY choose any supported content encoding format.
+    # If there was no request input, then the default output encoding is
+    # XML or JSON, depending on server preference. File extensions encoded
+    # in the request are not used to identify format encoding.
+
+    # TODO: Below is a list of steps/rules we need to perform sending responses to clients
+
+    #  5.2 Message Encoding
+    #   RESTCONF messages are encoded in HTTP according to [RFC7230]. The
+    #   "utf-8" character set is used for all messages. RESTCONF message
+    #   content is sent in the HTTP message-body
+    #
+    #   Request input content encoding format is identified with the Content-
+    #   Type header. This field MUST be present if a message-body is sent by
+    #   the client.

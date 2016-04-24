@@ -44,12 +44,13 @@ def register_yang_library_version(root_resource, verbose=False):
 
 def _yang_library_get():
     # Look at the Accept header.  Expect one of the following two
-    #  application/yang.data+xml (default)
+    #  application/yang.data+xml
     #  application/yang.data+json
     allowed = ['application/yang.data+xml', 'application/yang.data+json']
     accepted = request.headers.get('Accept', 'application/yang.data+xml')
     return
     pass
+
 
 class YangLibrary(object):
     """
