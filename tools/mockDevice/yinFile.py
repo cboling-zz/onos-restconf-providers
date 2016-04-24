@@ -54,7 +54,7 @@ class YINFile:
         self._root = xml.etree.ElementTree.parse(file_path).getroot()  # Locate the 'module' root node
 
         if self._root.tag[0] == "{":
-            self._namespace, _ignore1, _ignore2 = self._root.tag[1:].partition("}")
+            self._namespace, _, _ = self._root.tag[1:].partition("}")
 
         self._keywords = [self.get_name_with_namespace(kw) for kw in self._important_keywords]
 
