@@ -44,6 +44,8 @@ parser.add_argument('--disable_schema', '-s', action='store_true', default=False
 parser.add_argument('--default_xml', '-x', action='store_true', default=False,
                     help='Specifies that XML encoding is the default if not specified otherwise '
                          'by the clients "Accept" header, default is JSON')
+parser.add_argument('--accept_patch', '-P', action='store_true', default=False,
+                    help='Specifies that the PATCH method is supported, default is False')
 
 args = parser.parse_args()
 
@@ -62,6 +64,7 @@ notifications = None  # TODO Not yet implemented
 
 # Some other args that dependent models need access to
 default_json = not args.default_xml
+accept_patch = args.accept_patch
 
 
 def default_encoding_json():
@@ -77,6 +80,13 @@ def default_encoding_xml():
     :returns: (boolean) Flag indicating, if true, the default content encoded is XML
     """
     return not default_encoding_json()
+
+
+def accept_patch():
+    """
+    :returns: (boolean) Flag indicating, if true, that the PATCH command is supported
+    """
+    return accept_patch
 
 
 @app.route('/')
