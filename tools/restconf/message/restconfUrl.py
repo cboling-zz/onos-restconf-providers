@@ -205,6 +205,7 @@ class RestconfUrl(object):
     request URI represents the target resource for the operation.
     """
 
+    _allSchemes = ['http', 'https']
     _allMethods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD']
 
     _parsedUrl = None
@@ -215,6 +216,10 @@ class RestconfUrl(object):
     _resource = None
     _query = None
     _queryParams = {}
+
+    DEFAULT_METHOD = 'GET'
+    DEFAULT_SCHEME = 'http'
+    DEFAULT_API_ROOT = 'restconf'
 
     def __init__(self, url, method='GET', api_root='restconf'):
         self._method = method.upper()
@@ -227,7 +232,7 @@ class RestconfUrl(object):
         # Parse as if http, specify all_fragments as true so that they are not
         # included in the preceding component.  RESTCONF ignores fragments
 
-        self._parsedUrl = urlparse(url, scheme='http', allow_fragments=True)
+        self._parsedUrl = urlparse(url, scheme=RestconfUrl.DEFAULT_SCHEME, allow_fragments=True)
 
         # Now proceed with RESTCONF specific parsing
 
@@ -259,6 +264,16 @@ class RestconfUrl(object):
         :returns (string): The operational method being performed
         """
         return self._method
+
+    @property
+    def scheme(self):
+        return self._parsedUrl.scheme.lower()
+
+    def _parse_scheme(self):
+        if self.scheme not in self._allSchemes:
+            self._valid = False
+            self._errorMessage = "Scheme '%s' not valid for RESTCONF"
+            raise ValueError(self._errorMessage)
 
     @property
     def entry(self):
@@ -299,6 +314,7 @@ class RestconfUrl(object):
         return self._resource
 
     # TODO: For the resource, also parse out the module name (if any) and any initial containers
+    # TODO: For the resource, also parse type if present ('data', 'operations', ...)
 
 
     def _parse_resource(self, api_root):
