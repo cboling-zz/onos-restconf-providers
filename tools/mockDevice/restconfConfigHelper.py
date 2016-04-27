@@ -18,6 +18,7 @@ from uuid import uuid4
 from restconfDataHelper import RestconfDataHelper
 from dataModels import update_datastore
 
+
 class RestconfConfigHelper(RestconfDataHelper):
     """
     Provides RESTCONF required properties/capabilities for each node in a YANG data model

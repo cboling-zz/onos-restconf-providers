@@ -41,12 +41,32 @@ class RestconfUrlTest(unittest.TestCase):
         pass
 
     def test_api_root_resource(self):
-        # TODO Test for parsing good/bad paths at api root:
         # ''
+        self.assertEqual(RestconfUrl('test.com/restconf').resource, '')
+        self.assertEqual(RestconfUrl('test.com/restconf').resource_api, None)
+
         # '/'
+        self.assertEqual(RestconfUrl('test.com/restconf/').resource, '/')
+        self.assertEqual(RestconfUrl('test.com/restconf/').resource_api, None)
+        self.assertEqual(RestconfUrl('test.com/restconf/abcd').resource_api, None)
+
         # '/data'
-        # '/operations',
+        self.assertEqual(RestconfUrl('test.com/restconf/data').resource, '/data')
+        self.assertEqual(RestconfUrl('test.com/restconf/data').resource_api, RestconfUrl.DATA_RESOURCE_API)
+        self.assertEqual(RestconfUrl('test.com/restconf/data/abcd').resource_api, RestconfUrl.DATA_RESOURCE_API)
+
+        # '/operations'
+        self.assertEqual(RestconfUrl('test.com/restconf/operations').resource, '/operations')
+        self.assertEqual(RestconfUrl('test.com/restconf/operations').resource_api, RestconfUrl.OPERATIONS_RESOURCE_API)
+        self.assertEqual(RestconfUrl('test.com/restconf/operations/abcd').resource_api,
+                         RestconfUrl.OPERATIONS_RESOURCE_API)
+
         # '/yang-library-version
+        self.assertEqual(RestconfUrl('test.com/restconf/yang-library-version').resource, '/yang-library-version')
+        self.assertEqual(RestconfUrl('test.com/restconf/yang-library-version').resource_api,
+                         RestconfUrl.LIBRARY_RESOURCE_API)
+        self.assertEqual(RestconfUrl('test.com/restconf/yang-library-version/abcd').resource_api,
+                         RestconfUrl.LIBRARY_RESOURCE_API)
         pass
 
     def test_methods_with_api(self):
