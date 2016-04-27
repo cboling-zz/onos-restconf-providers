@@ -214,12 +214,16 @@ class RestconfUrl(object):
 
     _entry = None
     _resource = None
+    _resource_api = None
     _query = None
     _queryParams = {}
 
     DEFAULT_METHOD = 'GET'
     DEFAULT_SCHEME = 'http'
     DEFAULT_API_ROOT = 'restconf'
+    DATA_RESOURCE_API = 'data'
+    OPERATIONS_RESOURCE_API = 'operations'
+    LIBRARY_RESOURCE_API = 'yang-library-version'
 
     def __init__(self, url, method='GET', api_root='restconf'):
         self._method = method.upper()
@@ -243,6 +247,49 @@ class RestconfUrl(object):
 
         if self._valid:
             self._query = self._parse_query()
+
+    @staticmethod
+    def create(url, method='GET', api_root='restconf'):
+        # Validate method
+        if method not in RestconfUrl._allMethods:
+            raise ValueError('[%s] is not a valid RESTCONF operation/method' % method)
+
+        # Validate scheme and api root
+        parsed = urlparse(url, scheme=RestconfUrl.DEFAULT_SCHEME, allow_fragments=True)
+
+        if parsed.scheme not in RestconfUrl._allSchemes:
+            raise ValueError("Scheme '%s' not valid for RESTCONF" % parsed.scheme)
+
+        # The API root should show up in the path and be the first part of it
+
+        path = parsed.path()
+        if path is None or not path.startswith(api_root):
+            raise ValueError("URL path '%s' does not start RESTCONF API root '%s'" % (path, api_root))
+
+        api = path[len(api_root):]
+
+        if len(api) == 0 or (len(api) == 1 and api == '/'):
+            return RestconfUrl(url, method=method, api_root=api_root)
+
+        if api[1:len(RestconfUrl.DATA_RESOURCE_API)] == RestconfUrl.DATA_RESOURCE_API and \
+                (len(api[1 + len(RestconfUrl.DATA_RESOURCE_API):]) == 0 or
+                         api[1 + len(RestconfUrl.DATA_RESOURCE_API):1] == '/'):
+            from restconfDataUrl import RestconfDataUrl
+            return RestconfDataUrl(url, method=method, api_root=api_root)
+
+        if api[1:len(RestconfUrl.OPERATIONS_RESOURCE_API)] == RestconfUrl.OPERATIONS_RESOURCE_API and \
+                (len(api[1 + len(RestconfUrl.OPERATIONS_RESOURCE_API):]) == 0 or
+                         api[1 + len(RestconfUrl.OPERATIONS_RESOURCE_API):1] == '/'):
+            from restconfOperationUrl import RestconfOperationUrl
+            return RestconfOperationUrl(url, method=method, api_root=api_root)
+
+        if api[1:len(RestconfUrl.OPERATIONS_RESOURCE_API)] == RestconfUrl.OPERATIONS_RESOURCE_API and \
+                (len(api[1 + len(RestconfUrl.OPERATIONS_RESOURCE_API):]) == 0 or
+                         api[1 + len(RestconfUrl.OPERATIONS_RESOURCE_API):1] == '/'):
+            from restconfLibraryUrl import RestconfLibraryUrl
+            return RestconfLibraryUrl(url, method=method, api_root=api_root)
+
+        raise ValueError("URL path '%s' does not start a valid RESTCONF API URI" % path)
 
     @property
     def is_valid(self):
@@ -272,7 +319,7 @@ class RestconfUrl(object):
     def _parse_scheme(self):
         if self.scheme not in self._allSchemes:
             self._valid = False
-            self._errorMessage = "Scheme '%s' not valid for RESTCONF"
+            self._errorMessage = "Scheme '%s' not valid for RESTCONF" % self.scheme
             raise ValueError(self._errorMessage)
 
     @property
@@ -316,9 +363,13 @@ class RestconfUrl(object):
     # TODO: For the resource, also parse out the module name (if any) and any initial containers
     # TODO: For the resource, also parse type if present ('data', 'operations', ...)
 
+    def resource_api(self):
+        """
+        :returns: (None) The root API resource is None.  Derived classed provide the others
+        """
+        return None
 
     def _parse_resource(self, api_root):
-
         path = self._parsedUrl.path()
 
         if not path.startswith(api_root):
