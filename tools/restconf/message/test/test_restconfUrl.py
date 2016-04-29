@@ -61,7 +61,7 @@ class RestconfUrlTest(unittest.TestCase):
         self.assertEqual(RestconfUrl('test.com/restconf/operations/abcd').resource_api,
                          RestconfUrl.OPERATIONS_RESOURCE_API)
 
-        # '/yang-library-version
+        # '/yang-library-version'
         self.assertEqual(RestconfUrl('test.com/restconf/yang-library-version').resource, '/yang-library-version')
         self.assertEqual(RestconfUrl('test.com/restconf/yang-library-version').resource_api,
                          RestconfUrl.LIBRARY_RESOURCE_API)
