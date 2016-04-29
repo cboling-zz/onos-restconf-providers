@@ -15,11 +15,14 @@
 #
 import unittest
 from ..restconfUrl import RestconfUrl
+from ..restconfDataUrl import RestconfDataUrl
+from ..restconfOperationUrl import RestconfOperationUrl
+from ..restconfLibraryUrl import RestconfLibraryUrl
 
 
 class RestconfUrlTest(unittest.TestCase):
     def test_defaults(self):
-        url = RestconfUrl('www.test.com/restconf')
+        url = RestconfUrl.create('www.test.com/restconf')
 
         self.assertIsInstance(url, RestconfUrl)
         self.assertEqual(url.method, RestconfUrl.DEFAULT_METHOD)
@@ -32,53 +35,113 @@ class RestconfUrlTest(unittest.TestCase):
         """
         Test several value exceptions that should be generated
         """
-        self.assertRaises(ValueError, RestconfUrl('test.com/restconf', method='BAD'))
-        self.assertRaises(ValueError, RestconfUrl('mailto:test@bcsw.net'))
-        self.assertRaises(ValueError, RestconfUrl('test.com/restbad'))
-        self.assertRaises(ValueError, RestconfUrl('http://test.com'))
-        self.assertRaises(ValueError, RestconfUrl('https://test.com'))
-        self.assertRaises(ValueError, RestconfUrl('test.com/restconf', api_root='not_restconf'))
+        self.assertRaises(ValueError, RestconfUrl.create('test.com/restconf', method='BAD'))
+        self.assertRaises(ValueError, RestconfUrl.create('mailto:test@bcsw.net'))
+        self.assertRaises(ValueError, RestconfUrl.create('test.com/restbad'))
+        self.assertRaises(ValueError, RestconfUrl.create('http://test.com'))
+        self.assertRaises(ValueError, RestconfUrl.create('https://test.com'))
+        self.assertRaises(ValueError, RestconfUrl.create('test.com/restconf', api_root='not_restconf'))
         pass
 
     def test_api_root_resource(self):
         # ''
-        self.assertEqual(RestconfUrl('test.com/restconf').resource, '')
-        self.assertEqual(RestconfUrl('test.com/restconf').resource_api, None)
+        url = 'test.com/restconf'
+        self.assertIsInstance(RestconfUrl.create(url), RestconfUrl)
+        self.assertEqual(RestconfUrl.create(url).resource, '')
+        self.assertEqual(RestconfUrl.create(url).resource_api, None)
 
         # '/'
-        self.assertEqual(RestconfUrl('test.com/restconf/').resource, '/')
-        self.assertEqual(RestconfUrl('test.com/restconf/').resource_api, None)
-        self.assertEqual(RestconfUrl('test.com/restconf/abcd').resource_api, None)
+        url = 'test.com/restconf/'
+        self.assertIsInstance(RestconfUrl.create(url), RestconfUrl)
+        self.assertEqual(RestconfUrl.create(url).resource, '/')
+        self.assertEqual(RestconfUrl.create(url).resource_api, None)
+        self.assertEqual(RestconfUrl.create(url + 'abcd').resource_api, None)  # TODO: May want to assert here
 
         # '/data'
-        self.assertEqual(RestconfUrl('test.com/restconf/data').resource, '/data')
-        self.assertEqual(RestconfUrl('test.com/restconf/data').resource_api, RestconfUrl.DATA_RESOURCE_API)
-        self.assertEqual(RestconfUrl('test.com/restconf/data/abcd').resource_api, RestconfUrl.DATA_RESOURCE_API)
+        url = 'test.com/restconf/data'
+        self.assertIsInstance(RestconfDataUrl(url), RestconfDataUrl)
+        self.assertIsInstance(RestconfUrl.create(url), RestconfDataUrl)
+        self.assertEqual(RestconfUrl.create(url).resource, '/data')
+        self.assertEqual(RestconfUrl.create(url).resource_api, RestconfUrl.DATA_RESOURCE_API)
+        self.assertEqual(RestconfUrl.create(url + 'abcd').resource_api, RestconfUrl.DATA_RESOURCE_API)
 
         # '/operations'
-        self.assertEqual(RestconfUrl('test.com/restconf/operations').resource, '/operations')
-        self.assertEqual(RestconfUrl('test.com/restconf/operations').resource_api, RestconfUrl.OPERATIONS_RESOURCE_API)
-        self.assertEqual(RestconfUrl('test.com/restconf/operations/abcd').resource_api,
-                         RestconfUrl.OPERATIONS_RESOURCE_API)
+        url = 'test.com/restconf/operations'
+        self.assertIsInstance(RestconfOperationUrl(url), RestconfOperationUrl)
+        self.assertIsInstance(RestconfUrl.create(url), RestconfOperationUrl)
+        self.assertEqual(RestconfUrl.create(url).resource, '/operations')
+        self.assertEqual(RestconfUrl.create(url).resource_api, RestconfUrl.OPERATIONS_RESOURCE_API)
+        self.assertEqual(RestconfUrl.create(url + 'abcd').resource_api, RestconfUrl.OPERATIONS_RESOURCE_API)
 
         # '/yang-library-version'
-        self.assertEqual(RestconfUrl('test.com/restconf/yang-library-version').resource, '/yang-library-version')
-        self.assertEqual(RestconfUrl('test.com/restconf/yang-library-version').resource_api,
-                         RestconfUrl.LIBRARY_RESOURCE_API)
-        self.assertEqual(RestconfUrl('test.com/restconf/yang-library-version/abcd').resource_api,
-                         RestconfUrl.LIBRARY_RESOURCE_API)
+        url = 'test.com/restconf/yang-library-version'
+        self.assertIsInstance(RestconfLibraryUrl(url), RestconfLibraryUrl)
+        self.assertIsInstance(RestconfUrl.create(url), RestconfLibraryUrl)
+        self.assertEqual(RestconfUrl.create(url).resource, '/yang-library-version')
+        self.assertEqual(RestconfUrl.create(url).resource_api, RestconfUrl.LIBRARY_RESOURCE_API)
+        self.assertEqual(RestconfUrl.create(url + 'abcd').resource_api, RestconfUrl.LIBRARY_RESOURCE_API)
         pass
 
     def test_methods_with_api(self):
-        # TODO Test base resource API for GET/POST/PUT/...
+        # Test base resource API for GET/POST/PUT/...
         # /restconf                         GET, HEAD, OPTIONS
+        url = 'test.com/restconf'
+
+        for method in ['GET', 'HEAD', 'OPTIONS']:
+            self.assertIsInstance(RestconfUrl.create(url, method=method), RestconfUrl)
+
+        for method in ['POST', 'PUT', 'DELETE', 'PATCH']:
+            self.assertRaises(ValueError, RestconfUrl.create(url, method=method))
+
+        ################################################################################
         # /restconf/data                    GET, HEAD, POST, PUT, DELETE, PATCH, OPTIONS
+        url = 'test.com/restconf/data'
+        for method in ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']:
+            self.assertIsInstance(RestconfUrl.create(url, method=method), RestconfDataUrl)
+
+        ################################################################################
         # /restconf/data/*                  GET, HEAD, POST, PUT, DELETE, PATCH, OPTIONS
+        url = 'test.com/restconf/abcd'
+        for method in ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']:
+            self.assertIsInstance(RestconfUrl.create(url, method=method), RestconfDataUrl)
+
+        ################################################################################
         # /restconf/operations              -none-
+        url = 'test.com/restconf/operations'
+        for method in ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']:
+            self.assertRaises(ValueError, RestconfUrl.create(url, method=method))
+
+        ################################################################################
         # /restconf/operations/*            POST, OPTIONS
+        url = 'test.com/restconf/operations/abcd'
+        for method in ['POST', 'OPTIONS']:
+            self.assertIsInstance(RestconfUrl.create(url, method=method), RestconfOperationUrl)
+
+        for method in ['GET', 'HEAD', 'PUT', 'DELETE', 'PATCH']:
+            self.assertRaises(ValueError, RestconfUrl.create(url, method=method))
+            pass
+
+        ################################################################################
         # /restconf/yang-library-version    GET, HEAD, OPTIONS
+        url = 'test.com/restconf/yang-library-version'
+        for method in ['GET', 'HEAD', 'OPTIONS']:
+            self.assertIsInstance(RestconfUrl.create(url, method=method), RestconfLibraryUrl)
+            pass
+
+        for method in ['POST', 'PUT', 'DELETE', 'PATCH']:
+            self.assertRaises(ValueError, RestconfUrl.create(url, method=method))
+            pass
+
+        ################################################################################
         # /restconf/yang-library-version/*  GET, HEAD, OPTIONS
-        pass
+        url = 'test.com/restconf/yang-library-version/abcd'
+        for method in ['GET', 'HEAD', 'OPTIONS']:
+            self.assertIsInstance(RestconfUrl.create(url, method=method), RestconfLibraryUrl)
+            pass
+
+        for method in ['POST', 'PUT', 'DELETE', 'PATCH']:
+            self.assertRaises(ValueError, RestconfUrl.create(url, method=method))
+            pass
 
     def test_resource_path_basics(self):
         # TODO Test for parsing good/bad paths at the /<path> - resource
@@ -87,6 +150,9 @@ class RestconfUrlTest(unittest.TestCase):
         # Model + a container  (ie model:container)
         # model+container+more-levels (simple)
         # module:container/path/path/model2:path/...
+
+        self.assertTrue(RestconfUrl.create('test.com/restconf/testResource').is_valid)
+        self.assertEqual(RestconfUrl.create('test.com/restconf/testResource').resource, 'testResource')
         #
         #
         pass

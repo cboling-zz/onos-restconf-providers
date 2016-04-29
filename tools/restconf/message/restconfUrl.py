@@ -203,6 +203,13 @@ class RestconfUrl(object):
 
     The "target" of an operation is a resource. The "path" field in the
     request URI represents the target resource for the operation.
+
+    Raises ValueError on encoding error and sets any created object
+    valid flag to False.
+
+    TODO: Do we need more narrow Exceptions that pass back an appropriate
+          error message?
+
     """
 
     _allSchemes = ['http', 'https']
