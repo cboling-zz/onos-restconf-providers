@@ -24,7 +24,7 @@ class RestconfDataResource(object):
     _valid = True
     _error_message = ''
 
-    #   An identifier MUST NOT start with ((’X’|’x’) (’M’|’m’) (’L’|’l’))
+    #   An identifier MUST NOT start with ((X|x) (M|m) (L|l))
 
     def __init__(self, resource):
         self._resource = resource
