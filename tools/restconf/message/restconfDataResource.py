@@ -37,7 +37,7 @@ class RestconfDataResource(object):
 
     def __init__(self, resource):
         self._resource = resource
-        self._parse_resource(resource)
+        self._parse_api_path(resource)
 
     @staticmethod
     def valid_identifier(identifier):
@@ -50,7 +50,7 @@ class RestconfDataResource(object):
                identifier[0] in RestconfDataResource._goodStart and \
                len(identifier.translate(None, RestconfDataResource._validChars)) == 0
 
-    def _parse_resource(self, resource):
+    def _parse_api_path(self, resource):
         # api-path = "/" |
         #           ("/" api-identifier
         #           0*("/" (api-identifier | list-instance )))
@@ -83,41 +83,119 @@ class RestconfDataResource(object):
 
                 module_and_identifier = api_identifier.split(':')
 
-                if len(module_and_identifier) != 2:
+                if len(module_and_identifier) == 2:
+                    module_name = module_and_identifier[0]
+                    status, module_name, identifier = self._parse_module_and_identifier(module_name,
+                                                                                        module_and_identifier[1])
+                else:
                     self._error_message = "Invalid Module and Identity '%s' found in resource path: '%s'" % \
                                           (api_identifier, self._resource)
                     self._valid = False
                     break
-
-                # Extract module and identifier
-
-                module_name = module_and_identifier[0]
-
-                if not RestconfDataResource.valid_identifier(module_name):
-                    self._error_message = "Invalid Module '%s' found in resource path: '%s'" % \
-                                          (module_name, self._resource)
-                    self._valid = False
-                    break
-
-                identifier = module_and_identifier[1]
-
-                if not RestconfDataResource.valid_identifier(identifier):
-                    self._error_message = "Invalid Identifier '%s' found in resource path: '%s'" % \
-                                          (identifier, self._resource)
-                    self._valid = False
-                    break
+            else:
+                status, module_name, identifier = self._parse_identifier_or_list_instance(api_identifier,
+                                                                                          module_name)
+            if not status:
+                self._valid = False
+                break
 
             # Add new module name entry if needed
 
             if module_name not in self._resource_dict:
                 self._resource_dict[module_name] = []
 
-            # TODO start here Saturday.  need to populate dictionary entry with the path...
-
             self._resource_dict[module_name].extend(identifier)
 
+    def _parse_module_and_identifier(self, module_name, identifier):
+        """
+        Process a api-identifier that is made up of a module and an identifier.  This
+        is the case where
 
-            # TODO: Enforce 'Note 1' validation
+            api-identifier = [module-name ":"] identifier
+        and
+            module-name = identifier
+
+        and the 'module-name' was located in the api-identifier
+
+        :param module_name: (string) The module-name
+        :param identifier: (string) The identifier
+
+        :returns: (boolean) True if successfully parsed
+        """
+
+        if not RestconfDataResource.valid_identifier(module_name):
+            self._error_message = "Invalid Module '%s' found in resource path: '%s'" % \
+                                  (module_name, self._resource)
+            return False, None, None
+
+        # Parse the identifier now
+
+        return self._parse_identifier_or_list_instance(module_name, identifier)
+
+    def _parse_identifier_or_list_instance(self, current_module_name, identifier):
+        """
+        Process a api-identifier that is made up of an identifier.  This is the case where:
+
+            api-identifier = [module-name ":"] identifier
+
+        and the 'module-name' was NOT located in the api-identifier
+        and
+            list-instance = api-identifier "=" key-value ["," key-value]*
+
+        :param current_module_name: (string) The module-name
+        :param identifier: (string) The identifier
+
+        :returns: (boolean) True if successfully parsed.
+        """
+        # This is either an identifier or a list-instance.  List-instances will always contain
+        # and "=" since it is not a valid instance character
+
+        if '=' in identifier:
+            return self._parse_list_instance(current_module_name, identifier)
+
+        if not RestconfDataResource.valid_identifier(identifier):
+            self._error_message = "Invalid Identifier '%s' found in resource path: '%s'" % \
+                                  (identifier, self._resource)
+            return False, None, None
+
+        return True, current_module_name, identifier
+
+    def _parse_list_instance(self, current_module_name, list_instance):
+        """
+        Process the list-instance portion of an api-identifier where:
+
+            list-instance = api-identifier "=" key-value ["," key-value]*
+
+               key-value = string
+
+               string = <a quoted or unquoted string>
+
+        :param current_module_name: (string) The module-name
+        :param list_instance: (string) The identifier
+
+        :returns: (boolean) True if successfully parsed.
+        """
+        # This is either an identifier or a list-instance.  List-instances will always contain
+        # and "=" since it is not a valid instance character
+
+        instance_and_keys = list_instance.split('=')
+
+        if len(instance_and_keys) != 2 or len(instance_and_keys[1].strip()) == 0:
+            self._error_message = "Invalid list-instance '%s' found in resource path: '%s'" % \
+                                  (list_instance, self._resource)
+            return False, None, None
+
+        identifier = instance_and_keys[0]
+
+        if not RestconfDataResource.valid_identifier(identifier):
+            self._error_message = "Invalid Identifier '%s' found in resource path: '%s'" % \
+                                  (identifier, self._resource)
+            return False, None, None
+
+        # TODO: Is there a better way to encode keys
+        identifier += '[%s]' % instance_and_keys[1].strip()
+
+        return True, current_module_name, identifier
 
     @property
     def dict(self):
