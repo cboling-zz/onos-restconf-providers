@@ -12,17 +12,26 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-import re
+import string
+import urllib
 
 
 class RestconfDataResource(object):
     """
     This class wraps a RESTCONF data resource string and allows for paths and module information
     to be easily extracted.
+
+    This class checks for simple errors and does not test validity against an existing model
     """
     _resource_dict = {}
     _valid = True
     _error_message = ''
+    # _badStart = 'XxMmLl'      # TODO The MUST NOT start clause seems incorrect?
+    _badStart = ''
+    _goodStart = (string.ascii_letters + '_').translate(None, ''.join(_badStart))
+    _validChars = string.ascii_letters + string.digits + '_-.'
+    _invalidChars = string.printable.translate(None, ''.join(_validChars))
+    _percentEncoded = urllib.quote(',:" /') + urllib.quote("'")
 
     #   An identifier MUST NOT start with ((X|x) (M|m) (L|l))
 
@@ -37,9 +46,9 @@ class RestconfDataResource(object):
         #
         #           identifier = (ALPHA / "_") *(ALPHA / DIGIT / "_" / "-" / ".")
         """
-        bad_start = ['X', 'x', 'M', 'm', 'L', 'l']
-        good_chars = '^[a-zA-Z0-9_.]+$'
-        return len(identifier) == 0 or identifier[0] in bad_start or not re.match(good_chars, identifier)
+        return len(identifier) > 0 and \
+               identifier[0] in RestconfDataResource._goodStart and \
+               len(identifier.translate(None, RestconfDataResource._validChars)) == 0
 
     def _parse_resource(self, resource):
         # api-path = "/" |
@@ -105,7 +114,7 @@ class RestconfDataResource(object):
 
             # TODO start here Saturday.  need to populate dictionary entry with the path...
 
-            self._resource_dict[module_name].extend('TODO')
+            self._resource_dict[module_name].extend(identifier)
 
 
             # TODO: Enforce 'Note 1' validation

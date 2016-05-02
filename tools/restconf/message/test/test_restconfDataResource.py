@@ -167,6 +167,7 @@ class RestconfDataResourceTest(unittest.TestCase):
 
         resource = RestconfDataResource('/abcd:')
         self.assertFalse(resource.is_valid)
+        self.assertFalse(resource.is_valid)
         self.assertGreater(len(resource.error_message), 0)
         self.assertEqual(len(resource.dict), 0)
 
@@ -189,26 +190,54 @@ class RestconfDataResourceTest(unittest.TestCase):
         Note 1: The syntax for "api-identifier" and "key-value" MUST conform to the
                 JSON identifier encoding rules in Section 4 of [I-D.ietf-netmod-yang-json]
         """
-        pass
 
-    def test_api_key_value(self):
-        """
-                  key-value = string                                            ;; note 1
+        resource = RestconfDataResource('/abcd')
+        self.assertTrue(resource.is_valid)
+        self.assertEqual(len(resource.error_message), 0)
+        self.assertEqual(len(resource.dict), 1)
+        self.assertTrue('' in resource.dict)
+        self.assertEqual(len(resource.dict['']), 1)
+        self.assertEqual(resource.dict[''][0], 'abcd')
 
-                  string = <a quoted or unquoted string>
+        resource = RestconfDataResource('/top-leaflist=fred')
+        self.assertTrue(resource.is_valid)
+        self.assertEqual(len(resource.error_message), 0)
+        self.assertEqual(len(resource.dict), 1)
+        self.assertTrue('' in resource.dict)
+        self.assertEqual(len(resource.dict['']), 1)
+        self.assertEqual(resource.dict[''][0], 'top-leaflist[fred]')
 
-        Note 1: The syntax for "api-identifier" and "key-value" MUST conform to the
-                JSON identifier encoding rules in Section 4 of [I-D.ietf-netmod-yang-json]
-        """
-        pass
+        resource = RestconfDataResource('/list1=key1,key2,key3')
+        self.assertTrue(resource.is_valid)
+        self.assertEqual(len(resource.error_message), 0)
+        self.assertEqual(len(resource.dict), 1)
+        self.assertTrue('' in resource.dict)
+        self.assertEqual(len(resource.dict['']), 1)
+        self.assertEqual(resource.dict[''][0], 'list1[key1,key2,key3]')
 
-    def test_key_value(self):
-        """
-        Note 1: The syntax for "api-identifier" and "key-value" MUST conform to the
-                JSON identifier encoding rules in Section 4 of [I-D.ietf-netmod-yang-json]
-        """
-        resource = RestconfDataResource('module:api')
+        resource = RestconfDataResource('/list1=key1,key2,key3/list2=key4,key5')
+        self.assertTrue(resource.is_valid)
+        self.assertEqual(len(resource.error_message), 0)
+        self.assertEqual(len(resource.dict), 1)
+        self.assertTrue('' in resource.dict)
+        self.assertEqual(len(resource.dict['']), 2)
+        self.assertEqual(resource.dict[''][0], 'list1[key1,key2,key3]')
+        self.assertEqual(resource.dict[''][1], 'list2[key4,key5]')
 
-        self.assertTrue(resource.isValid)
+        resource = RestconfDataResource('/list1=key1,key2,key3/list2=key4,key5/X')
+        self.assertTrue(resource.is_valid)
+        self.assertEqual(len(resource.error_message), 0)
+        self.assertEqual(len(resource.dict), 1)
+        self.assertTrue('' in resource.dict)
+        self.assertEqual(len(resource.dict['']), 3)
+        self.assertEqual(resource.dict[''][0], 'list1[key1,key2,key3]')
+        self.assertEqual(resource.dict[''][1], 'list2[key4,key5]')
+        self.assertEqual(resource.dict[''][2], 'X')
 
-        # TODO Test percent encoded values of   (,':" /)
+        resource = RestconfDataResource('/list1=%2C%27"%3A"%20%2F,,foo')
+        self.assertTrue(resource.is_valid)
+        self.assertEqual(len(resource.error_message), 0)
+        self.assertEqual(len(resource.dict), 1)
+        self.assertTrue('' in resource.dict)
+        self.assertEqual(len(resource.dict['']), 1)
+        self.assertEqual(resource.dict[''][0], 'list1[%2C%27"%3A"%20%2F,,foo]')
