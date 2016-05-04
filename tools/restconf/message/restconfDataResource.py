@@ -14,6 +14,7 @@
 #
 import string
 import urllib
+from restconfListInstance import RestconfListInstance
 
 
 class RestconfDataResource(object):
@@ -178,7 +179,7 @@ class RestconfDataResource(object):
         # This is either an identifier or a list-instance.  List-instances will always contain
         # and "=" since it is not a valid instance character
 
-        instance_and_keys = list_instance.split('=')
+        instance_and_keys = RestconfListInstance(list_instance, module_name=current_module_name)
 
         if len(instance_and_keys) != 2 or len(instance_and_keys[1].strip()) == 0:
             self._error_message = "Invalid list-instance '%s' found in resource path: '%s'" % \
