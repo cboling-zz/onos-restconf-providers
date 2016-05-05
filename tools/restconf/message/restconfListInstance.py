@@ -92,9 +92,9 @@ class RestconfListInstance(object):
                     new_value = float(key)
                 except (TypeError, ValueError):
                     try:
-                        if key.lower() == 'true':  # TODO: Do we really want this conversion (or leave as string?)
+                        if key in ['True', 'true']:  # TODO: Do we really want this conversion (or leave as string?)
                             new_value = True
-                        elif key.lower() == 'false':
+                        elif key in ['False', 'false']:
                             new_value = False
                         else:
                             raise TypeError
