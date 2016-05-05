@@ -83,6 +83,8 @@ class RestconfListInstance(object):
 
         Keys can be an empty string, strings, ints, floats, ...
         """
+        # TODO: How do we handle -0, do we keep a 'minus' flag available?
+
         for key in key_list:
             new_value = key
             if not any(x not in key for x in string.whitespace):
@@ -120,5 +122,17 @@ class RestconfListInstance(object):
     def module_name(self):
         return self._module_name
 
+    @property
+    def keys(self):
+        return self._keys
+
     def __str__(self):
-        return self._resource
+        str_val = '%s=' % self._identifier
+        first = True
+        for key in self._keys:
+            if not first:
+                str_val += ','
+            str_val += '%s' % str(key)
+            first = False
+
+        return str_val
