@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright 2015 - 2016 Boling Consulting Solutions, bcsw.net
+  ~ Copyright 2015-present Boling Consulting Solutions, bcsw.net
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
     <parent>
         <artifactId>onos-drivers-general</artifactId>
         <groupId>org.onosproject</groupId>
-        <version>1.6.0-SNAPSHOT</version>
+        <version>1.7.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -41,6 +41,16 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.onosproject</groupId>
+            <artifactId>onos-restconf-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.onosproject</groupId>
+            <artifactId>onos-drivers-utilities</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>
