@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * Created by cboling on 9/30/15.
  */
-public interface RESTConfConfigurationService {
+public interface RestconfConfigurationService {
     /**
      * Get the number of worker threads to use for background processing
      *
@@ -47,5 +47,5 @@ public interface RESTConfConfigurationService {
      *
      * @return a list of RESTConf devices
      */
-    List<RESTConfDeviceEntry> getDevices();
+    List<RestconfDeviceEntry> getDevices();
 }

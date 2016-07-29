@@ -37,7 +37,7 @@ import static org.slf4j.LoggerFactory.getLogger;
  * Created by cboling on 9/27/15.
  */
 @Path("restconf")
-public class RESTConfResource extends AbstractWebResource {
+public class RestconfResource extends AbstractWebResource {
 
     private final Logger log = getLogger(getClass());
 
@@ -110,7 +110,7 @@ public class RESTConfResource extends AbstractWebResource {
 
         //RESTManager restService = get(RESTManager.class);
         // TODO Get a list of devices
-        //List<RESTConfDeviceEntry> list = restService.getAccessPoints();
+        //List<RestconfDeviceEntry> list = restService.getAccessPoints();
         ObjectNode result = new ObjectMapper().createObjectNode();
         //result.set("list", new ESTConfDeviceCodec().encode(list, this));
 

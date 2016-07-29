@@ -27,7 +27,7 @@ import java.util.List;
  * TODO: Support REST with this as well
  * TODO: A YANG module to describe this would be helpful (as well as other classes)
  */
-public class RESTConfDeviceEntry {
+public class RestconfDeviceEntry {
 
     private String hostName;
     private IpAddress ipAddress;
@@ -43,19 +43,19 @@ public class RESTConfDeviceEntry {
      * s
      * Default consturctor
      */
-    public RESTConfDeviceEntry() {
+    public RestconfDeviceEntry() {
         portNumbers = new ArrayList<>();
-        portNumbers.add(RESTConfConfiguration.DEFAULT_SSL_PORT);
-        portNumbers.add(RESTConfConfiguration.DEFAULT_TCP_PORT);
+        portNumbers.add(RestconfConfiguration.DEFAULT_SSL_PORT);
+        portNumbers.add(RestconfConfiguration.DEFAULT_TCP_PORT);
 
         mediaTypes = new ArrayList<>();
-        mediaTypes.add(RESTConfConfiguration.DEFAULT_XML_MEDIA_TYPE);
-        mediaTypes.add(RESTConfConfiguration.DEFAULT_JSON_MEDIA_TYPE);
+        mediaTypes.add(RestconfConfiguration.DEFAULT_XML_MEDIA_TYPE);
+        mediaTypes.add(RestconfConfiguration.DEFAULT_JSON_MEDIA_TYPE);
 
-        apiRoot = RESTConfConfiguration.DEFAULT_API_ROOT;
+        apiRoot = RestconfConfiguration.DEFAULT_API_ROOT;
     }
 
-    public RESTConfDeviceEntry(String name, IpAddress addr,
+    public RestconfDeviceEntry(String name, IpAddress addr,
                                List<Integer> ports, String root,
                                String url, String user, String pwd,
                                List<String> typeList, String certificateFile) {

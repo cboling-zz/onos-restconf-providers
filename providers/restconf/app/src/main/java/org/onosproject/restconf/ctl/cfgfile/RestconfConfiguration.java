@@ -23,9 +23,9 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * JSON RESTConfConfiguration file support
+ * JSON RestconfConfiguration file support
  */
-public class RESTConfConfiguration {
+public class RestconfConfiguration {
 
     /////////////////////////////////////////////////////////////////////////
     // Constants / Defaults
@@ -49,12 +49,12 @@ public class RESTConfConfiguration {
     private final int numThreads;
     private final int connectionTimeout;
     private final int eventInterval;
-    private final List<RESTConfDeviceEntry> devices;
+    private final List<RestconfDeviceEntry> devices;
 
     /**
      * Default constructor.
      */
-    private RESTConfConfiguration() {
+    private RestconfConfiguration() {
         eventInterval = DEFAULT_EVENT_INTERVAL;
         connectionTimeout = DEFAULT_CONN_TIMEOUT;
         numThreads = DEFAULT_WORKER_THREADS;
@@ -62,14 +62,14 @@ public class RESTConfConfiguration {
     }
 
     @JsonCreator
-    public RESTConfConfiguration(@JsonProperty("eventInterval")
+    public RestconfConfiguration(@JsonProperty("eventInterval")
                                          Integer interval,
                                  @JsonProperty("connectionTimeout")
                                          Integer timeout,
                                  @JsonProperty("numThreads")
                                          Integer workers,
                                  @JsonProperty("devices")
-                                         List<RESTConfDeviceEntry> devs) {
+                                         List<RestconfDeviceEntry> devs) {
         eventInterval = interval;
         connectionTimeout = timeout;
         numThreads = workers;
@@ -108,7 +108,7 @@ public class RESTConfConfiguration {
      *
      * @return a list of RESTConf devices
      */
-    public List<RESTConfDeviceEntry> getDevices() {
+    public List<RestconfDeviceEntry> getDevices() {
         return Collections.unmodifiableList(devices);
     }
 }

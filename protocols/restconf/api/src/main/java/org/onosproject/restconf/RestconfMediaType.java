@@ -26,7 +26,7 @@ import java.util.TreeMap;
  * <p>
  * An abstraction for a media type for RESTCONF. Instances are immutable.
  */
-public class RestConfMediaType {
+public class RestconfMediaType {
     private String type;
     private String subtype;
     private Map<String, String> parameters;
@@ -44,50 +44,50 @@ public class RestConfMediaType {
      */
     public final static String WILDCARD = "*/*";
     /**
-     * A {@link RestConfMediaType} constant representing wildcard {@value #WILDCARD} media type.
+     * A {@link RestconfMediaType} constant representing wildcard {@value #WILDCARD} media type.
      */
-    public final static RestConfMediaType WILDCARD_TYPE = new RestConfMediaType();
+    public final static RestconfMediaType WILDCARD_TYPE = new RestconfMediaType();
 
     public static final String APPLICATION_API_XML = "application/yang.api+xml";
     public static final String APPLICATION_API_JSON = "application/yang.api+json";
-    public static final RestConfMediaType APPLICATION_API_XML_TYPE = new RestConfMediaType("application", "yang.api+xml");
-    public static final RestConfMediaType APPLICATION_API_JSON_TYPE = new RestConfMediaType("application", "yang.api+json");
+    public static final RestconfMediaType APPLICATION_API_XML_TYPE = new RestconfMediaType("application", "yang.api+xml");
+    public static final RestconfMediaType APPLICATION_API_JSON_TYPE = new RestconfMediaType("application", "yang.api+json");
 
     public static final String APPLICATION_DATASTORE_XML = "application/yang.datastore+xml";
     public static final String APPLICATION_DATASTORE_JSON = "application/yang.datastore+json";
-    public static final RestConfMediaType APPLICATION_DATASTORE_XML_TYPE = new RestConfMediaType("application", "yang.datastore+xml");
-    public static final RestConfMediaType APPLICATION_DATASTORE_JSON_TYPE = new RestConfMediaType("application", "yang.datastore+json");
+    public static final RestconfMediaType APPLICATION_DATASTORE_XML_TYPE = new RestconfMediaType("application", "yang.datastore+xml");
+    public static final RestconfMediaType APPLICATION_DATASTORE_JSON_TYPE = new RestconfMediaType("application", "yang.datastore+json");
 
     public static final String APPLICATION_DATA_XML = "application/yang.data+xml";
     public static final String APPLICATION_DATA_JSON = "application/yang.data+json";
-    public static final RestConfMediaType APPLICATION_DATA_XML_TYPE = new RestConfMediaType("application", "yang.data+xml");
-    public static final RestConfMediaType APPLICATION_DATA_JSON_TYPE = new RestConfMediaType("application", "yang.data+json");
+    public static final RestconfMediaType APPLICATION_DATA_XML_TYPE = new RestconfMediaType("application", "yang.data+xml");
+    public static final RestconfMediaType APPLICATION_DATA_JSON_TYPE = new RestconfMediaType("application", "yang.data+json");
 
     public static final String APPLICATION_ERRORS_XML = "application/yang.errors+xml";
     public static final String APPLICATION_ERRORS_JSON = "application/yang.errors+json";
-    public static final RestConfMediaType APPLICATION_ERRORS_XML_TYPE = new RestConfMediaType("application", "yang.errors+xml");
-    public static final RestConfMediaType APPLICATION_ERRORS_JSON_TYPE = new RestConfMediaType("application", "yang.errors+json");
+    public static final RestconfMediaType APPLICATION_ERRORS_XML_TYPE = new RestconfMediaType("application", "yang.errors+xml");
+    public static final RestconfMediaType APPLICATION_ERRORS_JSON_TYPE = new RestconfMediaType("application", "yang.errors+json");
 
     public static final String APPLICATION_OPERATION_XML = "application/yang.operation+xml";
     public static final String APPLICATION_OPERATION_JSON = "yang.operation+json";
-    public static final RestConfMediaType APPLICATION_OPERATION_XML_TYPE = new RestConfMediaType("application", "yang.operation+xml");
-    public static final RestConfMediaType APPLICATION_OPERATION_JSON_TYPE = new RestConfMediaType("application", "yang.operation+json");
+    public static final RestconfMediaType APPLICATION_OPERATION_XML_TYPE = new RestconfMediaType("application", "yang.operation+xml");
+    public static final RestconfMediaType APPLICATION_OPERATION_JSON_TYPE = new RestconfMediaType("application", "yang.operation+json");
 
     public static final String APPLICATION_SCHEMA = "application/yang";
-    public static final RestConfMediaType APPLICATION_SCHEMA_TYPE = new RestConfMediaType("application", "yang");
+    public static final RestconfMediaType APPLICATION_SCHEMA_TYPE = new RestconfMediaType("application", "yang");
 
     /**
-     * Creates a new instance of {@code RestConfMediaType} by parsing the supplied string.
+     * Creates a new instance of {@code RestconfMediaType} by parsing the supplied string.
      *
      * @param type the media type string.
      *
-     * @return the newly created RestConfMediaType.
+     * @return the newly created RestconfMediaType.
      *
      * @throws IllegalArgumentException if the supplied string cannot be parsed
      *                                  or is {@code null}.
      */
-    public static RestConfMediaType valueOf(String type) {
-        return RuntimeDelegate.getInstance().createHeaderDelegate(RestConfMediaType.class).fromString(type);
+    public static RestconfMediaType valueOf(String type) {
+        return RuntimeDelegate.getInstance().createHeaderDelegate(RestconfMediaType.class).fromString(type);
     }
 
     private static TreeMap<String, String> createParametersMap(Map<String, String> initialValues) {
@@ -107,7 +107,7 @@ public class RestConfMediaType {
     }
 
     /**
-     * Creates a new instance of {@code RestConfMediaType} with the supplied type, subtype and
+     * Creates a new instance of {@code RestconfMediaType} with the supplied type, subtype and
      * parameters.
      *
      * @param type       the primary type, {@code null} is equivalent to
@@ -117,24 +117,24 @@ public class RestConfMediaType {
      * @param parameters a map of media type parameters, {@code null} is the same as an
      *                   empty map.
      */
-    public RestConfMediaType(String type, String subtype, Map<String, String> parameters) {
+    public RestconfMediaType(String type, String subtype, Map<String, String> parameters) {
         this(type, subtype, null, createParametersMap(parameters));
     }
 
     /**
-     * Creates a new instance of {@code RestConfMediaType} with the supplied type and subtype.
+     * Creates a new instance of {@code RestconfMediaType} with the supplied type and subtype.
      *
      * @param type    the primary type, {@code null} is equivalent to
      *                {@link #MEDIA_TYPE_WILDCARD}
      * @param subtype the subtype, {@code null} is equivalent to
      *                {@link #MEDIA_TYPE_WILDCARD}
      */
-    public RestConfMediaType(String type, String subtype) {
+    public RestconfMediaType(String type, String subtype) {
         this(type, subtype, null, null);
     }
 
     /**
-     * Creates a new instance of {@code RestConfMediaType} with the supplied type, subtype and
+     * Creates a new instance of {@code RestconfMediaType} with the supplied type, subtype and
      * {@value #CHARSET_PARAMETER} parameter.
      *
      * @param type    the primary type, {@code null} is equivalent to
@@ -144,19 +144,19 @@ public class RestConfMediaType {
      * @param charset the {@value #CHARSET_PARAMETER} parameter value. If {@code null} or empty
      *                the {@value #CHARSET_PARAMETER} parameter will not be set.
      */
-    public RestConfMediaType(String type, String subtype, String charset) {
+    public RestconfMediaType(String type, String subtype, String charset) {
         this(type, subtype, charset, null);
     }
 
     /**
-     * Creates a new instance of {@code RestConfMediaType}, both type and subtype are wildcards.
+     * Creates a new instance of {@code RestconfMediaType}, both type and subtype are wildcards.
      * Consider using the constant WILDCARD_TYPE instead.
      */
-    public RestConfMediaType() {
+    public RestconfMediaType() {
         this(MEDIA_TYPE_WILDCARD, MEDIA_TYPE_WILDCARD, null, null);
     }
 
-    private RestConfMediaType(String type, String subtype, String charset, Map<String, String> parameterMap) {
+    private RestconfMediaType(String type, String subtype, String charset, Map<String, String> parameterMap) {
 
         this.type = type == null ? MEDIA_TYPE_WILDCARD : type;
         this.subtype = subtype == null ? MEDIA_TYPE_WILDCARD : subtype;
@@ -223,19 +223,19 @@ public class RestConfMediaType {
     }
 
     /**
-     * Create a new {@code RestConfMediaType} instance with the same type, subtype and parameters
+     * Create a new {@code RestconfMediaType} instance with the same type, subtype and parameters
      * copied from the original instance and the supplied {@value #CHARSET_PARAMETER} parameter.
      *
      * @param charset the {@value #CHARSET_PARAMETER} parameter value. If {@code null} or empty
      *                the {@value #CHARSET_PARAMETER} parameter will not be set or updated.
      *
-     * @return copy of the current {@code RestConfMediaType} instance with the {@value #CHARSET_PARAMETER}
+     * @return copy of the current {@code RestconfMediaType} instance with the {@value #CHARSET_PARAMETER}
      * parameter set to the supplied value.
      *
      * @since 2.0
      */
-    public RestConfMediaType withCharset(String charset) {
-        return new RestConfMediaType(this.type, this.subtype, charset, createParametersMap(this.parameters));
+    public RestconfMediaType withCharset(String charset) {
+        return new RestconfMediaType(this.type, this.subtype, charset, createParametersMap(this.parameters));
     }
 
     /**
@@ -247,7 +247,7 @@ public class RestConfMediaType {
      *
      * @return true if the types are compatible, false otherwise.
      */
-    public boolean isCompatible(RestConfMediaType other) {
+    public boolean isCompatible(RestconfMediaType other) {
         return other != null && // return false if other is null, else
                 (type.equals(MEDIA_TYPE_WILDCARD) || other.type.equals(MEDIA_TYPE_WILDCARD) || // both are wildcard types, or
                         (type.equalsIgnoreCase(other.type) && (subtype.equals(MEDIA_TYPE_WILDCARD)
@@ -264,7 +264,7 @@ public class RestConfMediaType {
      * <p/>
      * Note that the {@code equals(...)} implementation does not perform
      * a class equality check ({@code this.getClass() == obj.getClass()}). Therefore
-     * any class that extends from {@code RestConfMediaType} class and needs to override
+     * any class that extends from {@code RestconfMediaType} class and needs to override
      * one of the {@code equals(...)} and {@link #hashCode()} methods must
      * always override both methods to ensure the contract between
      * {@link Object#equals(java.lang.Object)} and {@link Object#hashCode()} does
@@ -277,11 +277,11 @@ public class RestConfMediaType {
     @SuppressWarnings("UnnecessaryJavaDocLink")
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof RestConfMediaType)) {
+        if (!(obj instanceof RestconfMediaType)) {
             return false;
         }
 
-        RestConfMediaType other = (RestConfMediaType) obj;
+        RestconfMediaType other = (RestconfMediaType) obj;
         return (this.type.equalsIgnoreCase(other.type)
                 && this.subtype.equalsIgnoreCase(other.subtype)
                 && this.parameters.equals(other.parameters));
@@ -292,7 +292,7 @@ public class RestConfMediaType {
      * <p/>
      * Note that the {@link #equals(java.lang.Object)} implementation does not perform
      * a class equality check ({@code this.getClass() == obj.getClass()}). Therefore
-     * any class that extends from {@code RestConfMediaType} class and needs to override
+     * any class that extends from {@code RestconfMediaType} class and needs to override
      * one of the {@link #equals(Object)} and {@code hashCode()} methods must
      * always override both methods to ensure the contract between
      * {@link Object#equals(java.lang.Object)} and {@link Object#hashCode()} does
@@ -314,6 +314,6 @@ public class RestConfMediaType {
      */
     @Override
     public String toString() {
-        return RuntimeDelegate.getInstance().createHeaderDelegate(RestConfMediaType.class).toString(this);
+        return RuntimeDelegate.getInstance().createHeaderDelegate(RestconfMediaType.class).toString(this);
     }
 }

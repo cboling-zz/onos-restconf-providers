@@ -34,7 +34,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 @Component(immediate = true)
 @Service
-public class RESTConfConfigurationManager implements RESTConfConfigurationService {
+public class RestconfConfigurationManager implements RestconfConfigurationService {
     private static final String CONFIG_DIR = "../config";
 
     //////////////////////////////////////////////////////////////////////
@@ -46,14 +46,14 @@ public class RESTConfConfigurationManager implements RESTConfConfigurationServic
     //////////////////////////////////////////////////////////////////////
     // Class data
 
-    private Integer numThreads = RESTConfConfiguration.DEFAULT_WORKER_THREADS;
-    private Integer eventInterval = RESTConfConfiguration.DEFAULT_EVENT_INTERVAL;
-    private Integer connectionTimeout = RESTConfConfiguration.DEFAULT_CONN_TIMEOUT;
+    private Integer numThreads = RestconfConfiguration.DEFAULT_WORKER_THREADS;
+    private Integer eventInterval = RestconfConfiguration.DEFAULT_EVENT_INTERVAL;
+    private Integer connectionTimeout = RestconfConfiguration.DEFAULT_CONN_TIMEOUT;
 
     /**
      * Collection of RESTConf Devide entries
      */
-    private List<RESTConfDeviceEntry> deviceEntries = new CopyOnWriteArrayList<>();
+    private List<RestconfDeviceEntry> deviceEntries = new CopyOnWriteArrayList<>();
 
     //////////////////////////////////////////////////////////////////////
 
@@ -87,7 +87,7 @@ public class RESTConfConfigurationManager implements RESTConfConfigurationServic
 
         try {
             log.info("Loading config: {}", configFile.getAbsolutePath());
-            RESTConfConfiguration config = mapper.readValue(configFile, RESTConfConfiguration.class);
+            RestconfConfiguration config = mapper.readValue(configFile, RestconfConfiguration.class);
 
             numThreads = config.getNumThreads();
             eventInterval = config.getEventInterval();
@@ -95,7 +95,7 @@ public class RESTConfConfigurationManager implements RESTConfConfigurationServic
             deviceEntries = config.getDevices();
 
         } catch (FileNotFoundException e) {
-            log.warn("RESTConfConfiguration file not found: {}", configFileName);
+            log.warn("RestconfConfiguration file not found: {}", configFileName);
         } catch (IOException e) {
             log.error("Error loading configuration", e);
         }
@@ -138,7 +138,7 @@ public class RESTConfConfigurationManager implements RESTConfConfigurationServic
      * @return a list of RESTConf devices
      */
     @Override
-    public List<RESTConfDeviceEntry> getDevices() {
+    public List<RestconfDeviceEntry> getDevices() {
         return deviceEntries;
     }
 }
