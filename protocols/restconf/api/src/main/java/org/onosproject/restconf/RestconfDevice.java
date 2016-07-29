@@ -92,6 +92,13 @@ public interface RestconfDevice {
     String getFailureReason();
 
     /**
+     * Returns a NETCONF session context for this device.
+     *
+     * @return netconf session
+     */
+    RestconfSession getSession();
+
+    /**
      * Get the initial connection information fro a device
      *
      * @return device info

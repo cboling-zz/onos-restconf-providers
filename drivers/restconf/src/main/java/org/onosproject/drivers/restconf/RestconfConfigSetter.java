@@ -21,7 +21,7 @@ import org.onosproject.net.driver.AbstractHandlerBehaviour;
 import com.google.common.base.Preconditions;
 import org.onosproject.net.DeviceId;
 import org.onosproject.net.driver.DriverHandler;
-import org.onosproject.netconf.RestconfController;
+import org.onosproject.restconf.RestconfController;
 import org.slf4j.Logger;
 
 import java.io.IOException;
