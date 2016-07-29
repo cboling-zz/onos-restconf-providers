@@ -14,7 +14,17 @@
  * limitations under the License.
  */
 
-/**
- * Package for RESTCONF device drivers.
- */
 package org.onosproject.drivers.restconf;
+
+import org.apache.felix.scr.annotations.Component;
+import org.onosproject.net.driver.AbstractDriverLoader;
+
+/**
+ * Loader for NETCONF device drivers.
+ */
+@Component(immediate = true)
+public class RestconfDriversLoader extends AbstractDriverLoader {
+    public RestconfDriversLoader() {
+        super("/restconf-drivers.xml");
+    }
+}
