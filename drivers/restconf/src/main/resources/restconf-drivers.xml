@@ -15,7 +15,7 @@
   ~ limitations under the License.
   -->
 <drivers>
-    <!--This driver is for simulated RESTCONF devices through of-config tool on top og OVSDB-->
+    <!--This driver is for simulated RESTCONF devices through of-config tool on top of OVSDB-->
     <driver name="ovs-restconf" manufacturer="" hwVersion="" swVersion="">
         <behaviour api="org.onosproject.net.behaviour.ControllerConfig"
                    impl="org.onosproject.drivers.restconf.RestconfControllerConfig"/>
