@@ -24,7 +24,6 @@ import org.onosproject.net.behaviour.ControllerConfig;
 import org.onosproject.net.behaviour.ControllerInfo;
 import org.onosproject.net.driver.AbstractHandlerBehaviour;
 import org.onosproject.net.driver.DriverHandler;
-import org.onosproject.restconf.RestId;
 import org.onosproject.restconf.RestconfController;
 import org.onosproject.restconf.RestconfDevice;
 import org.slf4j.Logger;
@@ -53,7 +52,6 @@ public class RestconfControllerConfig extends AbstractHandlerBehaviour
         RestconfController controller = handler.get(RestconfController.class);
         MastershipService mastershipService = handler.get(MastershipService.class);
         DeviceId deviceId = handler.data().deviceId();
-        RestId restId = new RestId(deviceId);
         Preconditions.checkNotNull(controller, "RESTconf controller is null");
         List<ControllerInfo> controllers = new ArrayList<>();
         if (mastershipService.isLocalMaster(deviceId)) {
@@ -80,12 +78,11 @@ public class RestconfControllerConfig extends AbstractHandlerBehaviour
         DriverHandler handler = handler();
         RestconfController controller = handler.get(RestconfController.class);
         DeviceId deviceId = handler.data().deviceId();
-        RestId restId = new RestId(deviceId);
         Preconditions.checkNotNull(controller, "RESTconf controller is null");
         MastershipService mastershipService = handler.get(MastershipService.class);
         if (mastershipService.isLocalMaster(deviceId)) {
             try {
-                RestconfDevice device = controller.getDevice(restId);
+                RestconfDevice device = controller.getDevice(deviceId);
                 String config = null;
 
 //                try {

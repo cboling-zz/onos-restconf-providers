@@ -29,13 +29,6 @@ public interface RestconfDevice {
     DeviceId getDeviceId();
 
     /**
-     * Get the RESTCONF ID for this device
-     *
-     * @return RESTCONF specific ID
-     */
-    RestId getRestconfId();
-
-    /**
      * Start the device state machine to begin the discover process.
      * <p>
      * This transitions the device into the 'DISCOVERY' state regardless of current state

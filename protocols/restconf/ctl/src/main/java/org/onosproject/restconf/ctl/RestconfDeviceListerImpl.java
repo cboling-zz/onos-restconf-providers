@@ -16,7 +16,6 @@
 package org.onosproject.restconf.ctl;
 
 import org.onosproject.net.DeviceId;
-import org.onosproject.restconf.RestId;
 import org.onosproject.restconf.RestconfDevice;
 import org.onosproject.restconf.RestconfDeviceInfo;
 import org.onosproject.restconf.RestconfDeviceListener;
@@ -31,10 +30,10 @@ import java.util.Map;
  */
 public class RestconfDeviceListerImpl implements RestconfDeviceListener {
 
-    final List<RestId> removedDevices = new ArrayList<>();
-    final List<RestId> addedDevices = new ArrayList<>();
-    final List<RestId> changedDevices = new ArrayList<>();
-    // final Map<RestId, OFPortStatus> portChangedDevices = new HashMap<>();
+    final List<DeviceId> removedDevices = new ArrayList<>();
+    final List<DeviceId> addedDevices = new ArrayList<>();
+    final List<DeviceId> changedDevices = new ArrayList<>();
+    // final Map<DeviceId, OFPortStatus> portChangedDevices = new HashMap<>();
 
     /**
      * Notifies that the RESTCONF node was added.

@@ -89,13 +89,6 @@ public class RestconfDeviceInfo {
     /**
      * @return
      */
-    public RestId getRestconfId() {
-        return RestId.valueOf(address);
-    }
-
-    /**
-     * @return
-     */
     public String getHostName() {
         return hostName;
     }

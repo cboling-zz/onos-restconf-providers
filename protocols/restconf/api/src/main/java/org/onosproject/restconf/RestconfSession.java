@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 - 2016 Boling Consulting Solutions, bcsw.net
+ * Copyright 2015-present Boling Consulting Solutions, bcsw.net
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,72 @@
  * limitations under the License.
  */
 package org.onosproject.restconf;
+import com.google.common.annotations.Beta;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
- * Created by cboling on 3/24/16.
+ * RESTConf session object that allows RESTConf operations on top with the physical
+ * device on top of an http or https connection.
  */
 public interface RestconfSession {
+
+
+    /**
+     * Retrives the requested configuration, different from get-config.
+     *
+     * @param request the XML containing the request to the server.
+     * @return device running configuration
+     * @throws RestconfException when there is a problem in the communication process on
+     * the underlying connection
+     */
+    String get(String request) throws RestconfException;
+
+    /**
+     * Retrives the requested data.
+     *
+     * @param filterSchema XML subtrees to include in the reply
+     * @param withDefaultsMode with-defaults mode
+     * @return Server response
+     * @throws RestconfException when there is a problem in the communication process on
+     * the underlying connection
+     */
+    String get(String filterSchema, String withDefaultsMode)
+            throws RestconfException;
+
+    /**
+     * Retrives the specified configuration.
+     *
+     * @return configuration.
+     * @throws RestconfException when there is a problem in the communication process on
+     * the underlying connection
+     */
+    String getConfig() throws RestconfException;
+
+    /**
+     * Retrives part of the specivied configuration based on the filterSchema.
+     *
+     * @param configurationFilterSchema XML schema to filter the configuration
+     *                                  elements we are interested in
+     * @return device running configuration.
+     * @throws RestconfException when there is a problem in the communication process on
+     * the underlying connection
+     */
+    String getConfig(String configurationFilterSchema)
+            throws RestconfException;
+
+    /**
+     * Remove a listener from the underlying stream handler implementation.
+     *
+     * @param listener event listener.
+     */
+    void addDeviceOutputListener(RestconfDeviceOutputEventListener listener);
+
+    /**
+     * Remove a listener from the underlying stream handler implementation.
+     *
+     * @param listener event listener.
+     */
+    void removeDeviceOutputListener(RestconfDeviceOutputEventListener listener);
+
 }

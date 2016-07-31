@@ -45,7 +45,7 @@ public class RestconfControllerImpl implements RestconfController {
     public static final Logger log = LoggerFactory
             .getLogger(RestconfControllerImpl.class);
 
-    private Map<RestId, RestconfDevice> restconfDeviceMap = new ConcurrentHashMap<>();
+    private Map<DeviceId, RestconfDevice> restconfDeviceMap = new ConcurrentHashMap<>();
 
     //private final RestconfDeviceOutputEventListener downListener = new DeviceDownEventListener();
 
@@ -85,7 +85,7 @@ public class RestconfControllerImpl implements RestconfController {
      *
      * @return Requested device or NULL if not found
      */
-    public RestconfDevice getDevice(RestId id) {
+    public RestconfDevice getDevice(DeviceId id) {
         return restconfDeviceMap.get(id);
     }
 
@@ -143,7 +143,7 @@ public class RestconfControllerImpl implements RestconfController {
      * @param msg Message to send
      */
     @Override
-    public void write(RestId id, Byte[] msg) {
+    public void write(DeviceId id, Byte[] msg) {
         this.getDevice(id).sendMsg(msg);
     }
 
@@ -154,7 +154,7 @@ public class RestconfControllerImpl implements RestconfController {
      * @param msg Message to send
      */
     @Override
-    public void processPacket(RestId id, Byte[] msg) {
+    public void processPacket(DeviceId id, Byte[] msg) {
     }
 
     /**

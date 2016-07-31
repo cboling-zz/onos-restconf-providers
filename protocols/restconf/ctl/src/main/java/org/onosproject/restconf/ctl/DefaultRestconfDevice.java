@@ -36,7 +36,6 @@ public class DefaultRestconfDevice implements RestconfDevice {
     public static final Logger log = LoggerFactory.getLogger(DefaultRestconfDevice.class);
 
     private RestconfDeviceInfo deviceInfo;
-    private final RestId restId;
     private final DeviceId deviceId;
     private RestconfDeviceStateMachine stateMachine;
     private boolean isAdminUp;
@@ -49,8 +48,7 @@ public class DefaultRestconfDevice implements RestconfDevice {
     public DefaultRestconfDevice(RestconfDeviceInfo deviceInfo) {
         this.isAdminUp = true;
         this.deviceInfo = deviceInfo;
-        this.restId = deviceInfo.getRestconfId();
-        this.deviceId = DeviceId.deviceId(RestId.uri(restId));
+        this.deviceId = deviceInfo.getDeviceId();
         this.stateMachine = new RestconfDeviceStateMachine(this);
     }
 
@@ -62,16 +60,6 @@ public class DefaultRestconfDevice implements RestconfDevice {
     @Override
     public DeviceId getDeviceId() {
         return deviceId;
-    }
-
-    /**
-     * Get the RESTCONF ID for this device
-     *
-     * @return RESTCONF specific ID
-     */
-    @Override
-    public RestId getRestconfId() {
-        return restId;
     }
 
     /**

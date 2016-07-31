@@ -227,7 +227,7 @@ public class RestconfDeviceProvider extends AbstractProvider
             switch (newRole) {
                 case MASTER:
                     try {
-                        RestconfDevice device = controller.getDevice(new RestId(deviceId));
+                        RestconfDevice device = controller.getDevice(deviceId);
 
                         if ((device != null) && isReachable(deviceId)) {
                             controller.connectDevice(deviceId);
@@ -271,7 +271,7 @@ public class RestconfDeviceProvider extends AbstractProvider
      */
     @Override
     public boolean isReachable(DeviceId deviceId) {
-        RestconfDevice device = controller.getDevice(new RestId(deviceId));
+        RestconfDevice device = controller.getDevice(deviceId);
 
         if (device == null) {
             log.debug("Requested device id: {} is not associated to any " +
@@ -389,12 +389,11 @@ public class RestconfDeviceProvider extends AbstractProvider
              */
             Preconditions.checkNotNull(device, "RESTCONF Device is null");
             DeviceId did = device.getDeviceId();
-            RestId rid = device.getRestconfId();
 
-            if ((providerService == null) && (controller.getDevice(rid) != null)) {
+            if ((providerService == null) && (controller.getDevice(did) != null)) {
                 return;
             }
-            ChassisId cid = new ChassisId(rid.toLong());
+            ChassisId cid = new ChassisId(did.toLong());
             IpAddress ipAddress = device.getDeviceInfo().getIpAddress();
 
             // TODO: After discovery, can add the MANAGEMENT_ADDRESS annotation?

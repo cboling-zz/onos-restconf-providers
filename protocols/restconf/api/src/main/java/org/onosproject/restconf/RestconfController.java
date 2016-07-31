@@ -17,38 +17,14 @@ package org.onosproject.restconf;
 
 import org.onosproject.net.DeviceId;
 
+import java.util.Map;
+
 /**
  * Abstraction of an RESTCONF controller.
  *
  * Used to obtain RestconfDevice and (un)register listeners on RESTCONF device events.
  */
 public interface RestconfController {
-
-    /**
-     * Returns all devices known to this RESTCONF controller.
-     * @return Iterable of RESTCONF devices
-     */
-    Iterable<RestconfDevice> getDevices();
-
-    /**
-     * Get a specific RESTCONF device
-     *
-     * @param id device ID
-     *
-     * @return Requested device or NULL if not found
-     */
-    RestconfDevice getDevice(RestId id);
-
-    // TODO: These are being moved to the RestconfDevice interface
-
-    /**
-     * Create a RESTCONF device object
-     *
-     * @param devInfo
-     *
-     * @return
-     */
-    RestconfDevice createDevice(RestconfDeviceInfo devInfo);
 
     /**
      * Adds Device Event Listener.
@@ -85,12 +61,53 @@ public interface RestconfController {
     void disconnectDevice(DeviceId deviceId, boolean remove);
 
     /**
+     * Removes a RESTCONF device from the core.
+     *
+     * @param deviceId id of the device to remove
+     */
+    void removeDevice(DeviceId deviceId);
+
+    /**
+     * Gets all the nodes information.
+     *
+     * @return map of devices
+     */
+    Map<DeviceId, RestconfDevice> getDevicesMap();
+
+    /**
+     * Returns all devices known to this RESTCONF controller.
+     * @return Iterable of RESTCONF devices
+     */
+    Iterable<RestconfDevice> getDevices();
+
+    /**
+     * Get a specific RESTCONF device
+     *
+     * @param id device ID
+     *
+     * @return Requested device or NULL if not found
+     */
+    RestconfDevice getDevice(DeviceId id);
+
+    // TODO: These are being moved to the RestconfDevice interface
+
+    /**
+     * Create a RESTCONF device object
+     *
+     * @param devInfo
+     *
+     * @return
+     */
+    RestconfDevice createDevice(RestconfDeviceInfo devInfo);
+
+
+    /**
      * Send a RESTCONF message to a managed RESTCONF device
      *
      * @param id  Device ID
      * @param msg Message to send       // TODO: Come up with a message object to encaps this
      */
-    void write(RestId id, Byte[] msg);
+    void write(DeviceId id, Byte[] msg);
 
     /**
      * Send a RESTCONF message to a managed RESTCONF device
@@ -98,5 +115,5 @@ public interface RestconfController {
      * @param id  Device ID
      * @param msg Message to send     // TODO: Come up with a message object to encaps this
      */
-    void processPacket(RestId id, Byte[] msg);
+    void processPacket(DeviceId id, Byte[] msg);
 }
