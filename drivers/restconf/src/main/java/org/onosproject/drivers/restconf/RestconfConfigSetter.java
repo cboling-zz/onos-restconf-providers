@@ -53,7 +53,7 @@ public class RestconfConfigSetter extends AbstractHandlerBehaviour
         DriverHandler handler = handler();
         RestconfController controller = handler.get(RestconfController.class);
         DeviceId deviceId = handler.data().deviceId();
-        Preconditions.checkNotNull(controller, "Netconf controller is null");
+        Preconditions.checkNotNull(controller, "RESTconf controller is null");
 
         String request;
         try {
