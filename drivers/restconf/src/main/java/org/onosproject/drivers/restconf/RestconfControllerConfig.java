@@ -38,73 +38,92 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Implementation of controller config which allows to get and set controllers
- * through the Netconf protocol.
+ * through the RESTconf protocol.
  */
 public class RestconfControllerConfig extends AbstractHandlerBehaviour
         implements ControllerConfig {
 
     private final Logger log = getLogger(RestconfControllerConfig.class);
 
-
+    /**
+     * Get a list of RESTconf controllers which are currently configured
+     *
+     * @return List of ControllerInfo objects
+     */
     @Override
     public List<ControllerInfo> getControllers() {
         DriverHandler handler = handler();
         RestconfController controller = handler.get(RestconfController.class);
         MastershipService mastershipService = handler.get(MastershipService.class);
         DeviceId deviceId = handler.data().deviceId();
+
         Preconditions.checkNotNull(controller, "RESTconf controller is null");
+
         List<ControllerInfo> controllers = new ArrayList<>();
+
         if (mastershipService.isLocalMaster(deviceId)) {
-//            try {
-//                // TODO: Need to implement this
-//                String reply = controller.getDevice(restId).getSession().
-//                        getConfig("running");
-//                log.debug("Reply XML {}", reply);
-//                controllers.addAll(XmlConfigParser.parseStreamControllers(XmlConfigParser.
-//                        loadXml(new ByteArrayInputStream(reply.getBytes(StandardCharsets.UTF_8)))));
-//            } catch (IOException e) {
-//                log.error("Cannot communicate with device {} ", deviceId, e);
-//            }
+            try {
+                // TODO: Need to implement this
+                String reply = controller.getDevice(deviceId).getSession().
+                        getConfig("running");
+
+                log.debug("Reply XML {}", reply);
+
+                controllers.addAll(XmlConfigParser.parseStreamControllers(XmlConfigParser.
+                        loadXml(new ByteArrayInputStream(reply.getBytes(StandardCharsets.UTF_8)))));
+
+            } catch (IOException e) {
+                log.error("Cannot communicate with device {} ", deviceId, e);
+            }
         } else {
-            log.warn("I'm not master for {} please use master, {} to execute command",
+            log.warn("Not the master for {}. Please use master, {} to execute command",
                     deviceId,
                     mastershipService.getMasterFor(deviceId));
         }
         return controllers;
     }
 
+    /**
+     * Set a list of controllers on a device
+     *
+     * @param controllers a list of controller descriptions
+     */
     @Override
     public void setControllers(List<ControllerInfo> controllers) {
         DriverHandler handler = handler();
         RestconfController controller = handler.get(RestconfController.class);
         DeviceId deviceId = handler.data().deviceId();
+
         Preconditions.checkNotNull(controller, "RESTconf controller is null");
+
         MastershipService mastershipService = handler.get(MastershipService.class);
+
         if (mastershipService.isLocalMaster(deviceId)) {
             try {
                 RestconfDevice device = controller.getDevice(deviceId);
                 String config = null;
 
-//                try {
-//                    //TODO Need to implement this
-//                    String reply = device.getSession().getConfig("running");
-//                    log.info("reply XML {}", reply);
-//                    config = XmlConfigParser.createControllersConfig(
-//                            XmlConfigParser.loadXml(getClass().getResourceAsStream("controllers.xml")),
-//                            XmlConfigParser.loadXml(
-//                                    new ByteArrayInputStream(reply.getBytes(StandardCharsets.UTF_8))),
-//                            "running", "merge", "create", controllers
-//                    );
-//                } catch (IOException e) {
-//                    log.error("Cannot communicate to device {} , exception {}", deviceId, e.getMessage());
-//                }
-//                // TODO IMplement this
-//                device.getSession().editConfig(config.substring(config.indexOf("-->") + 3));
+                try {
+                    //TODO Need to implement this
+                    String reply = device.getSession().getConfig("running");
+                    log.info("reply XML {}", reply);
+                    config = XmlConfigParser.createControllersConfig(
+                            XmlConfigParser.loadXml(getClass().getResourceAsStream("controllers.xml")),
+                            XmlConfigParser.loadXml(
+                                    new ByteArrayInputStream(reply.getBytes(StandardCharsets.UTF_8))),
+                            "running", "merge", "create", controllers
+                    );
+                } catch (IOException e) {
+                    log.error("Cannot communicate to device {} , exception {}", deviceId, e.getMessage());
+                }
+                // TODO Implement this
+                device.getSession().editConfig(config.substring(config.indexOf("-->") + 3));
+
             } catch (NullPointerException e) {
                 log.warn("No RESTCONF device with requested parameters " + e);
                 throw new NullPointerException("No RESTCONF device with requested parameters " + e);
-//            } catch (IOException e) {
-//                log.error("Cannot communicate to device {} , exception {}", deviceId, e.getMessage());
+            } catch (IOException e) {
+                log.error("Cannot communicate to device {} , exception {}", deviceId, e.getMessage());
             }
         } else {
             log.warn("I'm not master for {} please use master, {} to execute command",

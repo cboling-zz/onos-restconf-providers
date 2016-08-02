@@ -31,7 +31,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 /**
  * Gets the configuration of the specified type from the specified device. If a
  * failure occurs it returns the error string found in UNABLE_TO_READ_CONFIG.
- * This is a temporary development tool for use until yang integration is complete.
+ * This is a temporary development tool for use until YANG integration is complete.
  * This is not a properly specified behavior implementation. DO NOT USE AS AN EXAMPLE.
  */
 //FIXME this should eventually be removed.
@@ -45,8 +45,16 @@ public class RestconfConfigGetter extends AbstractHandlerBehaviour
     // ConfigGetter
     public static final String UNABLE_TO_READ_CONFIG = "config retrieval error";
 
+    /**
+     * Behaviour that gets the configuration of the specified type from the device
+     *
+     * @param unused Not currently used.  Needed to keep interface happy
+     *
+     * @return Returns the string representation of a device configuration, returns a
+     * failure string if the configuration cannot be retrieved.
+     */
     @Override
-    public String getConfiguration(String type) {
+    public String getConfiguration(String unused) {
         DriverHandler handler = handler();
         RestconfController controller = handler.get(RestconfController.class);
         DeviceId ofDeviceId = handler.data().deviceId();
@@ -55,7 +63,7 @@ public class RestconfConfigGetter extends AbstractHandlerBehaviour
             return controller.getDevicesMap().
                     get(ofDeviceId).
                     getSession().
-                    getConfig(type);
+                    getConfig();
         } catch (IOException e) {
             log.error("Configuration could not be retrieved {}",
                     e.getMessage());

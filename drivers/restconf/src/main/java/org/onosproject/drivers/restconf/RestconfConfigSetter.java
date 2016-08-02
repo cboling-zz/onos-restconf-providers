@@ -48,6 +48,14 @@ public class RestconfConfigSetter extends AbstractHandlerBehaviour
     private static final String UNABLE_TO_SET_CONFIG =
             "Configuration cannot be set";
 
+    /**
+     * Sets the configuration contained in the file at the file path, returns the response
+     * of the RESTconf device.
+     *
+     * @param filePath the path to the configuration file
+     *
+     * @return string response received from the device
+     */
     @Override
     public String setConfiguration(String filePath) {
         DriverHandler handler = handler();

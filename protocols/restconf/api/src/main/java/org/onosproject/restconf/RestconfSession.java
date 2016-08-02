@@ -31,7 +31,7 @@ public interface RestconfSession {
      * @param request the XML containing the request to the server.
      * @return device running configuration
      * @throws RestconfException when there is a problem in the communication process on
-     * the underlying connection
+     *                           the underlying connection
      */
     String get(String request) throws RestconfException;
 
@@ -42,30 +42,67 @@ public interface RestconfSession {
      * @param withDefaultsMode with-defaults mode
      * @return Server response
      * @throws RestconfException when there is a problem in the communication process on
-     * the underlying connection
+     *                           the underlying connection
      */
     String get(String filterSchema, String withDefaultsMode)
             throws RestconfException;
+
+    /**
+     * Executes an synchronous RPC to the server.
+     *
+     * @param request the XML/JSON containing the RPC for the server.
+     * @return Server response or ERROR
+     * @throws RestconfException when there is a problem in the communication process on
+     *                           the underlying connection
+     */
+    String requestSync(String request) throws RestconfException;
 
     /**
      * Retrives the specified configuration.
      *
      * @return configuration.
      * @throws RestconfException when there is a problem in the communication process on
-     * the underlying connection
+     *                           the underlying connection
      */
     String getConfig() throws RestconfException;
 
     /**
-     * Retrives part of the specivied configuration based on the filterSchema.
+     * Retrieves part of the specivied configuration based on the filterSchema.
      *
      * @param configurationFilterSchema XML schema to filter the configuration
      *                                  elements we are interested in
      * @return device running configuration.
      * @throws RestconfException when there is a problem in the communication process on
-     * the underlying connection
+     *                           the underlying connection
      */
     String getConfig(String configurationFilterSchema)
+            throws RestconfException;
+
+    /**
+     * Retrieves part of the specified configuration based on the filterSchema.
+     *
+     * @param newConfiguration configuration to set
+     *
+     * @return true if the configuration was edited correctly
+     *
+     * @throws RestconfException when there is a problem in the communication process on
+     *                           the underlying connection
+     */
+
+    boolean editConfig(String newConfiguration) throws RestconfException;
+
+    /**
+     * Retrives part of the specified configuration based on the filterSchema.
+     *
+     * @param mode             selected mode to change the configuration
+     * @param newConfiguration configuration to set
+     *
+     * @return true if the configuration was edited correctly
+     *
+     * @throws RestconfException when there is a problem in the communication process on
+     *                           the underlying connection
+     */
+    boolean editConfig(String mode, String newConfiguration)
             throws RestconfException;
 
     /**

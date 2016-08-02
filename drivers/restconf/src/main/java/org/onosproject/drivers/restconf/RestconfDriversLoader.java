@@ -18,13 +18,23 @@ package org.onosproject.drivers.restconf;
 
 import org.apache.felix.scr.annotations.Component;
 import org.onosproject.net.driver.AbstractDriverLoader;
+import org.slf4j.Logger;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
- * Loader for NETCONF device drivers.
+ * Loader for RESTconf device drivers.
  */
 @Component(immediate = true)
 public class RestconfDriversLoader extends AbstractDriverLoader {
+    private final Logger log = getLogger(RestconfControllerConfig.class);
+
+    private static String DRIVER_DEFINITION_RESOURCE_PATH = "/restconf-drivers.xml";
+
     public RestconfDriversLoader() {
-        super("/restconf-drivers.xml");
+        super(DRIVER_DEFINITION_RESOURCE_PATH);
+
+        log.debug("RestconfDriversLoader has been created. Resource Path: {}",
+                DRIVER_DEFINITION_RESOURCE_PATH);
     }
 }
