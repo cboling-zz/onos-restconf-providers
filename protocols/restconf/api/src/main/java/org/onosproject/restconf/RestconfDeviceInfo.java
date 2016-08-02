@@ -19,6 +19,8 @@ import com.google.common.base.Preconditions;
 import org.onlab.packet.IpAddress;
 import org.onosproject.net.DeviceId;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -28,13 +30,14 @@ import java.util.Objects;
  */
 public class RestconfDeviceInfo {
 
+    private DeviceId deviceId;
     private final String hostName;
     private final String userName;
     private final String password;
-    private final String certificatePath;
+    private final String certificatePath;   // TODO: May want to contain it here, not in a file
     private final IpAddress address;
-    private final int tcpPort;
-    private final int sslPort;
+    private final int port;
+    private final boolean useTLS;
     private final String apiRoot;
     private final List<String> mediaTypes;
     private final int socketTimeout;
@@ -51,22 +54,21 @@ public class RestconfDeviceInfo {
      *
      * @param hostname
      * @param ipaddr
-     * @param tcpPort
-     * @param sslPort
+     * @param port
+     * @param tls
      * @param username
      * @param password
      * @param certificatePath
      * @param apiRoot
      * @param mediaTypes
      */
-    public RestconfDeviceInfo(String hostname, IpAddress ipaddr, int tcpPort,
-                              int sslPort, int socketTimeout,
+    public RestconfDeviceInfo(String hostname, IpAddress ipaddr, int port,
+                              boolean tls, int socketTimeout,
                               String username, String password, String certificatePath,
                               String apiRoot, List<String> mediaTypes) {
 
         Preconditions.checkArgument(!apiRoot.equals(""), "Empty RESTCONF API Root");
-        Preconditions.checkNotNull(tcpPort > 0, "Negative TCP port");
-        Preconditions.checkNotNull(sslPort > 0, "Negative SSL port");
+        Preconditions.checkNotNull(port > 0, "Negative TCP port");
         Preconditions.checkNotNull(ipaddr, "Null ip address");
 
         // TODO: Validate parameters...  Throw exception on error.
@@ -79,8 +81,8 @@ public class RestconfDeviceInfo {
         this.password = password;
         this.certificatePath = certificatePath;
         this.address = ipaddr;
-        this.tcpPort = tcpPort;
-        this.sslPort = sslPort;
+        this.port = port;
+        this.useTLS = tls;
         this.socketTimeout = socketTimeout;
         this.apiRoot = apiRoot;
         this.mediaTypes = mediaTypes;
@@ -138,34 +140,65 @@ public class RestconfDeviceInfo {
     /**
      * @return
      */
-    public List<String> getMediaTYpes() {
+    public List<String> getMediaTypes() {
         return Collections.unmodifiableList(mediaTypes);
     }
 
     /**
      * @return
      */
-    public int getSslPort() {
-        return sslPort;
+    public int getPort() {
+        return port;
     }
 
     /**
      * @return
      */
-    public int getTcpPort() {
-        return tcpPort;
+    public boolean getTLS() {
+        return useTLS;
+    }
+
+    /**
+     * Return the DeviceId about the device containing the URI.
+     *
+     * @return DeviceId
+     */
+    public DeviceId getDeviceId() {
+        if (deviceId == null) {
+            try {
+                deviceId = DeviceId.deviceId(new URI("restconf", address.toString() + ":" + port, null));
+            } catch (URISyntaxException e) {
+                throw new IllegalArgumentException("Unable to build deviceID for device " + toString(), e);
+            }
+        }
+        return deviceId;
+    }
+
+    /**
+     * Return the info about the device in a string.
+     * String format: "netconf:name@ip:port"
+     *
+     * @return String device info
+     */
+    @Override
+    public String toString() {
+        return "restconf:" + address + ":" + port;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(address);
+        return Objects.hash(address, port);
     }
 
     @Override
     public boolean equals(Object toBeCompared) {
         if (toBeCompared instanceof RestconfDeviceInfo) {
             RestconfDeviceInfo deviceInfo = (RestconfDeviceInfo) toBeCompared;
-            if (deviceInfo.address.equals(address)) {
+            if (deviceInfo.address.equals(address)
+                    && deviceInfo.getPort() == port
+                    && deviceInfo.getHostName() == hostName
+                    && deviceInfo.getPassword() == password
+                    && deviceInfo.getCertificatePath() == certificatePath) {
                 return true;
             }
         }

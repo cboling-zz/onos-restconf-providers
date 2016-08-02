@@ -136,6 +136,17 @@ public class RestconfControllerImpl implements RestconfController {
         // TODO: Implement this
     }
 
+
+    /**
+     * Removes a RESTCONF device from the core.
+     *
+     * @param deviceId id of the device to remove
+     */
+    @Override
+    public void removeDevice(DeviceId deviceId) {
+        // TODO: Implement this
+    }
+
     /**
      * Send a RESTCONF message to a managed RESTCONF device
      *
@@ -155,6 +166,16 @@ public class RestconfControllerImpl implements RestconfController {
      */
     @Override
     public void processPacket(DeviceId id, Byte[] msg) {
+    }
+
+    /**
+     * Gets all the nodes information.
+     *
+     * @return map of devices
+     */
+    @Override
+    public Map<DeviceId, RestconfDevice> getDevicesMap() {
+        return restconfDeviceMap;
     }
 
     /**

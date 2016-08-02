@@ -100,7 +100,6 @@ public interface RestconfController {
      */
     RestconfDevice createDevice(RestconfDeviceInfo devInfo);
 
-
     /**
      * Send a RESTCONF message to a managed RESTCONF device
      *

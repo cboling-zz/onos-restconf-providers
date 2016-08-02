@@ -324,7 +324,7 @@ public class RestconfDeviceProvider extends AbstractProvider
         if (cfg != null) {
             try {
                 for (RestconfDeviceInfo devInfo : cfg.getDeviceInfo().values()) {
-                    RestconfDevice device = controller.getDevice(devInfo.getRestconfId());
+                    RestconfDevice device = controller.getDevice(devInfo.getDeviceId());
 
                     if (device != null) {
                         // If new information, may need to kick device back to DISCOVERY
@@ -393,7 +393,8 @@ public class RestconfDeviceProvider extends AbstractProvider
             if ((providerService == null) && (controller.getDevice(did) != null)) {
                 return;
             }
-            ChassisId cid = new ChassisId(did.toLong());
+            //TODO: ChassisId cid = new ChassisId(did..toLong());
+            ChassisId cid = new ChassisId(0x1234);   // TODO: Need to implement this
             IpAddress ipAddress = device.getDeviceInfo().getIpAddress();
 
             // TODO: After discovery, can add the MANAGEMENT_ADDRESS annotation?

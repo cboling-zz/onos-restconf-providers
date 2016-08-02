@@ -15,7 +15,6 @@
  */
 package org.onosproject.restconf.ctl;
 
-import org.onlab.packet.IpAddress;
 import org.onosproject.net.DeviceId;
 import org.onosproject.restconf.*;
 import org.slf4j.Logger;
@@ -24,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.URI;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
 
@@ -39,6 +37,7 @@ public class DefaultRestconfDevice implements RestconfDevice {
     private final DeviceId deviceId;
     private RestconfDeviceStateMachine stateMachine;
     private boolean isAdminUp;
+    private RestconfSession restconfSession;
 
     /**
      * Constructor for a RESTCONF device
@@ -96,7 +95,7 @@ public class DefaultRestconfDevice implements RestconfDevice {
             stateMachine.connect();
         } catch (RestconfDeviceStateMachineException ex) {
             log.error("Illegal start/restart of device state. Device: {], Message: {}",
-                    restId.toString(), ex.toString());
+                    deviceId.toString(), ex.toString());
         }
     }
 
@@ -136,9 +135,9 @@ public class DefaultRestconfDevice implements RestconfDevice {
      */
     @Override
     public String getBaseURL() {
-        boolean isSSL = false; // TODO: Support SSL sometime with fallback (or preference for) plain-old TCP
+        boolean isSSL = deviceInfo.getTLS(); // TODO: Support SSL sometime with fallback (or preference for) plain-old TCP
         String moniker = isSSL ? "https" : "http";
-        int port = isSSL ? deviceInfo.getSslPort() : deviceInfo.getTcpPort();
+        int port = deviceInfo.getPort();
 
         return String.format("%s://%s:%d/", moniker, deviceInfo.getIpAddress(), port);
     }
@@ -186,8 +185,7 @@ public class DefaultRestconfDevice implements RestconfDevice {
     public boolean isReachable() {
         switch (getState()) {
             case RestconfDeviceStateMachine.IDLE:
-                return testConnection(getDeviceInfo().getSslPort()) ||
-                        testConnection(getDeviceInfo().getTcpPort());
+                return testConnection(getDeviceInfo().getPort());
 
             case RestconfDeviceStateMachine.DISCOVERY:
             case RestconfDeviceStateMachine.POPULATE:
@@ -209,6 +207,16 @@ public class DefaultRestconfDevice implements RestconfDevice {
     @Override
     public String getFailureReason() {
         return stateMachine.getFailureReason();
+    }
+
+    /**
+     * Returns a NETCONF session context for this device.
+     *
+     * @return netconf session
+     */
+    @Override
+    public RestconfSession getSession() {
+        return restconfSession;
     }
 
     /**
