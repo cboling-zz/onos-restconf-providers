@@ -34,6 +34,7 @@ public class RestconfProviderConfig extends Config<ApplicationId> {
 
     static final int DEFAULT_SSL_PORT = 443;
     static final int DEFAULT_TCP_PORT = 80;
+    static final boolean DEFAULT_IS_TLS = true;
 
     static final String DEFAULT_XML_MEDIA_TYPE = "xml";
     static final String DEFAULT_JSON_MEDIA_TYPE = "json";
@@ -51,6 +52,7 @@ public class RestconfProviderConfig extends Config<ApplicationId> {
 
     /////////////////////////////////////////////////////////////////////////
     // Per Device/node Properties
+    //boolean tls = node.path().asBoolean();
 
     private static String DEVICES = "devices";
     private static String HOSTNAME = "hostname";
@@ -58,8 +60,8 @@ public class RestconfProviderConfig extends Config<ApplicationId> {
     private static String PASSWORD = "password";
     private static String CERTIFICATE_PATH = "x509Path";
     private static String IP_ADDRESS = "ipAddress";
-    private static String TCP_PORT = "tcpPort";
-    private static String SSL_PORT = "sslPort";
+    private static String PORT = "port";
+    private static String IS_TLS = "useTls";
     private static String API_ROOT = "apiRoot";
     private static String MEDIA_TYPES = "mediaTypes";
     private static String NOTES = "notes";
@@ -77,7 +79,7 @@ public class RestconfProviderConfig extends Config<ApplicationId> {
     public boolean isValid() {
         return hasOnlyFields(WORKER_THREADS, CONNECTION_TIMEOUT, EVENT_INTERVAL,
                 SSL_PREFERRED, DEVICES, HOSTNAME, USERNAME, PASSWORD, CERTIFICATE_PATH,
-                IP_ADDRESS, TCP_PORT, SSL_PORT, API_ROOT, MEDIA_TYPES, NOTES)
+                IP_ADDRESS, PORT, IS_TLS, API_ROOT, MEDIA_TYPES, NOTES)
                 && isNumber(WORKER_THREADS, OPTIONAL, 1)
                 && isNumber(CONNECTION_TIMEOUT, OPTIONAL, 50)
                 && isNumber(EVENT_INTERVAL, OPTIONAL, 1, 60)
@@ -87,8 +89,8 @@ public class RestconfProviderConfig extends Config<ApplicationId> {
                 && isString(PASSWORD, OPTIONAL)
                 && isString(CERTIFICATE_PATH, OPTIONAL, filePathRegEx)
                 && isIpAddress(IP_ADDRESS, MANDATORY)
-                && isNumber(TCP_PORT, OPTIONAL, 0, 65535)
-                && isNumber(SSL_PORT, OPTIONAL, 0, 65535)
+                && isNumber(PORT, OPTIONAL, 0, 65535)
+                && isBoolean(IS_TLS, OPTIONAL)
                 && isString(API_ROOT, OPTIONAL)
                 && isString(NOTES, OPTIONAL);
     }
@@ -166,8 +168,8 @@ public class RestconfProviderConfig extends Config<ApplicationId> {
                     String password = node.path(PASSWORD).asText("");
                     String certPath = node.path(CERTIFICATE_PATH).asText("");
                     IpAddress address = IpAddress.valueOf(node.path(IP_ADDRESS).asText(""));
-                    int tcpPort = node.path(TCP_PORT).asInt(DEFAULT_TCP_PORT);
-                    int sslPort = node.path(SSL_PORT).asInt(DEFAULT_SSL_PORT);
+                    int port = node.path(PORT).asInt(DEFAULT_TCP_PORT);
+                    boolean tls = node.path(IS_TLS).asBoolean(DEFAULT_IS_TLS);
                     int timeout = get(CONNECTION_TIMEOUT, DEFAULT_CONNECTION_TIMEOUT);
                     String apiRoot = node.path(API_ROOT).asText(DEFAULT_API_ROOT);
                     List<String> mediaTypes = Lists.newArrayList();
@@ -183,9 +185,10 @@ public class RestconfProviderConfig extends Config<ApplicationId> {
                         mediaTypes.add(DEFAULT_JSON_MEDIA_TYPE);
                     }
                     RestconfDeviceInfo device = new RestconfDeviceInfo(hostName, address,
-                            tcpPort, sslPort, timeout,
+                            port, tls, timeout,
                             userName, password, certPath, apiRoot,
                             mediaTypes);
+
 
                     devicesInfo.put(address.toString(), device);
                 });
