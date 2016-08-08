@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 - 2016 Boling Consulting Solutions, bcsw.net
+ * Copyright 2015-present Boling Consulting Solutions, bcsw.net
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,8 @@ public interface RestconfDevice {
      *
      * @return device ID
      */
+    @Deprecated
+    // TODO: Move to the RestconfDeviceInfo interface
     DeviceId getDeviceId();
 
     /**
@@ -34,6 +36,8 @@ public interface RestconfDevice {
      * This transitions the device into the 'DISCOVERY' state regardless of current state
      * unless already in the 'DISCOVERY' state.
      */
+    @Deprecated
+    // TODO: Move to the RestconfSession interface
     void start();
 
     /**
@@ -47,6 +51,8 @@ public interface RestconfDevice {
      * @param setAdminUp If true, the administrative state of the device will be placed in the
      *                   UP state.  Down otherwise.
      */
+    @Deprecated
+    // TODO: Move to the RestconfSession interface
     void setAdminState(boolean setAdminUp);
 
     /**
@@ -54,6 +60,8 @@ public interface RestconfDevice {
      *
      * @return current ADMIN UP state.  true = UP, false = down
      */
+    @Deprecated
+    // TODO: Move to the RestconfSession interface
     boolean getAdminStateUp();
 
     /**
@@ -61,6 +69,8 @@ public interface RestconfDevice {
      *
      * @return Device State
      */
+    @Deprecated
+    // TODO: Move to the RestconfSession interface
     int getState();
 
     /**
@@ -68,6 +78,8 @@ public interface RestconfDevice {
      *
      * @return http[s]://<ip-addr>:<port>/
      */
+    @Deprecated
+    // TODO: Move to the RestconfDeviceInfo interface
     String getBaseURL();
 
     /**
@@ -82,6 +94,8 @@ public interface RestconfDevice {
      *
      * @return Failure reason (blank if not in a failed or inactive state)
      */
+    @Deprecated
+    // TODO: Move to the RestconfSession interface
     String getFailureReason();
 
     /**
@@ -90,6 +104,12 @@ public interface RestconfDevice {
      * @return netconf session
      */
     RestconfSession getSession();
+
+    /**
+     * Ensures that all sessions are closed.
+     * A device cannot be used after disconnect is called.
+     */
+    void disconnect();
 
     /**
      * Get the initial connection information fro a device
@@ -107,5 +127,7 @@ public interface RestconfDevice {
      *
      * @param msg the message to write
      */
+    @Deprecated
+    // TODO: Move to the RestconfSession interface
     void sendMsg(Byte[] msg);
 }

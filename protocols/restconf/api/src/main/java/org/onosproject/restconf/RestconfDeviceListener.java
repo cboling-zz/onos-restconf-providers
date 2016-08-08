@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 - 2016 Boling Consulting Solutions, bcsw.net
+ * Copyright 2015-present Boling Consulting Solutions, bcsw.net
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,9 @@ public interface RestconfDeviceListener {
     /**
      * Notifies that the RESTCONF node was added.
      *
-     * @param device RESTCONF Device object
+     * @param id Device ID
      */
-    void deviceAdded(RestconfDevice device);
+    void deviceAdded(DeviceId id);
 
     /**
      * Notifies that the RESTCONF node was removed.
@@ -36,13 +36,12 @@ public interface RestconfDeviceListener {
     void deviceRemoved(DeviceId id);
 
     /**
-     * Notifies that the RESTCONF node was removed.
+     * Notifies that the RESTCONF node was modified.
      *
      * @param id   Device ID
      * @param info Updated device information
      */
     void deviceModified(DeviceId id, RestconfDeviceInfo info);
 
-    // TODO: Add other methods that provide different change events that
-    // may be of importance to others.
+    // TODO: Add other methods that provide different change events that may be of importance to others.
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 - 2016 Boling Consulting Solutions, bcsw.net
+ * Copyright 2015-present Boling Consulting Solutions, bcsw.net
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.onosproject.restconf;
 
+import org.onlab.packet.IpAddress;
 import org.onosproject.net.DeviceId;
 
 import java.util.Map;
@@ -89,7 +90,15 @@ public interface RestconfController {
      */
     RestconfDevice getDevice(DeviceId id);
 
-    // TODO: These are being moved to the RestconfDevice interface
+
+    /**
+     * Gets a RESTCONF Device by node identifier.
+     *
+     * @param ip   device ip
+     * @param port device port
+     * @return RestconfDevice RESTCONF device
+     */
+    RestconfDevice getDevice(IpAddress ip, int port);
 
     /**
      * Create a RESTCONF device object
@@ -98,6 +107,8 @@ public interface RestconfController {
      *
      * @return
      */
+    @Deprecated
+    // TODO: These are being moved to the RestconfDevice interface
     RestconfDevice createDevice(RestconfDeviceInfo devInfo);
 
     /**
@@ -106,6 +117,8 @@ public interface RestconfController {
      * @param id  Device ID
      * @param msg Message to send       // TODO: Come up with a message object to encaps this
      */
+    @Deprecated
+    // TODO: These are being moved to the RestconfDevice interface
     void write(DeviceId id, Byte[] msg);
 
     /**
@@ -114,5 +127,7 @@ public interface RestconfController {
      * @param id  Device ID
      * @param msg Message to send     // TODO: Come up with a message object to encaps this
      */
+    @Deprecated
+    // TODO: These are being moved to the RestconfDevice interface
     void processPacket(DeviceId id, Byte[] msg);
 }

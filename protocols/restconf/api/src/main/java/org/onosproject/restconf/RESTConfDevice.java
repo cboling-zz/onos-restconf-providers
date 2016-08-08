@@ -26,6 +26,7 @@ import static org.slf4j.LoggerFactory.getLogger;
  * This is a logical representation of actual RESTConf device, carrying all the
  * necessary information to connect and execute RESTConf operations.
  */
+@Deprecated
 public class RESTConfDevice {
     // TODO: Store these in distributed store (eventually consistent) and provide ability to change
     //       via CLI, REST, and JSON Configuration File

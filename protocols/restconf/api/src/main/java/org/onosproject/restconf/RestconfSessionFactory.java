@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 - 2016 Boling Consulting Solutions, bcsw.net
+ * Copyright 2015-present Boling Consulting Solutions, bcsw.net
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,19 @@
 package org.onosproject.restconf;
 
 /**
- * Created by cboling on 3/24/16.
+ * Abstract interface for the creation of a RESTCONF session.
  */
 public interface RestconfSessionFactory {
+    /**
+     * Creates a new NETCONF session for the specified device.
+     *
+     * @param deviceInfo information of the device to create the session for.
+     *
+     * @return Instance of RestconfSession
+     * .
+     *
+     * @throws RestconfException when problems arise establishing the connection.
+     */
+    RestconfSession createSession(RestconfDeviceInfo deviceInfo)
+            throws RestconfException;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 - 2016 Boling Consulting Solutions, bcsw.net
+ * Copyright 2015-present Boling Consulting Solutions, bcsw.net
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,6 @@ import java.util.Objects;
 public class RestconfDeviceInfo {
 
     private DeviceId deviceId;
-    private final String hostName;
     private final String userName;
     private final String password;
     private final String certificatePath;   // TODO: May want to contain it here, not in a file
@@ -52,7 +51,6 @@ public class RestconfDeviceInfo {
     /**
      * TODO: Complete documentation here...
      *
-     * @param hostname
      * @param ipaddr
      * @param port
      * @param tls
@@ -62,21 +60,18 @@ public class RestconfDeviceInfo {
      * @param apiRoot
      * @param mediaTypes
      */
-    public RestconfDeviceInfo(String hostname, IpAddress ipaddr, int port,
+    public RestconfDeviceInfo(IpAddress ipaddr, int port,
                               boolean tls, int socketTimeout,
                               String username, String password, String certificatePath,
                               String apiRoot, List<String> mediaTypes) {
 
+        Preconditions.checkArgument(!username.equals(""), "Empty device user name");
         Preconditions.checkArgument(!apiRoot.equals(""), "Empty RESTCONF API Root");
         Preconditions.checkNotNull(port > 0, "Negative TCP port");
         Preconditions.checkNotNull(ipaddr, "Null ip address");
 
         // TODO: Validate parameters...  Throw exception on error.
 
-        if ((hostname == null) || hostname.isEmpty()) {
-            hostname = ipaddr.toString();
-        }
-        this.hostName = hostname;
         this.userName = username;
         this.password = password;
         this.certificatePath = certificatePath;
@@ -86,13 +81,6 @@ public class RestconfDeviceInfo {
         this.socketTimeout = socketTimeout;
         this.apiRoot = apiRoot;
         this.mediaTypes = mediaTypes;
-    }
-
-    /**
-     * @return
-     */
-    public String getHostName() {
-        return hostName;
     }
 
     /**
@@ -166,9 +154,11 @@ public class RestconfDeviceInfo {
     public DeviceId getDeviceId() {
         if (deviceId == null) {
             try {
-                deviceId = DeviceId.deviceId(new URI("restconf", address.toString() + ":" + port, null));
+                deviceId = DeviceId.deviceId(new URI("restconf", address.toString() + ":"
+                        + port, null));
             } catch (URISyntaxException e) {
-                throw new IllegalArgumentException("Unable to build deviceID for device " + toString(), e);
+                throw new IllegalArgumentException("Unable to build deviceID for device "
+                        + toString(), e);
             }
         }
         return deviceId;
@@ -176,13 +166,13 @@ public class RestconfDeviceInfo {
 
     /**
      * Return the info about the device in a string.
-     * String format: "netconf:name@ip:port"
+     * String format: "restconf:username@ip:port"
      *
      * @return String device info
      */
     @Override
     public String toString() {
-        return "restconf:" + address + ":" + port;
+        return "restconf:" + userName + "@" + address + ":" + port;
     }
 
     @Override
@@ -195,10 +185,7 @@ public class RestconfDeviceInfo {
         if (toBeCompared instanceof RestconfDeviceInfo) {
             RestconfDeviceInfo deviceInfo = (RestconfDeviceInfo) toBeCompared;
             if (deviceInfo.address.equals(address)
-                    && deviceInfo.getPort() == port
-                    && deviceInfo.getHostName() == hostName
-                    && deviceInfo.getPassword() == password
-                    && deviceInfo.getCertificatePath() == certificatePath) {
+                    && deviceInfo.getPort() == port) {
                 return true;
             }
         }
