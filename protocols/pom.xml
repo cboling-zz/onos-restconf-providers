@@ -36,14 +36,14 @@
         <module>netty-http-client</module>
         <!-- The java-openxrd is cloned from https://github.com/willnorris/java-openxrd and -->
         <!-- has been modified to perform well with this project -->
-        <!-- <module>java-openxrd</module> -->
+         <!--<module>java-openxrd</module>-->
     </modules>
 
     <dependencies>
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-codec-http</artifactId>
-            <version>4.0.35.Final</version>
+            <version>4.0.40.Final</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
