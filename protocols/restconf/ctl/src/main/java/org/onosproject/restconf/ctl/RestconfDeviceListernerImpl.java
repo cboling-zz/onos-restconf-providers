@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 - 2016 Boling Consulting Solutions, bcsw.net
+ * Copyright 2015-present Boling Consulting Solutions, bcsw.net
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,9 +26,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by cboling on 3/28/16.
+ * Allows for providers interested in node events to be notified.
  */
-public class RestconfDeviceListerImpl implements RestconfDeviceListener {
+public class RestconfDeviceListernerImpl implements RestconfDeviceListener {
 
     final List<DeviceId> removedDevices = new ArrayList<>();
     final List<DeviceId> addedDevices = new ArrayList<>();
@@ -38,9 +38,9 @@ public class RestconfDeviceListerImpl implements RestconfDeviceListener {
     /**
      * Notifies that the RESTCONF node was added.
      *
-     * @param device RESTCONF Device object
+     * @param id Device ID
      */
-    public void deviceAdded(RestconfDevice device) {
+    public void deviceAdded(DeviceId id) {
         // TODO: Implement this
 
         // Create device ID (may need to be port of RestconfDeviceInfo)

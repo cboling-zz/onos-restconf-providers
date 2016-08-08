@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 - 2016 Boling Consulting Solutions, bcsw.net
+ * Copyright 2015-present Boling Consulting Solutions, bcsw.net
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,12 @@ import org.onosproject.restconf.RestconfException;
 import org.onosproject.restconf.RestconfSession;
 
 /**
- * Created by cboling on 3/24/16.
+ * RESTConf session object that allows RESTConf operations on top with the physical
+ * device on top of an http or https connection.
+ *
+ *
+ * TODO: This class is expected to change significantly once we get past discover
+ *       and want to do real work.
  */
 public class RestconfSessionImpl implements RestconfSession {
 
@@ -29,25 +34,10 @@ public class RestconfSessionImpl implements RestconfSession {
     }
 
     /**
-     * Retrives the requested configuration, different from get-config.
+     * Retrieves the requested data.
      *
-     * @param request the XML containing the request to the server.
-     *
-     * @return device running configuration
-     *
-     * @throws RestconfException when there is a problem in the communication process on
-     *                           the underlying connection
-     */
-    @Override
-    public String get(String request) throws RestconfException {
-        // TODO: Implement me
-        return "";
-    }
-
-    /**
-     * Retrives the requested data.
-     *
-     * @param filterSchema     XML subtrees to include in the reply
+     * @param request the XML or JSON containing the request to the server
+     * @param headers Optional array of HTTP headers for the request
      * @param withDefaultsMode with-defaults mode
      *
      * @return Server response
@@ -56,93 +46,141 @@ public class RestconfSessionImpl implements RestconfSession {
      *                           the underlying connection
      */
     @Override
-    public String get(String filterSchema, String withDefaultsMode)
+    public String get(String request, String[] headers, String withDefaultsMode)
             throws RestconfException {
         // TODO: Implement me
         return "";
     }
 
     /**
-     * Executes an synchronous RPC to the server.
+     * Create the requested data or invoke an operation resource
      *
-     * @param request the XML/JSON containing the RPC for the server.
+     * @param request the XML or JSON containing the request to the server
+     * @param headers Optional array of HTTP headers for the request
      *
-     * @return Server response or ERROR
+     * @return Server response
      *
      * @throws RestconfException when there is a problem in the communication process on
      *                           the underlying connection
      */
     @Override
-    public String requestSync(String request) throws RestconfException {
-        // TODO: Implement me
+    public String post(String request, String[] headers) throws RestconfException {
+        // TODO: Implement this
         return "";
     }
 
     /**
-     * Retrives the specified configuration.
+     * Create or replace the target data resource
      *
-     * @return configuration.
+     * @param request the XML or JSON containing the request to the server
+     * @param headers Optional array of HTTP headers for the request
+     *
+     * @return Server response
      *
      * @throws RestconfException when there is a problem in the communication process on
      *                           the underlying connection
      */
     @Override
-    public String getConfig() throws RestconfException {
-        // TODO: Implement me
+    public String put(String request, String[] headers) throws RestconfException {
+        // TODO: Implement this
         return "";
     }
 
     /**
-     * Retrieves part of the specivied configuration based on the filterSchema.
+     * Replace portions of the target data resource
      *
-     * @param configurationFilterSchema XML schema to filter the configuration
-     *                                  elements we are interested in
+     * @param request the XML or JSON containing the request to the server
+     * @param headers Optional array of HTTP headers for the request
      *
-     * @return device running configuration.
+     * @return Server response
      *
      * @throws RestconfException when there is a problem in the communication process on
      *                           the underlying connection
      */
     @Override
-    public String getConfig(String configurationFilterSchema)
-            throws RestconfException {
-        // TODO: Implement me
+    public String patch(String request, String[] headers) throws RestconfException {
+        // TODO: Implement this
         return "";
     }
 
     /**
-     * Retrieves part of the specified configuration based on the filterSchema.
+     * Delete the target data resource
      *
-     * @param newConfiguration configuration to set
+     * @param request the XML or JSON containing the request to the server
+     * @param headers Optional array of HTTP headers for the request
      *
-     * @return true if the configuration was edited correctly
+     * @return Server response
      *
      * @throws RestconfException when there is a problem in the communication process on
      *                           the underlying connection
      */
     @Override
-    public boolean editConfig(String newConfiguration) throws RestconfException {
-        // TODO: Implement me
+    public String delete(String request, String[] headers) throws RestconfException {
+        // TODO: Implement this
+        return "";
+    }
+
+    /**
+     * Starts subscription to the device's notifications.
+     *
+     * @param request the XML or JSON containing the request to the server
+     *
+     * @throws RestconfException when there is a problem starting the subscription
+     */
+    @Override
+    public void startSubscription(String request) throws RestconfException {
+        // TODO: Implement this
+
+    }
+
+    /**
+     * Ends a specific subscription to the device's notifications.
+     *
+     * @param request the XML or JSON containing the request to the server
+     *
+     * @throws RestconfException when there is a problem ending the subscription
+     */
+    @Override
+    public void endSubscription(String request) throws RestconfException {
+        // TODO: Implement this
+
+    }
+
+    /**
+     * Ends all subscriptions to the device's notifications.
+     *
+     * @throws RestconfException when there is a problem ending the subscription
+     */
+    @Override
+    public void endAllSubscriptions() throws RestconfException {
+        // TODO: Implement this
+
+    }
+
+    /**
+     * Closes the RESTCONF session with the device.
+     * the first time it tries gracefully, then kills it forcefully
+     *
+     * @return true if closed
+     *
+     * @throws RestconfException when there is a problem in the communication process on
+     *                           the underlying connection
+     */
+    @Override
+    public boolean close() throws RestconfException {
+        // TODO: Implement this
         return false;
     }
 
     /**
-     * Retrives part of the specified configuration based on the filterSchema.
+     * Gets the session ID of the Netconf session.
      *
-     * @param mode             selected mode to change the configuration
-     * @param newConfiguration configuration to set
-     *
-     * @return true if the configuration was edited correctly
-     *
-     * @throws RestconfException when there is a problem in the communication process on
-     *                           the underlying connection
+     * @return Session ID as a string.
      */
     @Override
-    public boolean editConfig(String mode, String newConfiguration)
-            throws RestconfException {
-        // TODO: Implement me
-
-        return false;
+    public String getSessionId() {
+        // TODO: Implement this
+        return "";
     }
 
     /**
@@ -152,7 +190,7 @@ public class RestconfSessionImpl implements RestconfSession {
      */
     @Override
     public void addDeviceOutputListener(RestconfDeviceOutputEventListener listener) {
-        // TODO: Implement me
+        // TODO: Implement this
     }
 
     /**
@@ -162,6 +200,6 @@ public class RestconfSessionImpl implements RestconfSession {
      */
     @Override
     public void removeDeviceOutputListener(RestconfDeviceOutputEventListener listener) {
-        // TODO: Implement me
+        // TODO: Implement this
     }
 }

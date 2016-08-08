@@ -21,89 +21,126 @@ import java.util.concurrent.CompletableFuture;
 /**
  * RESTConf session object that allows RESTConf operations on top with the physical
  * device on top of an http or https connection.
+ *
+ *
+ * TODO: This class is expected to change significantly once we get past discover
+ *       and want to do real work.
  */
 public interface RestconfSession {
 
+    // TODO: Only support synchronous operations in the GET/POST/PATCH of normal operations
+    //       until working well enough to do it for other applications.  The State Machine
+    //       and initial discover should be the first test of async operations.
 
     /**
-     * Retrives the requested configuration, different from get-config.
+     * Retrieves the requested data.
      *
-     * @param request the XML containing the request to the server.
-     * @return device running configuration
-     * @throws RestconfException when there is a problem in the communication process on
-     *                           the underlying connection
-     */
-    String get(String request) throws RestconfException;
-
-    /**
-     * Retrives the requested data.
-     *
-     * @param filterSchema XML subtrees to include in the reply
+     * @param request the XML or JSON containing the request to the server
+     * @param headers Optional array of HTTP headers for the request
      * @param withDefaultsMode with-defaults mode
+     *
      * @return Server response
+     *
      * @throws RestconfException when there is a problem in the communication process on
      *                           the underlying connection
      */
-    String get(String filterSchema, String withDefaultsMode)
+    String get(String request, String[] headers, String withDefaultsMode)
             throws RestconfException;
 
     /**
-     * Executes an synchronous RPC to the server.
+     * Create the requested data or invoke an operation resource
      *
-     * @param request the XML/JSON containing the RPC for the server.
-     * @return Server response or ERROR
+     * @param request the XML or JSON containing the request to the server
+     * @param headers Optional array of HTTP headers for the request
+     *
+     * @return Server response
+     *
      * @throws RestconfException when there is a problem in the communication process on
      *                           the underlying connection
      */
-    String requestSync(String request) throws RestconfException;
+    String post(String request, String[] headers) throws RestconfException;
 
     /**
-     * Retrives the specified configuration.
+     * Create or replace the target data resource
      *
-     * @return configuration.
+     * @param request the XML or JSON containing the request to the server
+     * @param headers Optional array of HTTP headers for the request
+     *
+     * @return Server response
+     *
      * @throws RestconfException when there is a problem in the communication process on
      *                           the underlying connection
      */
-    String getConfig() throws RestconfException;
+    String put(String request, String[] headers) throws RestconfException;
 
     /**
-     * Retrieves part of the specivied configuration based on the filterSchema.
+     * Replace portions of the target data resource
      *
-     * @param configurationFilterSchema XML schema to filter the configuration
-     *                                  elements we are interested in
-     * @return device running configuration.
+     * @param request the XML or JSON containing the request to the server
+     * @param headers Optional array of HTTP headers for the request
+     *
+     * @return Server response
+     *
      * @throws RestconfException when there is a problem in the communication process on
      *                           the underlying connection
      */
-    String getConfig(String configurationFilterSchema)
-            throws RestconfException;
+    String patch(String request, String[] headers) throws RestconfException;
 
     /**
-     * Retrieves part of the specified configuration based on the filterSchema.
+     * Delete the target data resource
      *
-     * @param newConfiguration configuration to set
+     * @param request the XML or JSON containing the request to the server
+     * @param headers Optional array of HTTP headers for the request
      *
-     * @return true if the configuration was edited correctly
+     * @return Server response
      *
      * @throws RestconfException when there is a problem in the communication process on
      *                           the underlying connection
      */
-
-    boolean editConfig(String newConfiguration) throws RestconfException;
+    String delete(String request, String[] headers) throws RestconfException;
 
     /**
-     * Retrives part of the specified configuration based on the filterSchema.
+     * Starts subscription to the device's notifications.
      *
-     * @param mode             selected mode to change the configuration
-     * @param newConfiguration configuration to set
+     * @param request the XML or JSON containing the request to the server
      *
-     * @return true if the configuration was edited correctly
+     * @throws RestconfException when there is a problem starting the subscription
+     */
+    void startSubscription(String request) throws RestconfException;
+
+    /**
+     * Ends a specific subscription to the device's notifications.
+     *
+     * @param request the XML or JSON containing the request to the server
+     *
+     * @throws RestconfException when there is a problem ending the subscription
+     */
+    void endSubscription(String request) throws RestconfException;
+
+    /**
+     * Ends all subscriptions to the device's notifications.
+     *
+     * @throws RestconfException when there is a problem ending the subscription
+     */
+    void endAllSubscriptions() throws RestconfException;
+
+    /**
+     * Closes the RESTCONF session with the device.
+     * the first time it tries gracefully, then kills it forcefully
+     *
+     * @return true if closed
      *
      * @throws RestconfException when there is a problem in the communication process on
      *                           the underlying connection
      */
-    boolean editConfig(String mode, String newConfiguration)
-            throws RestconfException;
+    boolean close() throws RestconfException;
+
+    /**
+     * Gets the session ID of the Netconf session.
+     *
+     * @return Session ID as a string.
+     */
+    String getSessionId();
 
     /**
      * Remove a listener from the underlying stream handler implementation.

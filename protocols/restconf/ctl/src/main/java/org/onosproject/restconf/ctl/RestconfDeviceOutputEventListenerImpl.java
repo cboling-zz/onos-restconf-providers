@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 - 2016 Boling Consulting Solutions, bcsw.net
+ * Copyright 2015-present Boling Consulting Solutions, bcsw.net
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,19 @@
  */
 package org.onosproject.restconf.ctl;
 
+import org.onosproject.event.EventListener;
+import org.onosproject.restconf.RestconfDeviceOutputEvent;
 import org.onosproject.restconf.RestconfDeviceOutputEventListener;
 
 /**
  * Created by cboling on 3/24/16.
  */
-public class RestconfDeviceOutputEventListenerImpl implements RestconfDeviceOutputEventListener {
+public class RestconfDeviceOutputEventListenerImpl
+        implements EventListener<RestconfDeviceOutputEvent> {
 
+    @Override
+    public void event(RestconfDeviceOutputEvent event) {
+        // TODO: Implement this
+
+    }
 }

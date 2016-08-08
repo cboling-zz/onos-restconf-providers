@@ -90,7 +90,6 @@ public interface RestconfController {
      */
     RestconfDevice getDevice(DeviceId id);
 
-
     /**
      * Gets a RESTCONF Device by node identifier.
      *

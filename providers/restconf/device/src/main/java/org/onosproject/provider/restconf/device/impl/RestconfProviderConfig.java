@@ -184,7 +184,7 @@ public class RestconfProviderConfig extends Config<ApplicationId> {
                         mediaTypes.add(DEFAULT_XML_MEDIA_TYPE);
                         mediaTypes.add(DEFAULT_JSON_MEDIA_TYPE);
                     }
-                    RestconfDeviceInfo device = new RestconfDeviceInfo(hostName, address,
+                    RestconfDeviceInfo device = new RestconfDeviceInfo(address,
                             port, tls, timeout,
                             userName, password, certPath, apiRoot,
                             mediaTypes);

@@ -298,7 +298,7 @@ public class RestconfDeviceProvider extends AbstractProvider
 
         for (RestconfDevice device : controller.getDevices()) {
             try {
-                innerNodeListener.deviceAdded(device);
+                innerNodeListener.deviceAdded(device.getDeviceInfo().getDeviceId());
 
 
             } catch (Exception e) {
@@ -324,15 +324,17 @@ public class RestconfDeviceProvider extends AbstractProvider
         if (cfg != null) {
             try {
                 for (RestconfDeviceInfo devInfo : cfg.getDeviceInfo().values()) {
-                    RestconfDevice device = controller.getDevice(devInfo.getDeviceId());
+                    DeviceId id = devInfo.getDeviceId();
+                    RestconfDevice device = controller.getDevice(id);
 
                     if (device != null) {
                         // If new information, may need to kick device back to DISCOVERY
                         // state.
 
-                        innerNodeListener.deviceModified(device.getDeviceId(), devInfo);
+                        innerNodeListener.deviceModified(id, devInfo);
                     } else {
-                        innerNodeListener.deviceAdded(controller.createDevice(devInfo));
+                        // Create the device and then signal event
+                        //innerNodeListener.deviceAdded(controller.createDevice(id));
                     }
                 }
             } catch (ConfigException e) {
@@ -378,17 +380,17 @@ public class RestconfDeviceProvider extends AbstractProvider
         /**
          * Notifies that the RESTCONF node was added.
          *
-         * @param device RESTCONF Device object
+         * @param did RESTCONF Device ID
          */
         @Override
-        public void deviceAdded(RestconfDevice device) {
+        public void deviceAdded(DeviceId did) {
             /**
              * Notifies that the RESTCONF node was added.
              *
              * @param devInfo Device information
              */
+            RestconfDevice device = null;       // TODO: look up device here
             Preconditions.checkNotNull(device, "RESTCONF Device is null");
-            DeviceId did = device.getDeviceId();
 
             if ((providerService == null) && (controller.getDevice(did) != null)) {
                 return;

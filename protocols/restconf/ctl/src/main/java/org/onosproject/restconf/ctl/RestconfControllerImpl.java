@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 - 2016 Boling Consulting Solutions, bcsw.net
+ * Copyright 2015-present Boling Consulting Solutions, bcsw.net
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import org.apache.felix.scr.annotations.Activate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Deactivate;
 import org.apache.felix.scr.annotations.Service;
+import org.onlab.packet.IpAddress;
 import org.onosproject.net.DeviceId;
 import org.onosproject.restconf.*;
 import org.slf4j.Logger;
@@ -89,6 +90,17 @@ public class RestconfControllerImpl implements RestconfController {
         return restconfDeviceMap.get(id);
     }
 
+    /**
+     * Gets a RESTCONF Device by node identifier.
+     *
+     * @param ip   device ip
+     * @param port device port
+     *
+     * @return RestconfDevice RESTCONF device
+     */
+    public RestconfDevice getDevice(IpAddress ip, int port) {
+        return null; // TODO: Implement this
+    }
     /**
      * Create a RESTCONF device object
      *

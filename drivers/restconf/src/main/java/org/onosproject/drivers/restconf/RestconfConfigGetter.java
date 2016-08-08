@@ -59,16 +59,17 @@ public class RestconfConfigGetter extends AbstractHandlerBehaviour
         RestconfController controller = handler.get(RestconfController.class);
         DeviceId ofDeviceId = handler.data().deviceId();
         Preconditions.checkNotNull(controller, "RESTconf controller is null");
-        try {
-            return controller.getDevicesMap().
-                    get(ofDeviceId).
-                    getSession().
-                    getConfig();
-        } catch (IOException e) {
-            log.error("Configuration could not be retrieved {}",
-                    e.getMessage());
-        }
-        return UNABLE_TO_READ_CONFIG;
+//        try {
+        return "";      // TODO: Implement this
+//            return controller.getDevicesMap().
+//                    get(ofDeviceId).
+//                    getSession().
+//                    getConfig();
+//        } catch (IOException e) {
+//            log.error("Configuration could not be retrieved {}",
+//                    e.getMessage());
+//        }
+//        return UNABLE_TO_READ_CONFIG;
     }
 
 }

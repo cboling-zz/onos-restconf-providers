@@ -71,14 +71,14 @@ public class RestconfConfigSetter extends AbstractHandlerBehaviour
             return UNABLE_TO_READ_FILE;
         }
 
-        try {
-            return controller.getDevicesMap()
-                    .get(deviceId)
-                    .getSession()
-                    .requestSync(request);
-        } catch (IOException e) {
-            log.error("Configuration could not be set", e);
-        }
+        //try {
+//            return controller.getDevicesMap()
+//                    .get(deviceId)
+//                    .getSession()
+//                    .requestSync(request);
+//        } catch (IOException e) {
+//            log.error("Configuration could not be set", e);
+//        }
         return UNABLE_TO_SET_CONFIG;
     }
 
