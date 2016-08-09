@@ -59,6 +59,9 @@ public class RestconfConfigGetter extends AbstractHandlerBehaviour
         RestconfController controller = handler.get(RestconfController.class);
         DeviceId ofDeviceId = handler.data().deviceId();
         Preconditions.checkNotNull(controller, "RESTconf controller is null");
+
+        log.debug("getControllers: entry");
+
 //        try {
         return "";      // TODO: Implement this
 //            return controller.getDevicesMap().

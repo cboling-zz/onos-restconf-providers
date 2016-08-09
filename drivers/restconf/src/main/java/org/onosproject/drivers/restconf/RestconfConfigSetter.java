@@ -63,6 +63,8 @@ public class RestconfConfigSetter extends AbstractHandlerBehaviour
         DeviceId deviceId = handler.data().deviceId();
         Preconditions.checkNotNull(controller, "RESTconf controller is null");
 
+        log.debug("setConfiguration: entry");
+
         String request;
         try {
             request = new String(Files.readAllBytes(Paths.get(filePath)));

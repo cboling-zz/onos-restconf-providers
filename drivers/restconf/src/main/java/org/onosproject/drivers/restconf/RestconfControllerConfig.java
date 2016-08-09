@@ -59,6 +59,8 @@ public class RestconfControllerConfig extends AbstractHandlerBehaviour
 
         Preconditions.checkNotNull(controller, "RESTconf controller is null");
 
+        log.debug("getControllers: entry");
+
         List<ControllerInfo> controllers = new ArrayList<>();
 
         if (mastershipService.isLocalMaster(deviceId)) {
@@ -97,6 +99,8 @@ public class RestconfControllerConfig extends AbstractHandlerBehaviour
 
         Preconditions.checkNotNull(controller, "RESTconf controller is null");
 
+        log.debug("setControllers: entry");
+
         MastershipService mastershipService = handler.get(MastershipService.class);
 
         if (mastershipService.isLocalMaster(deviceId)) {
@@ -132,7 +136,6 @@ public class RestconfControllerConfig extends AbstractHandlerBehaviour
                     mastershipService.getMasterFor(deviceId));
         }
     }
-
     //TODO maybe put method getRestconfClientService like in ovsdb if we need it
 
 }
