@@ -1,0 +1,9 @@
+COMPILE_DEPS = [
+  '//lib:CORE_DEPS',
+  '//incubator/api:onos-incubator-api',
+  '//protocols/restconf/api:onos-protocols-restconf-api',
+]
+
+osgi_jar_with_tests(
+  deps = COMPILE_DEPS,
+)

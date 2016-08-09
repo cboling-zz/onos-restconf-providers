@@ -1,0 +1,15 @@
+BUNDLES = [
+  '//providers/restconf/device:onos-providers-restconf-device',
+  '//protocols/restconf/api:onos-protocols-restconf-api',
+  '//protocols/restconf/ctl:onos-protocols-restconf-ctl',
+]
+
+onos_app(
+  title = 'RESTCONF Provider',
+  category = 'Provider',
+  url = 'http://onosproject.org',
+  included_bundles = BUNDLES,
+  description = 'RESTCONF protocol southbound providers.',
+)
+
+
