@@ -119,6 +119,17 @@ public class RestconfDeviceInfo {
     }
 
     /**
+     * Get the base URL for this device
+     *
+     * @return http[s]://<ip-addr>:<port>/
+     */
+    public String getBaseURL() {
+        String url = useTLS ? "https://" : "http://";
+
+        return url + address + ":" + port;
+    }
+
+    /**
      * @return
      */
     public String getApiRoot() {

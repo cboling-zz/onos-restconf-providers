@@ -185,7 +185,7 @@ public class RestconfDeviceProvider extends AbstractProvider
         active = false;
 
         controller.getDevices().forEach(device -> {
-            DeviceId id = device.getDeviceId();
+            DeviceId id = device.getDeviceInfo().getDeviceId();
             deviceKeyAdminService.removeKey(DeviceKeyId.deviceKeyId(id.toString()));
             controller.disconnectDevice(id, true);
         });
@@ -303,7 +303,7 @@ public class RestconfDeviceProvider extends AbstractProvider
 
             } catch (Exception e) {
                 log.warn("Failed initially adding {} : {}",
-                        device.getDeviceId().toString(), e.getMessage());
+                        device.getDeviceInfo().getDeviceId().toString(), e.getMessage());
                 log.debug("Error details:", e);
 
                 // disconnect to trigger device-add later

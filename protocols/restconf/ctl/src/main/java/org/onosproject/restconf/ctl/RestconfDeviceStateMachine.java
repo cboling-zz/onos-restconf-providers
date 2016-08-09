@@ -81,7 +81,6 @@ public class RestconfDeviceStateMachine {
         RestconfDeviceInfo info = device.getDeviceInfo();
 
         this.device = device;
-        deviceId = device.getDeviceId();
         connectTimeout = Duration.millis(info.getSocketTimeout());
     }
 
@@ -214,7 +213,7 @@ public class RestconfDeviceStateMachine {
                     .setTimeout(connectTimeout)
                     .build();
 
-            String url = device.getBaseURL() + rootResource;
+            String url = device.getDeviceInfo().getBaseURL() + rootResource;
 
             HttpRequestBuilder builder = client.get()
                     .setURL(url);

@@ -56,7 +56,6 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!--<onos.version>1.7.0-SNAPSHOT</onos.version>-->
         <onos.version>${project.version}</onos.version>
         <onos-build-conf.version>1.3</onos-build-conf.version>
         <osgi.version>5.0.0</osgi.version>

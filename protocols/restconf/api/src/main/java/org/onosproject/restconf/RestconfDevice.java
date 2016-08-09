@@ -22,15 +22,6 @@ import org.onosproject.net.DeviceId;
  */
 public interface RestconfDevice {
     /**
-     * Get the device ID for this RESTCONF device
-     *
-     * @return device ID
-     */
-    @Deprecated
-    // TODO: Move to the RestconfDeviceInfo interface
-    DeviceId getDeviceId();
-
-    /**
      * Start the device state machine to begin the discover process.
      * <p>
      * This transitions the device into the 'DISCOVERY' state regardless of current state
@@ -73,14 +64,6 @@ public interface RestconfDevice {
     // TODO: Move to the RestconfSession interface
     int getState();
 
-    /**
-     * Get the base URL for this device
-     *
-     * @return http[s]://<ip-addr>:<port>/
-     */
-    @Deprecated
-    // TODO: Move to the RestconfDeviceInfo interface
-    String getBaseURL();
 
     /**
      * Do we have connectivity to the device

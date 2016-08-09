@@ -34,7 +34,6 @@ public class DefaultRestconfDevice implements RestconfDevice {
     public static final Logger log = LoggerFactory.getLogger(DefaultRestconfDevice.class);
 
     private RestconfDeviceInfo deviceInfo;
-    private final DeviceId deviceId;
     private RestconfDeviceStateMachine stateMachine;
     private boolean isAdminUp;
     private RestconfSession restconfSession;
@@ -47,19 +46,9 @@ public class DefaultRestconfDevice implements RestconfDevice {
     public DefaultRestconfDevice(RestconfDeviceInfo deviceInfo) {
         this.isAdminUp = true;
         this.deviceInfo = deviceInfo;
-        this.deviceId = deviceInfo.getDeviceId();
         this.stateMachine = new RestconfDeviceStateMachine(this);
     }
 
-    /**
-     * Get the device ID for this RESTCONF device
-     *
-     * @return device ID
-     */
-    @Override
-    public DeviceId getDeviceId() {
-        return deviceId;
-    }
 
     /**
      * Get the initial connection information fro a device
@@ -95,7 +84,7 @@ public class DefaultRestconfDevice implements RestconfDevice {
             stateMachine.connect();
         } catch (RestconfDeviceStateMachineException ex) {
             log.error("Illegal start/restart of device state. Device: {], Message: {}",
-                    deviceId.toString(), ex.toString());
+                    getDeviceInfo().getDeviceId().toString(), ex.toString());
         }
     }
 
@@ -129,20 +118,6 @@ public class DefaultRestconfDevice implements RestconfDevice {
     }
 
     /**
-     * Get the base URL for this device
-     *
-     * @return http[s]://<ip-addr>:<port>/
-     */
-    @Override
-    public String getBaseURL() {
-        boolean isSSL = deviceInfo.getTLS(); // TODO: Support SSL sometime with fallback (or preference for) plain-old TCP
-        String moniker = isSSL ? "https" : "http";
-        int port = deviceInfo.getPort();
-
-        return String.format("%s://%s:%d/", moniker, deviceInfo.getIpAddress(), port);
-    }
-
-    /**
      * Connectivity test to remote device
      *
      * @param port Port number to try
@@ -161,7 +136,7 @@ public class DefaultRestconfDevice implements RestconfDevice {
             return socket.isConnected() && !socket.isClosed();
 
         } catch (IOException e) {
-            log.info("Device {} is not reachable on port {}: {}", getDeviceId(),
+            log.info("Device {} is not reachable on port {}: {}", getDeviceInfo().getDeviceId(),
                     port, e.toString());
             return false;
         } finally {
@@ -169,8 +144,8 @@ public class DefaultRestconfDevice implements RestconfDevice {
                 try {
                     socket.close();
                 } catch (IOException e) {
-                    log.debug("Test Socket failed {} on port {}: {}", getDeviceId(), port,
-                            e.toString());
+                    log.debug("Test Socket failed {} on port {}: {}",
+                            getDeviceInfo().getDeviceId(), port, e.toString());
                 }
             }
         }
@@ -244,7 +219,7 @@ public class DefaultRestconfDevice implements RestconfDevice {
 
     @Override
     public int hashCode() {
-        return deviceId.hashCode();
+        return getDeviceInfo().hashCode();
     }
 
     @Override
@@ -252,7 +227,7 @@ public class DefaultRestconfDevice implements RestconfDevice {
         if (obj instanceof DefaultRestconfDevice) {
             DefaultRestconfDevice otherDev = (DefaultRestconfDevice) obj;
 
-            return deviceId.equals(otherDev.deviceId);
+            return getDeviceInfo().getDeviceId().equals(otherDev.getDeviceInfo().getDeviceId());
         }
         return false;
     }
@@ -260,7 +235,7 @@ public class DefaultRestconfDevice implements RestconfDevice {
     @Override
     public String toString() {
         return toStringHelper(this)
-                .add("DeviceId", deviceId)
+                .add("DeviceId", getDeviceInfo().getDeviceId())
                 .add("State", stateMachine.getStateAsText())
                 .add("AdminStatus", isAdminUp ? "UP" : "DOWN")
                 .toString();
