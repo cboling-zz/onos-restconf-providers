@@ -27,7 +27,7 @@
     </parent>
 
     <artifactId>onos-restconf-app</artifactId>
-    <packaging>bundle</packaging>
+    <packaging>pom</packaging>
 
     <properties>
         <onos.app.name>org.onosproject.restconf</onos.app.name>

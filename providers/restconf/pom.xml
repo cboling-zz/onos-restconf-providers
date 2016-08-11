@@ -32,8 +32,8 @@
     <description>ONOS RESTCONF protocol adapters</description>
 
     <modules>
-        <module>device</module>
         <module>app</module>
+        <module>device</module>
     </modules>
 
     <dependencies>
