@@ -24,7 +24,10 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Created by cboling on 9/27/15.
+ *
+ *  TODO: May not need at all if state machine and async http netty client can manage discovery
  */
+@Deprecated
 public class RestconfDiscovery {
 //    private static final Logger log = getLogger(RESTConfDiscovery.class);
 //    private static final int DEFAULT_SSL_PORT = 443;
