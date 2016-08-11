@@ -27,7 +27,13 @@
     </parent>
 
     <artifactId>onos-restconf-app</artifactId>
-    <packaging>pom</packaging>
+    <packaging>bundle</packaging>
+
+    <properties>
+        <onos.app.name>org.onosproject.restconf</onos.app.name>
+        <onos.app.title>RESTConf Meta App</onos.app.title>
+        <onos.app.category>Provider</onos.app.category>
+    </properties>
 
     <description>RESTCONF protocol southbound providers</description>
 

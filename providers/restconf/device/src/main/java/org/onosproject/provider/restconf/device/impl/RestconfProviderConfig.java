@@ -18,7 +18,10 @@ import static org.onosproject.net.config.Config.FieldPresence.MANDATORY;
 import static org.onosproject.net.config.Config.FieldPresence.OPTIONAL;
 
 /**
- * Configuration for RESTCONF provider.
+ * Configuration for RESTCONF provider application
+ *
+ *
+ * TODO: Weed out per-device configurations and move them into the drivers/device configuration
  */
 @Beta
 public class RestconfProviderConfig extends Config<ApplicationId> {
