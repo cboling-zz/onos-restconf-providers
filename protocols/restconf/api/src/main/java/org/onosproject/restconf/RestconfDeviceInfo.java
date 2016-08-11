@@ -42,7 +42,7 @@ public class RestconfDeviceInfo {
     private final int socketTimeout;
     private boolean isAdminUp;
 
-    // TODO: Do we want to support persistent connections to devices?
+    // TODO: Added persistent storage / cluster support?
     // TODO: Do we want to keep sessions to devices opened for a smaller window of time after
     //       a message is sent/received in order to improve performance during tasks that may
     //       take several round-trips to perform?
@@ -201,9 +201,9 @@ public class RestconfDeviceInfo {
      * Get the ADMIN state for this device
      *
      * @return current ADMIN UP state.  true = UP, false = down
-
+     */
     public boolean getAdminStateUp() {
-    return isAdminUp;
+        return isAdminUp;
     }
 
     /**

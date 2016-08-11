@@ -15,8 +15,17 @@
  */
 package org.onosproject.restconf.ctl;
 
+import org.onosproject.restconf.RestconfDeviceOutputEvent;
+
 /**
- * Created by cboling on 3/24/16.
+ * Delegate interface associated with a RestconfSessionImpl that is used to
+ * receiving notifications of events about the session.
  */
 public interface RestconfSessionDelegate {
+    /**
+     * Notifies the delegate via the specified event.
+     *
+     * @param event store generated event
+     */
+    void notify(RestconfDeviceOutputEvent event);
 }

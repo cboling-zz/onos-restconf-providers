@@ -29,6 +29,7 @@ public class RestconfProviderConfig extends Config<ApplicationId> {
     public static final int DEFAULT_WORKER_THREADS = 1;        // TODO: Increase later (before release)
     public static final int DEFAULT_EVENT_INTERVAL = 5;        // seconds
     public static final int DEFAULT_CONNECTION_TIMEOUT = 15 * 1000;  // milliseconds
+    public static final boolean DEFAULT_ADMIN_STATE_UP = true;
 
     // TODO: for some values, have a maximum as well...
 
@@ -55,7 +56,6 @@ public class RestconfProviderConfig extends Config<ApplicationId> {
     //boolean tls = node.path().asBoolean();
 
     private static String DEVICES = "devices";
-    private static String HOSTNAME = "hostname";
     private static String USERNAME = "username";
     private static String PASSWORD = "password";
     private static String CERTIFICATE_PATH = "x509Path";
@@ -65,9 +65,10 @@ public class RestconfProviderConfig extends Config<ApplicationId> {
     private static String API_ROOT = "apiRoot";
     private static String MEDIA_TYPES = "mediaTypes";
     private static String NOTES = "notes";
+    private static String ADMIN_UP = "adminStatusUp";
 
-    private static String hostRegEx = "^(?=.{1,255}$)[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}"
-            + "[0-9A-Za-z])?(?:\\.[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?)*\\.?$";
+    //    private static String hostRegEx = "^(?=.{1,255}$)[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}"
+//            + "[0-9A-Za-z])?(?:\\.[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?)*\\.?$";
     private static String filePathRegEx = "^(/[^/ ]*)+/?$";
 
     // TODO: Need a number of times we fail on a permanent redirect 'GET' request before we
@@ -78,19 +79,19 @@ public class RestconfProviderConfig extends Config<ApplicationId> {
     @Override
     public boolean isValid() {
         return hasOnlyFields(WORKER_THREADS, CONNECTION_TIMEOUT, EVENT_INTERVAL,
-                SSL_PREFERRED, DEVICES, HOSTNAME, USERNAME, PASSWORD, CERTIFICATE_PATH,
+                SSL_PREFERRED, DEVICES, USERNAME, PASSWORD, CERTIFICATE_PATH,
                 IP_ADDRESS, PORT, IS_TLS, API_ROOT, MEDIA_TYPES, NOTES)
                 && isNumber(WORKER_THREADS, OPTIONAL, 1)
                 && isNumber(CONNECTION_TIMEOUT, OPTIONAL, 50)
                 && isNumber(EVENT_INTERVAL, OPTIONAL, 1, 60)
                 && isBoolean(SSL_PREFERRED, OPTIONAL)
-                && isString(HOSTNAME, OPTIONAL, hostRegEx)
                 && isString(USERNAME, OPTIONAL)
                 && isString(PASSWORD, OPTIONAL)
                 && isString(CERTIFICATE_PATH, OPTIONAL, filePathRegEx)
                 && isIpAddress(IP_ADDRESS, MANDATORY)
                 && isNumber(PORT, OPTIONAL, 0, 65535)
                 && isBoolean(IS_TLS, OPTIONAL)
+                && isBoolean(ADMIN_UP, OPTIONAL)
                 && isString(API_ROOT, OPTIONAL)
                 && isString(NOTES, OPTIONAL);
     }
@@ -163,13 +164,13 @@ public class RestconfProviderConfig extends Config<ApplicationId> {
 
             try {
                 nodeArray.forEach(node -> {
-                    String hostName = node.path(HOSTNAME).asText("");
                     String userName = node.path(USERNAME).asText("");
                     String password = node.path(PASSWORD).asText("");
                     String certPath = node.path(CERTIFICATE_PATH).asText("");
                     IpAddress address = IpAddress.valueOf(node.path(IP_ADDRESS).asText(""));
                     int port = node.path(PORT).asInt(DEFAULT_TCP_PORT);
                     boolean tls = node.path(IS_TLS).asBoolean(DEFAULT_IS_TLS);
+                    boolean adminUp = node.path(ADMIN_UP).asBoolean(DEFAULT_ADMIN_STATE_UP);
                     int timeout = get(CONNECTION_TIMEOUT, DEFAULT_CONNECTION_TIMEOUT);
                     String apiRoot = node.path(API_ROOT).asText(DEFAULT_API_ROOT);
                     List<String> mediaTypes = Lists.newArrayList();
@@ -187,8 +188,7 @@ public class RestconfProviderConfig extends Config<ApplicationId> {
                     RestconfDeviceInfo device = new RestconfDeviceInfo(address,
                             port, tls, timeout,
                             userName, password, certPath, apiRoot,
-                            mediaTypes);
-
+                            mediaTypes, adminUp);
 
                     devicesInfo.put(address.toString(), device);
                 });

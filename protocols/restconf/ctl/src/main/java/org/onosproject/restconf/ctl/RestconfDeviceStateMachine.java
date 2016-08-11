@@ -42,6 +42,7 @@ public class RestconfDeviceStateMachine {
      * is created by CLI/NetConfig JSON or is being restored from persistent
      * storage after a Control or RESTCONF protocol driver reset.
      */
+    // TODO: Do we want to allow subscriptions to state machine change events?
     static final int IDLE = 0;
     static final int DISCOVERY = 1; // Attempting initial connection and meta-data lookup
     static final int POPULATE = 2;  // Pulling down YANG libraries supported
