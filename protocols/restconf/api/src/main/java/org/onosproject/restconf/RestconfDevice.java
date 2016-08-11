@@ -15,8 +15,6 @@
  */
 package org.onosproject.restconf;
 
-import org.onosproject.net.DeviceId;
-
 /**
  * RESTCONF Device interface
  */
@@ -27,43 +25,14 @@ public interface RestconfDevice {
      * This transitions the device into the 'DISCOVERY' state regardless of current state
      * unless already in the 'DISCOVERY' state.
      */
-    @Deprecated
-    // TODO: Move to the RestconfSession interface
     void start();
-
-    /**
-     * Set the Administrative state of the device to either UP or DOWN
-     * <p>
-     * The default state for a device is UP which allows it to participate with this
-     * provider over the RESTCONF protocol. You can place a device in the DOWN state
-     * to disable the RESTCONF protocol as needed (during shutdown, to maintain it in a
-     * standby mode, perform maintenance, ...)
-     *
-     * @param setAdminUp If true, the administrative state of the device will be placed in the
-     *                   UP state.  Down otherwise.
-     */
-    @Deprecated
-    // TODO: Move to the RestconfSession interface
-    void setAdminState(boolean setAdminUp);
-
-    /**
-     * Get the ADMIN state for this device
-     *
-     * @return current ADMIN UP state.  true = UP, false = down
-     */
-    @Deprecated
-    // TODO: Move to the RestconfSession interface
-    boolean getAdminStateUp();
 
     /**
      * Get the current state of the device
      *
      * @return Device State
      */
-    @Deprecated
-    // TODO: Move to the RestconfSession interface
     int getState();
-
 
     /**
      * Do we have connectivity to the device
@@ -77,8 +46,6 @@ public interface RestconfDevice {
      *
      * @return Failure reason (blank if not in a failed or inactive state)
      */
-    @Deprecated
-    // TODO: Move to the RestconfSession interface
     String getFailureReason();
 
     /**

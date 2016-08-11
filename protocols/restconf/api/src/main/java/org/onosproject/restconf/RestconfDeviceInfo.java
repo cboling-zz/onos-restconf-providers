@@ -40,6 +40,7 @@ public class RestconfDeviceInfo {
     private final String apiRoot;
     private final List<String> mediaTypes;
     private final int socketTimeout;
+    private boolean isAdminUp;
 
     // TODO: Do we want to support persistent connections to devices?
     // TODO: Do we want to keep sessions to devices opened for a smaller window of time after
@@ -63,7 +64,7 @@ public class RestconfDeviceInfo {
     public RestconfDeviceInfo(IpAddress ipaddr, int port,
                               boolean tls, int socketTimeout,
                               String username, String password, String certificatePath,
-                              String apiRoot, List<String> mediaTypes) {
+                              String apiRoot, List<String> mediaTypes, boolean adminUp) {
 
         Preconditions.checkArgument(!username.equals(""), "Empty device user name");
         Preconditions.checkArgument(!apiRoot.equals(""), "Empty RESTCONF API Root");
@@ -81,6 +82,7 @@ public class RestconfDeviceInfo {
         this.socketTimeout = socketTimeout;
         this.apiRoot = apiRoot;
         this.mediaTypes = mediaTypes;
+        this.isAdminUp = adminUp;
     }
 
     /**
@@ -173,6 +175,35 @@ public class RestconfDeviceInfo {
             }
         }
         return deviceId;
+    }
+
+    /**
+     * Set the Administrative state of the device to either UP or DOWN
+     * <p>
+     * The default state for a device is UP which allows it to participate with this
+     * provider over the RESTCONF protocol. You can place a device in the DOWN state
+     * to disable the RESTCONF protocol as needed (during shutdown, to maintain it in a
+     * standby mode, perform maintenance, ...)
+     *
+     * @param setAdminUp If true, the administrative state of the device will be placed in the
+     *                   UP state.  Down otherwise.
+     */
+    public void setAdminState(boolean setAdminUp) {
+
+        if (setAdminUp != isAdminUp) {
+            // TODO: Implement this.
+
+            isAdminUp = setAdminUp;
+        }
+    }
+
+    /**
+     * Get the ADMIN state for this device
+     *
+     * @return current ADMIN UP state.  true = UP, false = down
+
+    public boolean getAdminStateUp() {
+    return isAdminUp;
     }
 
     /**

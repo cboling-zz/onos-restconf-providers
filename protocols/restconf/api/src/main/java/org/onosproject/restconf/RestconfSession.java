@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 package org.onosproject.restconf;
-import com.google.common.annotations.Beta;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * RESTConf session object that allows RESTConf operations on top with the physical

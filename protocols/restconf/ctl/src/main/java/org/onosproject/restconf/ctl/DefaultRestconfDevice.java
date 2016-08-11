@@ -15,7 +15,6 @@
  */
 package org.onosproject.restconf.ctl;
 
-import org.onosproject.net.DeviceId;
 import org.onosproject.restconf.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +34,6 @@ public class DefaultRestconfDevice implements RestconfDevice {
 
     private RestconfDeviceInfo deviceInfo;
     private RestconfDeviceStateMachine stateMachine;
-    private boolean isAdminUp;
     private RestconfSession restconfSession;
 
     /**
@@ -44,11 +42,9 @@ public class DefaultRestconfDevice implements RestconfDevice {
      * @param deviceInfo Initial device information
      */
     public DefaultRestconfDevice(RestconfDeviceInfo deviceInfo) {
-        this.isAdminUp = true;
         this.deviceInfo = deviceInfo;
         this.stateMachine = new RestconfDeviceStateMachine(this);
     }
-
 
     /**
      * Get the initial connection information fro a device
@@ -89,35 +85,6 @@ public class DefaultRestconfDevice implements RestconfDevice {
     }
 
     /**
-     * Set the Administrative state of the device to either UP or DOWN
-     * <p>
-     * The default state for a device is UP which allows it to participate with this
-     * provider over the RESTCONF protocol. You can place a device in the DOWN state
-     * to disable the RESTCONF protocol as needed (during shutdown, to maintain it in a
-     * standby mode, perform maintenance, ...)
-     *
-     * @param setAdminUp If true, the administrative state of the device will be placed in the
-     *                   UP state.  Down otherwise.
-     */
-    public void setAdminState(boolean setAdminUp) {
-
-        if (setAdminUp != isAdminUp) {
-            // TODO: Implement this.
-
-            isAdminUp = setAdminUp;
-        }
-    }
-
-    /**
-     * Get the ADMIN state for this device
-     *
-     * @return current ADMIN UP state.  true = UP, false = down
-     */
-    public boolean getAdminStateUp() {
-        return isAdminUp;
-    }
-
-    /**
      * Connectivity test to remote device
      *
      * @param port Port number to try
@@ -153,6 +120,8 @@ public class DefaultRestconfDevice implements RestconfDevice {
 
     /**
      * Do we have connectivity to the device
+     *
+     * TODO: If we are running connectionless, may need another state and more logic here for that case
      *
      * @return true if we can connect to the device
      */
@@ -237,7 +206,7 @@ public class DefaultRestconfDevice implements RestconfDevice {
         return toStringHelper(this)
                 .add("DeviceId", getDeviceInfo().getDeviceId())
                 .add("State", stateMachine.getStateAsText())
-                .add("AdminStatus", isAdminUp ? "UP" : "DOWN")
+                .add("AdminStatus", deviceInfo.getAdminStateUp() ? "UP" : "DOWN")
                 .toString();
     }
 }
