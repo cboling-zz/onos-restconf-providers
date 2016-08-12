@@ -166,15 +166,28 @@ public class RestconfDeviceInfo {
      */
     public DeviceId getDeviceId() {
         if (deviceId == null) {
-            try {
-                deviceId = DeviceId.deviceId(new URI("restconf", address.toString() + ":"
-                        + port, null));
-            } catch (URISyntaxException e) {
-                throw new IllegalArgumentException("Unable to build deviceID for device "
-                        + toString(), e);
-            }
+            deviceId = createDeviceId(address, port);
         }
         return deviceId;
+    }
+
+    /**
+     * Helper method to create a DeviceId
+     *
+     * @param address IP Address
+     * @param port    port Number
+     *
+     * @return Device ID
+     */
+    public static DeviceId createDeviceId(IpAddress address, int port) {
+        try {
+            return DeviceId.deviceId(new URI("restconf", address.toString() + ":" + port,
+                    null));
+
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException("Unable to build deviceID for device "
+                    + address.toString() + ":" + port, e);
+        }
     }
 
     /**

@@ -1,4 +1,26 @@
 {
+  "devices": {
+    "restconf:192.168.0.1:80": {
+      "basic": {
+        "driver": "ovs-restconf"
+      }
+    },
+    "restconf:192.168.0.2:443": {
+      "basic": {
+        "driver": "ovs-restconf"
+      }
+    },
+    "restconf:192.168.0.3:80": {
+      "basic": {
+        "driver": "ovs-restconf"
+      }
+    },
+    "restconf:192.168.0.4:443": {
+      "basic": {
+        "driver": "ovs-restconf"
+      }
+    }
+  },
   "apps": {
     "org.onosproject.restconf": {
       "restconf": {
@@ -7,37 +29,57 @@
         "numThreads": 2,
         "devices": [
           {
+            "comments": "All options with HTTP",
+
             "ipAddress": "192.168.0.1",
-            "portNumbers": [
-              443,
-              80
-            ],
+            "port": 80,
+            "useTls": false,
             "apiRoot": "/.well-known/host-meta",
             "url": "/restconf",
             "userName": "myName",
             "password": "secret",
-            "mediaTypes": [
-              "xml",
-              "json"
-            ],
-            "x509Path": "../config/node1.pem"
-          },
-          {
-            "ipAddress": "192.168.0.2",
-            "portNumbers": [
-              80
-            ],
-            "apiRoot": "/.well-known/host-meta",
-            "url": "/restconf",
-            "userName": "",
-            "password": "",
+            "x509Path": "../config/node1.pem",
+            "adminStatusUp": true,
             "mediaTypes": [
               "json",
               "xml"
             ]
           },
           {
-            "ipAddress": "192.168.0.3"
+            "comments": "All options with HTTPS",
+
+            "ipAddress": "192.168.0.2",
+            "port": 443,
+            "useTls": true,
+            "apiRoot": "/.well-known/host-meta",
+            "url": "/restconf",
+            "userName": "",
+            "password": "",
+            "adminStatusUp": true,
+            "mediaTypes": [
+              "xml",
+              "json"
+            ]
+          },
+          {
+            "comments": "Take mostly defaults and HTTP",
+            "ipAddress": "192.168.0.3",
+            "useTls": false,
+            "userName": "myName",
+            "password": "secret",
+            "mediaTypes": [
+              "json"
+            ]
+          },
+          {
+            "comments": "Take mostly defaults and HTTPS",
+            "ipAddress": "192.168.0.4",
+            "adminStatusUp": false,
+            "userName": "myName",
+            "password": "secret",
+            "mediaTypes": [
+              "xml"
+            ]
           }
         ]
       }

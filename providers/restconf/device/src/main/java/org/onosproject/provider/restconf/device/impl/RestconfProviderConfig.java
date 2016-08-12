@@ -7,6 +7,7 @@ import com.google.common.collect.Maps;
 import org.onlab.packet.IpAddress;
 import org.onosproject.core.ApplicationId;
 import org.onosproject.incubator.net.config.basics.ConfigException;
+import org.onosproject.net.DeviceId;
 import org.onosproject.net.config.Config;
 import org.onosproject.restconf.RestconfDeviceInfo;
 
@@ -29,15 +30,26 @@ public class RestconfProviderConfig extends Config<ApplicationId> {
     /////////////////////////////////////////////////////////////////////////
     // Constants / Defaults
 
-    public static final int DEFAULT_WORKER_THREADS = 1;        // TODO: Increase later (before release)
+    public static final int DEFAULT_WORKER_THREADS = 1; // TODO: Increase later (before release)
+    public static final int MIN_WORKER_THREADS = 1;
+    public static final int MAX_WORKER_THREADS = 20;
+
     public static final int DEFAULT_EVENT_INTERVAL = 5;        // seconds
+    public static final int MIN_EVENT_INTERVAL = 1;
+    public static final int MAX_EVENT_INTERVAL = 60;
+
     public static final int DEFAULT_CONNECTION_TIMEOUT = 15 * 1000;  // milliseconds
+    public static final int MIN_CONNECTION_TIMEOUT = 500;
+    public static final int MAX_CONNECTION_TIMEOUT = 3 * 60 * 1000;
     public static final boolean DEFAULT_ADMIN_STATE_UP = true;
 
     // TODO: for some values, have a maximum as well...
 
     static final int DEFAULT_SSL_PORT = 443;
     static final int DEFAULT_TCP_PORT = 80;
+    public static final int MIN_PORT_NUMBER = 1;
+    public static final int MAX_PORT_NUMBER = 65535;
+
     static final boolean DEFAULT_IS_TLS = true;
 
     static final String DEFAULT_XML_MEDIA_TYPE = "xml";
@@ -67,7 +79,7 @@ public class RestconfProviderConfig extends Config<ApplicationId> {
     private static String IS_TLS = "useTls";
     private static String API_ROOT = "apiRoot";
     private static String MEDIA_TYPES = "mediaTypes";
-    private static String NOTES = "notes";
+    private static String COMMENT = "comments";
     private static String ADMIN_UP = "adminStatusUp";
 
     //    private static String hostRegEx = "^(?=.{1,255}$)[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}"
@@ -83,74 +95,63 @@ public class RestconfProviderConfig extends Config<ApplicationId> {
     public boolean isValid() {
         return hasOnlyFields(WORKER_THREADS, CONNECTION_TIMEOUT, EVENT_INTERVAL,
                 SSL_PREFERRED, DEVICES, USERNAME, PASSWORD, CERTIFICATE_PATH,
-                IP_ADDRESS, PORT, IS_TLS, API_ROOT, MEDIA_TYPES, NOTES)
-                && isNumber(WORKER_THREADS, OPTIONAL, 1)
-                && isNumber(CONNECTION_TIMEOUT, OPTIONAL, 50)
-                && isNumber(EVENT_INTERVAL, OPTIONAL, 1, 60)
-                && isBoolean(SSL_PREFERRED, OPTIONAL)
-                && isString(USERNAME, OPTIONAL)
-                && isString(PASSWORD, OPTIONAL)
-                && isString(CERTIFICATE_PATH, OPTIONAL, filePathRegEx)
+                IP_ADDRESS, PORT, IS_TLS, API_ROOT, MEDIA_TYPES, COMMENT)
+                // Mandatory items
+
                 && isIpAddress(IP_ADDRESS, MANDATORY)
-                && isNumber(PORT, OPTIONAL, 0, 65535)
+                && isString(USERNAME, MANDATORY)
+                && isString(PASSWORD, MANDATORY)
+
+                // Optional items
+                && isNumber(WORKER_THREADS, OPTIONAL, MIN_WORKER_THREADS, MAX_WORKER_THREADS)
+                && isNumber(CONNECTION_TIMEOUT, OPTIONAL, MIN_CONNECTION_TIMEOUT, MAX_CONNECTION_TIMEOUT)
+                && isNumber(EVENT_INTERVAL, OPTIONAL, MIN_EVENT_INTERVAL, MAX_EVENT_INTERVAL)
+                && isBoolean(SSL_PREFERRED, OPTIONAL)
+                && isString(CERTIFICATE_PATH, OPTIONAL, filePathRegEx)
+                && isNumber(PORT, OPTIONAL, MIN_PORT_NUMBER, MAX_PORT_NUMBER)
                 && isBoolean(IS_TLS, OPTIONAL)
                 && isBoolean(ADMIN_UP, OPTIONAL)
                 && isString(API_ROOT, OPTIONAL)
-                && isString(NOTES, OPTIONAL);
+                && isString(COMMENT, OPTIONAL);
     }
 
     /**
      * The number of worker threads for device discovery and maintenance
      *
-     * @return number of threads (1..n)
+     * @return number of threads
      *
      * @throws ConfigException
      */
     public int getNumberOfWorkerThreads() throws ConfigException {
-        int count = get(WORKER_THREADS, DEFAULT_WORKER_THREADS);
-
-        if (count < 1) {
-            throw new ConfigException("Invalid worker thread count. Must be >= 1");
-        }
-        return count;
+        return get(WORKER_THREADS, DEFAULT_WORKER_THREADS);
     }
 
     /**
      * The polling event interval for a discovered device, in seconds
      *
-     * @return number of seconds (1..n)
+     * @return number of seconds
      *
      * @throws ConfigException
      */
     public int getEventInterval() throws ConfigException {
-        int count = get(EVENT_INTERVAL, DEFAULT_EVENT_INTERVAL);
-
-        if (count < 1) {
-            throw new ConfigException("Invalid device polling interval. Must be >= 1");
-        }
-        return count;
+        return get(EVENT_INTERVAL, DEFAULT_EVENT_INTERVAL);
     }
 
     /**
      * The number of milliseconds to wait for a response to a REST command
      *
-     * @return number of milliseconds (1..n)
+     * @return number of milliseconds
      *
      * @throws ConfigException
      */
     public int getConnectionTimeout() throws ConfigException {
-        int count = get(CONNECTION_TIMEOUT, DEFAULT_CONNECTION_TIMEOUT);
-
-        if (count < 1) {
-            throw new ConfigException("Invalid connection timeout. Must be >= 1 mS");
-        }
-        return count;
+        return get(CONNECTION_TIMEOUT, DEFAULT_CONNECTION_TIMEOUT);
     }
 
     /**
      * Return an immutable map of the devices in the configuration file
      * <p>
-     * The key for the map is the string composed of the IP Address for the
+     * The key for the map is the string composed of the IP Address and port number for the
      * device.  The contents of the device info provides further information/clarification
      * for the way to contact/discover the device.
      *
@@ -167,11 +168,14 @@ public class RestconfProviderConfig extends Config<ApplicationId> {
 
             try {
                 nodeArray.forEach(node -> {
+                    // Mandatory items
                     String userName = node.path(USERNAME).asText("");
                     String password = node.path(PASSWORD).asText("");
-                    String certPath = node.path(CERTIFICATE_PATH).asText("");
                     IpAddress address = IpAddress.valueOf(node.path(IP_ADDRESS).asText(""));
-                    int port = node.path(PORT).asInt(DEFAULT_TCP_PORT);
+
+                    // Optional items
+
+                    String certPath = node.path(CERTIFICATE_PATH).asText("");
                     boolean tls = node.path(IS_TLS).asBoolean(DEFAULT_IS_TLS);
                     boolean adminUp = node.path(ADMIN_UP).asBoolean(DEFAULT_ADMIN_STATE_UP);
                     int timeout = get(CONNECTION_TIMEOUT, DEFAULT_CONNECTION_TIMEOUT);
@@ -188,12 +192,22 @@ public class RestconfProviderConfig extends Config<ApplicationId> {
                         mediaTypes.add(DEFAULT_XML_MEDIA_TYPE);
                         mediaTypes.add(DEFAULT_JSON_MEDIA_TYPE);
                     }
+                    // Port is optional but we derive it based on TLS settings
+
+                    int port = DEFAULT_SSL_PORT;
+
+                    port = node.has(PORT) ? node.path(PORT).asInt() :
+                            tls ? DEFAULT_SSL_PORT : DEFAULT_TCP_PORT;
+
                     RestconfDeviceInfo device = new RestconfDeviceInfo(address,
                             port, tls, timeout,
                             userName, password, certPath, apiRoot,
                             mediaTypes, adminUp);
 
-                    devicesInfo.put(address.toString(), device);
+                    DeviceId did = RestconfDeviceInfo.createDeviceId(address, port);
+
+                    // Key is IP-ADDR:PORT
+                    devicesInfo.put(did.uri().getSchemeSpecificPart(), device);
                 });
             } catch (IllegalArgumentException e) {
                 throw new ConfigException(CONFIG_VALUE_ERROR, e);
